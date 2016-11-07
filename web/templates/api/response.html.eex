@@ -1,0 +1,3 @@
+<p>
+  <%= @conn.params["request"]["url"] %>
+</p>

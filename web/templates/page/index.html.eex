@@ -1,0 +1,11 @@
+<div class="jumbotron">
+  <h2>Welcome to Accio</h2>
+  <p class="lead">Use your software's APIs<br />with no programming skills.</p>
+</div>
+
+<%= form_for @conn, api_path(@conn, :response), [as: :request], fn f -> %>
+  <label>
+   URL: <%= text_input f, :url %>
+  </label>
+  <%= submit "Go" %>
+<%= end %>
