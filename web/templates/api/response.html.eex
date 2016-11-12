@@ -1,3 +1,4 @@
-<p id="response">
+<div id="elm-main"></div>
+<!-- <p id="response">
   <%= @conn.assigns[:response]%>
-</p>
+</p> -->
