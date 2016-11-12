@@ -86,4 +86,4 @@ subscriptions model =
 
 getJson : String -> Cmd Msg
 getJson url =
-  Task.perform FetchFail FetchSucceed (Http.getString url)
+  Task.perform FetchFail FetchSucceed (Http.getString ("http://localhost:4000/response?url=" ++ url))

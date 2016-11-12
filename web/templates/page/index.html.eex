@@ -3,17 +3,17 @@
   <p class="lead">Use your software's APIs<br />with no programming skills.</p>
 </div>
 
-<%= form_for @conn, api_path(@conn, :request), [as: :parameters], fn f -> %>
-  <label>
-   API Key: <%= text_input f, :key %>
-  </label>
-  <label>
-    API Secret: <%= text_input f, :secret %>
-  </label>
-  <label>
-    Survey ID: <%= text_input f, :survey_id %>
-  </label>
-  <%= submit "Go" %>
-<%= end %>
+<!-- # <%= form_for @conn, api_path(@conn, :request), [as: :parameters], fn f -> %>
+#   <label>
+#    API Key: <%= text_input f, :key %>
+#   </label>
+#   <label>
+#     API Secret: <%= text_input f, :secret %>
+#   </label>
+#   <label>
+#     Survey ID: <%= text_input f, :survey_id %>
+#   </label>
+#   <%= submit "Go" %>
+# <%= end %> -->
 
 <div id="elm-main"></div>

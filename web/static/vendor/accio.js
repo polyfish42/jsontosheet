@@ -8727,7 +8727,8 @@ var _user$project$Accio$getJson = function (url) {
 		_elm_lang$core$Task$perform,
 		_user$project$Accio$FetchFail,
 		_user$project$Accio$FetchSucceed,
-		_evancz$elm_http$Http$getString(url));
+		_evancz$elm_http$Http$getString(
+			A2(_elm_lang$core$Basics_ops['++'], 'http://localhost:4000/response?url=', url)));
 };
 var _user$project$Accio$update = F2(
 	function (msg, model) {
