@@ -4,8 +4,10 @@ import Html exposing (..)
 import Html.App as App
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import WebSocket
-
+import Http
+import Json.Decode as Json
+import Task
+import Debug
 
 
 main =
@@ -17,47 +19,56 @@ main =
     }
 
 
-echoServer : String
-echoServer =
-  "wss://echo.websocket.org"
-
-
 
 -- MODEL
 
 
 type alias Model =
-  { input : String
-  , messages : List String
+  { url : String
+  , response : String
   }
 
 
 init : (Model, Cmd Msg)
 init =
-  (Model "" [], Cmd.none)
-
+  ( Model "" "", Cmd.none )
 
 
 -- UPDATE
 
 
 type Msg
-  = Input String
-  | Send
-  | NewMessage String
+  = Url String
+  | GetData
+  | FetchSucceed String
+  | FetchFail Http.Error
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
-update msg {input, messages} =
+update msg model =
   case msg of
-    Input newInput ->
-      (Model newInput messages, Cmd.none)
+    Url url ->
+      ({ model | url = url }, Cmd.none)
 
-    Send ->
-      (Model "" messages, WebSocket.send echoServer input)
+    GetData ->
+      (model, getJson model.url)
 
-    NewMessage str ->
-      (Model input (str :: messages), Cmd.none)
+    FetchSucceed response ->
+      ({model | response = response}, Cmd.none)
+
+    FetchFail error ->
+      ({model | response = toString error}, Cmd.none)
+
+-- VIEW
+
+
+view : Model -> Html Msg
+view model =
+  div []
+    [ input [ type' "text", placeholder "url", onInput Url ] []
+    , button [ onClick GetData ] [ text "Get Data"]
+    , div [] [ text model.response ]
+    ]
 
 
 
@@ -66,22 +77,13 @@ update msg {input, messages} =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  WebSocket.listen echoServer NewMessage
+  Sub.none
 
 
 
--- VIEW
+-- HTTP
 
 
-view : Model -> Html Msg
-view model =
-  div []
-    [ input [onInput Input, value model.input] []
-    , button [onClick Send] [text "Send"]
-    , div [] (List.map viewMessage (List.reverse model.messages))
-    ]
-
-
-viewMessage : String -> Html msg
-viewMessage msg =
-  div [] [ text msg ]
+getJson : String -> Cmd Msg
+getJson url =
+  Task.perform FetchFail FetchSucceed (Http.getString url)

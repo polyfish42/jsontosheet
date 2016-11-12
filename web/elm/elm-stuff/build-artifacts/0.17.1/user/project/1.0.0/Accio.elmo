@@ -1,66 +1,69 @@
-var _user$project$Accio$viewMessage = function (msg) {
-	return A2(
-		_elm_lang$html$Html$div,
-		_elm_lang$core$Native_List.fromArray(
-			[]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$html$Html$text(msg)
-			]));
+var _user$project$Accio$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$none;
 };
-var _user$project$Accio$echoServer = 'wss://echo.websocket.org';
 var _user$project$Accio$Model = F2(
 	function (a, b) {
-		return {input: a, messages: b};
+		return {url: a, response: b};
 	});
 var _user$project$Accio$init = {
 	ctor: '_Tuple2',
-	_0: A2(
-		_user$project$Accio$Model,
-		'',
-		_elm_lang$core$Native_List.fromArray(
-			[])),
+	_0: A2(_user$project$Accio$Model, '', ''),
 	_1: _elm_lang$core$Platform_Cmd$none
 };
+var _user$project$Accio$FetchFail = function (a) {
+	return {ctor: 'FetchFail', _0: a};
+};
+var _user$project$Accio$FetchSucceed = function (a) {
+	return {ctor: 'FetchSucceed', _0: a};
+};
+var _user$project$Accio$getJson = function (url) {
+	return A3(
+		_elm_lang$core$Task$perform,
+		_user$project$Accio$FetchFail,
+		_user$project$Accio$FetchSucceed,
+		_evancz$elm_http$Http$getString(url));
+};
 var _user$project$Accio$update = F2(
-	function (msg, _p0) {
-		var _p1 = _p0;
-		var _p4 = _p1.messages;
-		var _p3 = _p1.input;
-		var _p2 = msg;
-		switch (_p2.ctor) {
-			case 'Input':
+	function (msg, model) {
+		var _p0 = msg;
+		switch (_p0.ctor) {
+			case 'Url':
 				return {
 					ctor: '_Tuple2',
-					_0: A2(_user$project$Accio$Model, _p2._0, _p4),
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{url: _p0._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'Send':
+			case 'GetData':
 				return {
 					ctor: '_Tuple2',
-					_0: A2(_user$project$Accio$Model, '', _p4),
-					_1: A2(_elm_lang$websocket$WebSocket$send, _user$project$Accio$echoServer, _p3)
+					_0: model,
+					_1: _user$project$Accio$getJson(model.url)
+				};
+			case 'FetchSucceed':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{response: _p0._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
 				return {
 					ctor: '_Tuple2',
-					_0: A2(
-						_user$project$Accio$Model,
-						_p3,
-						A2(_elm_lang$core$List_ops['::'], _p2._0, _p4)),
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							response: _elm_lang$core$Basics$toString(_p0._0)
+						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}
 	});
-var _user$project$Accio$NewMessage = function (a) {
-	return {ctor: 'NewMessage', _0: a};
-};
-var _user$project$Accio$subscriptions = function (model) {
-	return A2(_elm_lang$websocket$WebSocket$listen, _user$project$Accio$echoServer, _user$project$Accio$NewMessage);
-};
-var _user$project$Accio$Send = {ctor: 'Send'};
-var _user$project$Accio$Input = function (a) {
-	return {ctor: 'Input', _0: a};
+var _user$project$Accio$GetData = {ctor: 'GetData'};
+var _user$project$Accio$Url = function (a) {
+	return {ctor: 'Url', _0: a};
 };
 var _user$project$Accio$view = function (model) {
 	return A2(
@@ -73,8 +76,9 @@ var _user$project$Accio$view = function (model) {
 				_elm_lang$html$Html$input,
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_elm_lang$html$Html_Events$onInput(_user$project$Accio$Input),
-						_elm_lang$html$Html_Attributes$value(model.input)
+						_elm_lang$html$Html_Attributes$type$('text'),
+						_elm_lang$html$Html_Attributes$placeholder('url'),
+						_elm_lang$html$Html_Events$onInput(_user$project$Accio$Url)
 					]),
 				_elm_lang$core$Native_List.fromArray(
 					[])),
@@ -82,20 +86,20 @@ var _user$project$Accio$view = function (model) {
 				_elm_lang$html$Html$button,
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_elm_lang$html$Html_Events$onClick(_user$project$Accio$Send)
+						_elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData)
 					]),
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_elm_lang$html$Html$text('Send')
+						_elm_lang$html$Html$text('Get Data')
 					])),
 				A2(
 				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
 					[]),
-				A2(
-					_elm_lang$core$List$map,
-					_user$project$Accio$viewMessage,
-					_elm_lang$core$List$reverse(model.messages)))
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text(model.response)
+					]))
 			]));
 };
 var _user$project$Accio$main = {
