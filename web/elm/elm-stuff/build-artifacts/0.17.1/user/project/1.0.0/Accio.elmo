@@ -1,0 +1,2 @@
+var _user$project$Accio$view = _elm_lang$html$Html$text('Hello from Elm');
+var _user$project$Accio$main = {main: _user$project$Accio$view};

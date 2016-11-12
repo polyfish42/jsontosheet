@@ -15,3 +15,5 @@
   </label>
   <%= submit "Go" %>
 <%= end %>
+
+<div id="elm-main"></div>
