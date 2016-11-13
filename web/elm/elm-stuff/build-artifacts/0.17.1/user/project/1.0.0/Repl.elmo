@@ -1,0 +1,17 @@
+var _user$project$Repl$toFullName = function (person) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		person.firstName,
+		A2(_elm_lang$core$Basics_ops['++'], ' ', person.lastName));
+};
+var _user$project$Repl$t_s_o_l = {ctor: '_Tuple0'};
+var _user$project$Repl$fullName = _user$project$Repl$toFullName(
+	{firstName: 'Hermann', lastName: 'Hesse'});
+var _user$project$Repl$divide = F2(
+	function (x, y) {
+		return x / y;
+	});
+var _user$project$Repl$d_e_l_t_r_o_n_3_0_3_0 = A2(
+	_elm_lang$core$Json_Decode$decodeString,
+	A2(_elm_lang$core$Json_Decode_ops[':='], 'x', _elm_lang$core$Json_Decode$int),
+	'{\"x\": 3, \"y\": 4 }');

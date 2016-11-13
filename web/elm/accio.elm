@@ -5,10 +5,11 @@ import Html.App as App
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http
-import Json.Decode as Json
+import Json.Decode exposing (Decoder, string)
+import Json.Encode
 import Task
 import Debug
-
+import String
 
 main =
   App.program
@@ -54,7 +55,7 @@ update msg model =
       (model, getJson model.url)
 
     FetchSucceed response ->
-      ({model | response = response}, Cmd.none)
+      ({model | response = Json.decodeString (Decoder(list string)) response}, Cmd.none)
 
     FetchFail error ->
       ({model | response = toString error}, Cmd.none)

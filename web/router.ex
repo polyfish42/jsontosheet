@@ -17,13 +17,13 @@ defmodule Accio.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
-    get "/response", APIController, :request
+    # get "/response", APIController, :request
   end
 
-  scope "/response", Accio do
+  scope "/", Accio do
     pipe_through :api
 
-    post "/response", APIController, :request
+    get "/response", APIController, :request
   end
 
   # Other scopes may use custom stacks.
