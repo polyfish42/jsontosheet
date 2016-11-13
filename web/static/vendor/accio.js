@@ -8704,9 +8704,12 @@ var _evancz$elm_http$Http$post = F3(
 			A2(_evancz$elm_http$Http$send, _evancz$elm_http$Http$defaultSettings, request));
 	});
 
-var _user$project$Accio$subscriptions = function (model) {
-	return _elm_lang$core$Platform_Sub$none;
-};
+var _user$project$Accio$check = _elm_lang$core$Native_Platform.outgoingPort(
+	'check',
+	function (v) {
+		return v;
+	});
+var _user$project$Accio$suggestions = _elm_lang$core$Native_Platform.incomingPort('suggestions', _elm_lang$core$Json_Decode$string);
 var _user$project$Accio$Model = F2(
 	function (a, b) {
 		return {url: a, response: b};
@@ -8715,6 +8718,12 @@ var _user$project$Accio$init = {
 	ctor: '_Tuple2',
 	_0: A2(_user$project$Accio$Model, '', ''),
 	_1: _elm_lang$core$Platform_Cmd$none
+};
+var _user$project$Accio$Suggest = function (a) {
+	return {ctor: 'Suggest', _0: a};
+};
+var _user$project$Accio$subscriptions = function (model) {
+	return _user$project$Accio$suggestions(_user$project$Accio$Suggest);
 };
 var _user$project$Accio$FetchFail = function (a) {
 	return {ctor: 'FetchFail', _0: a};
@@ -8751,12 +8760,10 @@ var _user$project$Accio$update = F2(
 			case 'FetchSucceed':
 				return {
 					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{response: _p0._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
+					_0: model,
+					_1: _user$project$Accio$check(_p0._0)
 				};
-			default:
+			case 'FetchFail':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
@@ -8764,6 +8771,14 @@ var _user$project$Accio$update = F2(
 						{
 							response: _elm_lang$core$Basics$toString(_p0._0)
 						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{response: _p0._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}

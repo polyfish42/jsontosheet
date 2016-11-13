@@ -22,3 +22,8 @@ import "phoenix_html"
 
 const elmDiv = document.getElementById('elm-main')
     , elmApp = Elm.Accio.embed(elmDiv)
+
+    elmApp.ports.check.subscribe(function(res) {
+        var json = JSON.parse(res);
+        elmApp.ports.suggestions.send(json);
+    });

@@ -1,4 +1,4 @@
-module Accio exposing (..)
+port module Accio exposing (..)
 
 import Html exposing (..)
 import Html.App as App
@@ -43,7 +43,9 @@ type Msg
   | GetData
   | FetchSucceed String
   | FetchFail Http.Error
+  | Suggest String
 
+port check : String -> Cmd msg
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -55,10 +57,14 @@ update msg model =
       (model, getJson model.url)
 
     FetchSucceed response ->
-      ({model | response = Json.decodeString (Decoder(list string)) response}, Cmd.none)
+      (model, check response)
 
     FetchFail error ->
       ({model | response = toString error}, Cmd.none)
+
+    Suggest string ->
+      ({model | response = string}, Cmd.none)
+
 
 -- VIEW
 
@@ -74,11 +80,11 @@ view model =
 
 
 -- SUBSCRIPTIONS
-
+port suggestions : (String -> msg) -> Sub msg
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.none
+  suggestions Suggest
 
 
 
@@ -88,3 +94,4 @@ subscriptions model =
 getJson : String -> Cmd Msg
 getJson url =
   Task.perform FetchFail FetchSucceed (Http.getString ("http://localhost:4000/response?url=" ++ url))
+  -- Task.perform FetchFail FetchSucceed (Http.getString (url))
