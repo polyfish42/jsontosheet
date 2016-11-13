@@ -8704,12 +8704,12 @@ var _evancz$elm_http$Http$post = F3(
 			A2(_evancz$elm_http$Http$send, _evancz$elm_http$Http$defaultSettings, request));
 	});
 
-var _user$project$Accio$check = _elm_lang$core$Native_Platform.outgoingPort(
-	'check',
+var _user$project$Accio$format = _elm_lang$core$Native_Platform.outgoingPort(
+	'format',
 	function (v) {
 		return v;
 	});
-var _user$project$Accio$suggestions = _elm_lang$core$Native_Platform.incomingPort('suggestions', _elm_lang$core$Json_Decode$string);
+var _user$project$Accio$javascriptValues = _elm_lang$core$Native_Platform.incomingPort('javascriptValues', _elm_lang$core$Json_Decode$string);
 var _user$project$Accio$Model = F2(
 	function (a, b) {
 		return {url: a, response: b};
@@ -8719,11 +8719,11 @@ var _user$project$Accio$init = {
 	_0: A2(_user$project$Accio$Model, '', ''),
 	_1: _elm_lang$core$Platform_Cmd$none
 };
-var _user$project$Accio$Suggest = function (a) {
-	return {ctor: 'Suggest', _0: a};
+var _user$project$Accio$Display = function (a) {
+	return {ctor: 'Display', _0: a};
 };
 var _user$project$Accio$subscriptions = function (model) {
-	return _user$project$Accio$suggestions(_user$project$Accio$Suggest);
+	return _user$project$Accio$javascriptValues(_user$project$Accio$Display);
 };
 var _user$project$Accio$FetchFail = function (a) {
 	return {ctor: 'FetchFail', _0: a};
@@ -8761,7 +8761,7 @@ var _user$project$Accio$update = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: _user$project$Accio$check(_p0._0)
+					_1: _user$project$Accio$format(_p0._0)
 				};
 			case 'FetchFail':
 				return {

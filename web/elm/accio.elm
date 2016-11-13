@@ -43,9 +43,9 @@ type Msg
   | GetData
   | FetchSucceed String
   | FetchFail Http.Error
-  | Suggest String
+  | Display String
 
-port check : String -> Cmd msg
+port format : String -> Cmd msg
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -57,12 +57,12 @@ update msg model =
       (model, getJson model.url)
 
     FetchSucceed response ->
-      (model, check response)
+      (model, format response)
 
     FetchFail error ->
       ({model | response = toString error}, Cmd.none)
 
-    Suggest string ->
+    Display string ->
       ({model | response = string}, Cmd.none)
 
 
@@ -80,11 +80,11 @@ view model =
 
 
 -- SUBSCRIPTIONS
-port suggestions : (String -> msg) -> Sub msg
+port javascriptValues : (String -> msg) -> Sub msg
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  suggestions Suggest
+  javascriptValues Display
 
 
 
