@@ -1,3 +1,10 @@
+var _user$project$Accio$prettify = A3(
+	_elm_lang$core$Regex$replace,
+	_elm_lang$core$Regex$All,
+	_elm_lang$core$Regex$regex(','),
+	function (_p0) {
+		return ',\n';
+	});
 var _user$project$Accio$format = _elm_lang$core$Native_Platform.outgoingPort(
 	'format',
 	function (v) {
@@ -35,14 +42,14 @@ var _user$project$Accio$getJson = function (url) {
 };
 var _user$project$Accio$update = F2(
 	function (msg, model) {
-		var _p0 = msg;
-		switch (_p0.ctor) {
+		var _p1 = msg;
+		switch (_p1.ctor) {
 			case 'Url':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{url: _p0._0}),
+						{url: _p1._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GetData':
@@ -55,7 +62,7 @@ var _user$project$Accio$update = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: _user$project$Accio$format(_p0._0)
+					_1: _user$project$Accio$format(_p1._0)
 				};
 			case 'FetchFail':
 				return {
@@ -63,7 +70,7 @@ var _user$project$Accio$update = F2(
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							response: _elm_lang$core$Basics$toString(_p0._0)
+							response: _elm_lang$core$Basics$toString(_p1._0)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -72,7 +79,9 @@ var _user$project$Accio$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{response: _p0._0}),
+						{
+							response: _user$project$Accio$prettify(_p1._0)
+						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}
@@ -109,9 +118,11 @@ var _user$project$Accio$view = function (model) {
 						_elm_lang$html$Html$text('Get Data')
 					])),
 				A2(
-				_elm_lang$html$Html$div,
+				_elm_lang$html$Html$pre,
 				_elm_lang$core$Native_List.fromArray(
-					[]),
+					[
+						_elm_lang$html$Html_Attributes$class('prettyprint')
+					]),
 				_elm_lang$core$Native_List.fromArray(
 					[
 						_elm_lang$html$Html$text(model.response)

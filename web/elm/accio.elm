@@ -10,6 +10,7 @@ import Json.Encode
 import Task
 import Debug
 import String
+import Regex exposing (..)
 
 main =
   App.program
@@ -37,7 +38,6 @@ init =
 
 -- UPDATE
 
-
 type Msg
   = Url String
   | GetData
@@ -62,9 +62,11 @@ update msg model =
     FetchFail error ->
       ({model | response = toString error}, Cmd.none)
 
-    Display string ->
-      ({model | response = string}, Cmd.none)
+    Display javascriptValue ->
+      ({model | response = prettify javascriptValue}, Cmd.none)
 
+prettify : String -> String
+prettify = Regex.replace All(Regex.regex ",") (\_ -> ",\n")
 
 -- VIEW
 
@@ -74,7 +76,7 @@ view model =
   div []
     [ input [ type' "text", placeholder "url", onInput Url ] []
     , button [ onClick GetData ] [ text "Get Data"]
-    , div [] [ text model.response ]
+    , pre [class "prettyprint"] [ text model.response ]
     ]
 
 

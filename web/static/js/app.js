@@ -23,7 +23,12 @@ import "phoenix_html"
 const elmDiv = document.getElementById('elm-main')
     , elmApp = Elm.Accio.embed(elmDiv)
 
+    function output(inp) {
+      document.body.appendChild(document.createElement('pre')).innerHTML = inp;
+    }
+
     elmApp.ports.format.subscribe(function(res) {
         var json = JSON.parse(res);
-        elmApp.ports.javascriptValues.send(json);
+        // output(json);
+        elmApp.ports.javascriptValues.send(res);
     });
