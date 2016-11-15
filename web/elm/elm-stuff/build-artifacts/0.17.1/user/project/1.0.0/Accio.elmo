@@ -1,9 +1,11 @@
+var _user$project$Accio$lst = _elm_lang$core$Native_List.fromArray(
+	['hello', 'I', 'am', 'with', 'you']);
 var _user$project$Accio$prettify = A3(
 	_elm_lang$core$Regex$replace,
 	_elm_lang$core$Regex$All,
 	_elm_lang$core$Regex$regex(','),
 	function (_p0) {
-		return ',\n';
+		return ',</p><p>';
 	});
 var _user$project$Accio$format = _elm_lang$core$Native_Platform.outgoingPort(
 	'format',
@@ -11,15 +13,39 @@ var _user$project$Accio$format = _elm_lang$core$Native_Platform.outgoingPort(
 		return v;
 	});
 var _user$project$Accio$javascriptValues = _elm_lang$core$Native_Platform.incomingPort('javascriptValues', _elm_lang$core$Json_Decode$string);
-var _user$project$Accio$Model = F2(
-	function (a, b) {
-		return {url: a, response: b};
+var _user$project$Accio$Model = F3(
+	function (a, b, c) {
+		return {url: a, response: b, selected: c};
 	});
 var _user$project$Accio$init = {
 	ctor: '_Tuple2',
-	_0: A2(_user$project$Accio$Model, '', ''),
+	_0: A3(_user$project$Accio$Model, '', '', false),
 	_1: _elm_lang$core$Platform_Cmd$none
 };
+var _user$project$Accio$Select = {ctor: 'Select'};
+var _user$project$Accio$toHtml = F2(
+	function (model, lst) {
+		return A2(
+			_elm_lang$html$Html$li,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$classList(
+					_elm_lang$core$Native_List.fromArray(
+						[
+							{ctor: '_Tuple2', _0: 'selected', _1: model.selected},
+							{
+							ctor: '_Tuple2',
+							_0: 'unselected',
+							_1: _elm_lang$core$Native_Utils.eq(model.selected, false)
+						}
+						])),
+					_elm_lang$html$Html_Events$onClick(_user$project$Accio$Select)
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text(lst)
+				]));
+	});
 var _user$project$Accio$Display = function (a) {
 	return {ctor: 'Display', _0: a};
 };
@@ -74,13 +100,23 @@ var _user$project$Accio$update = F2(
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			default:
+			case 'Display':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
 							response: _user$project$Accio$prettify(_p1._0)
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			default:
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							selected: _elm_lang$core$Basics$not(model.selected)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -97,6 +133,14 @@ var _user$project$Accio$view = function (model) {
 			[]),
 		_elm_lang$core$Native_List.fromArray(
 			[
+				A2(
+				_elm_lang$html$Html$ul,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				A2(
+					_elm_lang$core$List$map,
+					_user$project$Accio$toHtml(model),
+					_user$project$Accio$lst)),
 				A2(
 				_elm_lang$html$Html$input,
 				_elm_lang$core$Native_List.fromArray(
@@ -118,11 +162,9 @@ var _user$project$Accio$view = function (model) {
 						_elm_lang$html$Html$text('Get Data')
 					])),
 				A2(
-				_elm_lang$html$Html$pre,
+				_elm_lang$html$Html$div,
 				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('prettyprint')
-					]),
+					[]),
 				_elm_lang$core$Native_List.fromArray(
 					[
 						_elm_lang$html$Html$text(model.response)

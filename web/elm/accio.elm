@@ -11,6 +11,7 @@ import Task
 import Debug
 import String
 import Regex exposing (..)
+import Array
 
 main =
   App.program
@@ -28,12 +29,13 @@ main =
 type alias Model =
   { url : String
   , response : String
+  , selected : Bool
   }
 
 
 init : (Model, Cmd Msg)
 init =
-  ( Model "" "", Cmd.none )
+  ( Model "" "" False, Cmd.none )
 
 
 -- UPDATE
@@ -44,6 +46,7 @@ type Msg
   | FetchSucceed String
   | FetchFail Http.Error
   | Display String
+  | Select
 
 port format : String -> Cmd msg
 
@@ -65,18 +68,30 @@ update msg model =
     Display javascriptValue ->
       ({model | response = prettify javascriptValue}, Cmd.none)
 
+    Select ->
+      ({model | selected = (not model.selected)}, Cmd.none)
+
 prettify : String -> String
-prettify = Regex.replace All(Regex.regex ",") (\_ -> ",\n")
+prettify = Regex.replace All(Regex.regex ",") (\_ -> ",</p><p>")
 
 -- VIEW
-
+lst = ["hello", "I", "am", "with","you"]
+toHtml model lst =
+  li [ classList
+        [("selected", model.selected)
+        ,("unselected", model.selected == False)
+        ]
+        , onClick Select
+      ]
+      [text lst]
 
 view : Model -> Html Msg
 view model =
   div []
-    [ input [ type' "text", placeholder "url", onInput Url ] []
+    [ ul [] (List.map (toHtml model) lst)
+    , input [ type' "text", placeholder "url", onInput Url ] []
     , button [ onClick GetData ] [ text "Get Data"]
-    , pre [class "prettyprint"] [ text model.response ]
+    , div [] [ text model.response ]
     ]
 
 

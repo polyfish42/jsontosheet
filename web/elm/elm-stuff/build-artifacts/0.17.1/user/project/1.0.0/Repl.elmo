@@ -1,9 +1,2 @@
 var _user$project$Repl$t_s_o_l = {ctor: '_Tuple0'};
-var _user$project$Repl$devowel = A3(
-	_elm_lang$core$Regex$replace,
-	_elm_lang$core$Regex$All,
-	_elm_lang$core$Regex$regex('[aeiou]'),
-	function (_p0) {
-		return '';
-	});
-var _user$project$Repl$d_e_l_t_r_o_n_3_0_3_0 = _user$project$Repl$devowel('The quick brown fox');
+var _user$project$Repl$d_e_l_t_r_o_n_3_0_3_0 = _elm_lang$core$Native_Utils.eq(true, true) ? 'hello' : 'no';
