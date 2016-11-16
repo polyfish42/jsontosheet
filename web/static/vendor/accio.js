@@ -8847,8 +8847,6 @@ var _evancz$elm_http$Http$post = F3(
 			A2(_evancz$elm_http$Http$send, _evancz$elm_http$Http$defaultSettings, request));
 	});
 
-var _user$project$Accio$lst = _elm_lang$core$Native_List.fromArray(
-	['hello', 'I', 'am', 'with', 'you']);
 var _user$project$Accio$prettify = A3(
 	_elm_lang$core$Regex$replace,
 	_elm_lang$core$Regex$All,
@@ -8887,36 +8885,26 @@ var _user$project$Accio$Property = F3(
 	function (a, b, c) {
 		return {value: a, selected: b, id: c};
 	});
-var _user$project$Accio$Select = {ctor: 'Select'};
-var _user$project$Accio$toHtml = F2(
-	function (model, lst) {
-		return A2(
-			_elm_lang$html$Html$p,
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html_Attributes$classList(
-					_elm_lang$core$Native_List.fromArray(
-						[
-							{ctor: '_Tuple2', _0: 'selected', _1: model.selected},
-							{
-							ctor: '_Tuple2',
-							_0: 'unselected',
-							_1: _elm_lang$core$Native_Utils.eq(model.selected, false)
-						}
-						])),
-					_elm_lang$html$Html_Events$onClick(_user$project$Accio$Select)
-				]),
-			_elm_lang$core$Native_List.fromArray(
-				[
-					_elm_lang$html$Html$text(lst)
-				]));
-	});
+var _user$project$Accio$Select = function (a) {
+	return {ctor: 'Select', _0: a};
+};
 var _user$project$Accio$viewEntry = function (property) {
 	return A2(
 		_elm_lang$html$Html$p,
 		_elm_lang$core$Native_List.fromArray(
 			[
-				_elm_lang$html$Html_Events$onClick(_user$project$Accio$Select)
+				_elm_lang$html$Html_Attributes$classList(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						{ctor: '_Tuple2', _0: 'selected', _1: property.selected},
+						{
+						ctor: '_Tuple2',
+						_0: 'unselected',
+						_1: _elm_lang$core$Native_Utils.eq(property.selected, false)
+					}
+					])),
+				_elm_lang$html$Html_Events$onClick(
+				_user$project$Accio$Select(property.id))
 			]),
 		_elm_lang$core$Native_List.fromArray(
 			[
@@ -8940,30 +8928,9 @@ var _user$project$Accio$viewEntries = function (properties) {
 		_elm_lang$core$Native_List.fromArray(
 			[
 				A2(
-				_elm_lang$html$Html$input,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('toggle-all'),
-						_elm_lang$html$Html_Attributes$name('toggle')
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[])),
-				A2(
-				_elm_lang$html$Html$label,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$for('toggle-all')
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html$text('Mark all as complete')
-					])),
-				A2(
 				_elm_lang$html$Html_Keyed$ul,
 				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$class('todo-list')
-					]),
+					[]),
 				A2(_elm_lang$core$List$map, _user$project$Accio$viewKeyedEntry, properties))
 			]));
 };
@@ -9058,12 +9025,19 @@ var _user$project$Accio$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
+				var updateSelected = function (t) {
+					return _elm_lang$core$Native_Utils.eq(t.id, _p1._0) ? _elm_lang$core$Native_Utils.update(
+						t,
+						{
+							selected: _elm_lang$core$Basics$not(t.selected)
+						}) : t;
+				};
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							selected: _elm_lang$core$Basics$not(model.selected)
+							properties: A2(_elm_lang$core$List$map, updateSelected, model.properties)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -9116,14 +9090,6 @@ var _user$project$Accio$view = function (model) {
 			[]),
 		_elm_lang$core$Native_List.fromArray(
 			[
-				A2(
-				_elm_lang$html$Html$ul,
-				_elm_lang$core$Native_List.fromArray(
-					[]),
-				A2(
-					_elm_lang$core$List$map,
-					_user$project$Accio$toHtml(model),
-					_user$project$Accio$lst)),
 				A2(
 				_elm_lang$html$Html$input,
 				_elm_lang$core$Native_List.fromArray(

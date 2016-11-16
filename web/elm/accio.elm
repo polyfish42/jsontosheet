@@ -64,7 +64,7 @@ type Msg
   | FetchSucceed String
   | FetchFail Http.Error
   | Display String
-  | Select
+  | Select Int
 
 port format : String -> Cmd msg
 
@@ -101,28 +101,25 @@ update msg model =
     Display javascriptValue ->
       ({model | response = prettify javascriptValue}, Cmd.none)
 
-    Select ->
-      ({model | selected = (not model.selected)}, Cmd.none)
+    Select id ->
+      let
+        updateSelected t =
+          if t.id == id then
+            { t | selected = not t.selected}
+          else
+            t
+      in
+      ({model | properties = List.map updateSelected model.properties}, Cmd.none)
 
 prettify : String -> String
 prettify = Regex.replace All(Regex.regex ",") (\_ -> ",</p><p>")
 
 -- VIEW
-lst = ["hello", "I", "am", "with","you"]
-toHtml model lst =
-  p [ classList
-        [("selected", model.selected)
-        ,("unselected", model.selected == False)
-        ]
-        , onClick Select
-      ]
-      [text lst]
 
 view : Model -> Html Msg
 view model =
   div []
-    [ ul [] (List.map (toHtml model) lst)
-    , input [ type' "text", placeholder "url", onInput Url ] []
+    [ input [ type' "text", placeholder "url", onInput Url ] []
     , button [ onClick GetData ] [ text "Get Data"]
     , section []
               [ lazy viewInput model.field
@@ -151,15 +148,7 @@ viewEntries : List Property -> Html Msg
 viewEntries properties =
         section
             [ class "main" ]
-            [ input
-                [ class "toggle-all"
-                , name "toggle"
-                ]
-                []
-            , label
-                [ for "toggle-all" ]
-                [ text "Mark all as complete" ]
-            , Keyed.ul [ class "todo-list" ] <|
+            [ Keyed.ul [] <|
                 List.map viewKeyedEntry properties
             ]
 
@@ -169,7 +158,12 @@ viewKeyedEntry property =
 
 viewEntry : Property -> Html Msg
 viewEntry property =
-    p [onClick Select] [text property.value]
+    p [ classList [ ("selected", property.selected)
+                  , ("unselected", property.selected == False)
+                  ]
+      , onClick (Select property.id)
+      ]
+      [text property.value]
 
 -- SUBSCRIPTIONS
 port javascriptValues : (String -> msg) -> Sub msg
