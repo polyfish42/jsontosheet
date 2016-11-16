@@ -7,21 +7,37 @@ var _user$project$Accio$prettify = A3(
 	function (_p0) {
 		return ',</p><p>';
 	});
+var _user$project$Accio$newProperty = F2(
+	function (entry, id) {
+		return {value: entry, selected: false, id: id};
+	});
 var _user$project$Accio$format = _elm_lang$core$Native_Platform.outgoingPort(
 	'format',
 	function (v) {
 		return v;
 	});
 var _user$project$Accio$javascriptValues = _elm_lang$core$Native_Platform.incomingPort('javascriptValues', _elm_lang$core$Json_Decode$string);
-var _user$project$Accio$Model = F3(
-	function (a, b, c) {
-		return {url: a, response: b, selected: c};
+var _user$project$Accio$Model = F6(
+	function (a, b, c, d, e, f) {
+		return {url: a, response: b, field: c, uid: d, selected: e, properties: f};
 	});
 var _user$project$Accio$init = {
 	ctor: '_Tuple2',
-	_0: A3(_user$project$Accio$Model, '', '', false),
+	_0: A6(
+		_user$project$Accio$Model,
+		'',
+		'',
+		'',
+		0,
+		false,
+		_elm_lang$core$Native_List.fromArray(
+			[])),
 	_1: _elm_lang$core$Platform_Cmd$none
 };
+var _user$project$Accio$Property = F3(
+	function (a, b, c) {
+		return {value: a, selected: b, id: c};
+	});
 var _user$project$Accio$Select = {ctor: 'Select'};
 var _user$project$Accio$toHtml = F2(
 	function (model, lst) {
@@ -46,6 +62,62 @@ var _user$project$Accio$toHtml = F2(
 					_elm_lang$html$Html$text(lst)
 				]));
 	});
+var _user$project$Accio$viewEntry = function (property) {
+	return A2(
+		_elm_lang$html$Html$p,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Events$onClick(_user$project$Accio$Select)
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text(property.value)
+			]));
+};
+var _user$project$Accio$viewKeyedEntry = function (property) {
+	return {
+		ctor: '_Tuple2',
+		_0: _elm_lang$core$Basics$toString(property.id),
+		_1: A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Accio$viewEntry, property)
+	};
+};
+var _user$project$Accio$viewEntries = function (properties) {
+	return A2(
+		_elm_lang$html$Html$section,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('main')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$input,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('toggle-all'),
+						_elm_lang$html$Html_Attributes$name('toggle')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[])),
+				A2(
+				_elm_lang$html$Html$label,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$for('toggle-all')
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text('Mark all as complete')
+					])),
+				A2(
+				_elm_lang$html$Html_Keyed$ul,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$class('todo-list')
+					]),
+				A2(_elm_lang$core$List$map, _user$project$Accio$viewKeyedEntry, properties))
+			]));
+};
 var _user$project$Accio$Display = function (a) {
 	return {ctor: 'Display', _0: a};
 };
@@ -70,6 +142,32 @@ var _user$project$Accio$update = F2(
 	function (msg, model) {
 		var _p1 = msg;
 		switch (_p1.ctor) {
+			case 'Add':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{
+							uid: model.uid + 1,
+							field: '',
+							properties: _elm_lang$core$String$isEmpty(model.field) ? model.properties : A2(
+								_elm_lang$core$Basics_ops['++'],
+								model.properties,
+								_elm_lang$core$Native_List.fromArray(
+									[
+										A2(_user$project$Accio$newProperty, model.field, model.uid)
+									]))
+						}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'UpdateField':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{field: _p1._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			case 'Url':
 				return {
 					ctor: '_Tuple2',
@@ -123,6 +221,42 @@ var _user$project$Accio$update = F2(
 		}
 	});
 var _user$project$Accio$GetData = {ctor: 'GetData'};
+var _user$project$Accio$UpdateField = function (a) {
+	return {ctor: 'UpdateField', _0: a};
+};
+var _user$project$Accio$Add = {ctor: 'Add'};
+var _user$project$Accio$viewInput = function (task) {
+	return A2(
+		_elm_lang$html$Html$header,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('header')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html$h1,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html$text('Properties')
+					])),
+				A2(
+				_elm_lang$html$Html$input,
+				_elm_lang$core$Native_List.fromArray(
+					[
+						_elm_lang$html$Html_Attributes$placeholder('What property do you want to add?'),
+						_elm_lang$html$Html_Attributes$autofocus(true),
+						_elm_lang$html$Html_Attributes$value(task),
+						_elm_lang$html$Html_Attributes$name('newTodo'),
+						_elm_lang$html$Html_Events$onInput(_user$project$Accio$UpdateField),
+						_elm_lang$html$Html_Events$onClick(_user$project$Accio$Add)
+					]),
+				_elm_lang$core$Native_List.fromArray(
+					[]))
+			]));
+};
 var _user$project$Accio$Url = function (a) {
 	return {ctor: 'Url', _0: a};
 };
@@ -160,6 +294,15 @@ var _user$project$Accio$view = function (model) {
 				_elm_lang$core$Native_List.fromArray(
 					[
 						_elm_lang$html$Html$text('Get Data')
+					])),
+				A2(
+				_elm_lang$html$Html$section,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				_elm_lang$core$Native_List.fromArray(
+					[
+						A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Accio$viewInput, model.field),
+						A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Accio$viewEntries, model.properties)
 					])),
 				A2(
 				_elm_lang$html$Html$div,
