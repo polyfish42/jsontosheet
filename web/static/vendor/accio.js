@@ -8867,7 +8867,7 @@ var _user$project$Accio$Select = {ctor: 'Select'};
 var _user$project$Accio$toHtml = F2(
 	function (model, lst) {
 		return A2(
-			_elm_lang$html$Html$li,
+			_elm_lang$html$Html$p,
 			_elm_lang$core$Native_List.fromArray(
 				[
 					_elm_lang$html$Html_Attributes$classList(

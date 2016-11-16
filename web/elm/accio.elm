@@ -30,8 +30,14 @@ type alias Model =
   { url : String
   , response : String
   , selected : Bool
+  -- , properties : List Property
   }
 
+-- type alias Property =
+--   { value : String
+--   , property : String
+--   , selected : Bool
+--   }
 
 init : (Model, Cmd Msg)
 init =
@@ -77,7 +83,7 @@ prettify = Regex.replace All(Regex.regex ",") (\_ -> ",</p><p>")
 -- VIEW
 lst = ["hello", "I", "am", "with","you"]
 toHtml model lst =
-  li [ classList
+  p [ classList
         [("selected", model.selected)
         ,("unselected", model.selected == False)
         ]
