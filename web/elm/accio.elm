@@ -171,7 +171,7 @@ viewJson json =
       |> formatString "" False 0
       |> String.split uniqueHead
   in
-  pre [] <| List.map viewLine lines
+  div [] <| List.map viewLine lines
 
 viewLine : String -> Html msg
 viewLine lineStr =

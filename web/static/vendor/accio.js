@@ -9027,7 +9027,7 @@ var _user$project$Accio$viewJson = function (json) {
 		_user$project$Accio$uniqueHead,
 		A4(_user$project$Accio$formatString, '', false, 0, json));
 	return A2(
-		_elm_lang$html$Html$pre,
+		_elm_lang$html$Html$div,
 		_elm_lang$core$Native_List.fromArray(
 			[]),
 		A2(_elm_lang$core$List$map, _user$project$Accio$viewLine, lines));
