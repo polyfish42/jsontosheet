@@ -8847,13 +8847,181 @@ var _evancz$elm_http$Http$post = F3(
 			A2(_evancz$elm_http$Http$send, _evancz$elm_http$Http$defaultSettings, request));
 	});
 
-var _user$project$Accio$prettify = A3(
-	_elm_lang$core$Regex$replace,
-	_elm_lang$core$Regex$All,
-	_elm_lang$core$Regex$regex(','),
-	function (_p0) {
-		return ',</p><p>';
+var _user$project$Accio$splitLine = function (line) {
+	var newLine = A2(_elm_lang$core$String$dropLeft, 5, line);
+	var indent = A2(
+		_elm_lang$core$Result$withDefault,
+		0,
+		_elm_lang$core$String$toInt(
+			A2(_elm_lang$core$String$left, 5, line)));
+	return {ctor: '_Tuple2', _0: indent, _1: newLine};
+};
+var _user$project$Accio$pad = function (indent) {
+	return A3(
+		_elm_lang$core$String$padLeft,
+		5,
+		_elm_lang$core$Native_Utils.chr('0'),
+		_elm_lang$core$Basics$toString(indent));
+};
+var _user$project$Accio$px = function ($int) {
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$core$Basics$toString($int),
+		'px');
+};
+var _user$project$Accio$viewLine = function (lineStr) {
+	var _p0 = _user$project$Accio$splitLine(lineStr);
+	var indent = _p0._0;
+	var lineTxt = _p0._1;
+	return A2(
+		_elm_lang$html$Html$p,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$style(
+				_elm_lang$core$Native_List.fromArray(
+					[
+						{
+						ctor: '_Tuple2',
+						_0: 'paddingLeft',
+						_1: _user$project$Accio$px(indent)
+					},
+						{ctor: '_Tuple2', _0: 'marginTop', _1: '0px'},
+						{ctor: '_Tuple2', _0: 'marginBottom', _1: '0px'}
+					]))
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html$text(lineTxt)
+			]));
+};
+var _user$project$Accio$testString = '[{\"id\":91541985,\"time\":\"2016-10-29 01:48:04 UTC\",\"anon_visitor_id\":\"a86adf6b-910b-2b08-e291-c682\",\"ip_address\":\"76.20.48.125\",\"identity\":null,\"page\":\"https://trueme.goodhire.com/member/report-shared?candidateid=4402330f-4636-4323-a049-5a43643e69f9\",\"referrer\":null,\"user_agent\":\"Mozilla/5.0 (iPad; CPU OS 9_3_4 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Mobile/13G35\",\"nudge_id\":167540,\"nudge_name\":\"Candidate Satisfaction\",\"answered_questions\":{\"321141\":{\"question_id\":321141,\"question_title\":\"How satisfied are you with your experience with GoodHire?\",\"question_type\":\"radio\",\"answer\":\"Very Satisfied\",\"selected_option_id\":919755}}}]';
+var _user$project$Accio$incr = 20;
+var _user$project$Accio$uniqueHead = '##FORMAT##';
+var _user$project$Accio$newLineChars = ',';
+var _user$project$Accio$outdentChars = '}]';
+var _user$project$Accio$indentChars = '{[';
+var _user$project$Accio$quote = '\"';
+var _user$project$Accio$formatString = F3(
+	function (isInQuotes, indent, str) {
+		var _p1 = A2(_elm_lang$core$String$left, 1, str);
+		if (_p1 === '') {
+			return '';
+		} else {
+			var _p2 = _p1;
+			return isInQuotes ? (_elm_lang$core$Native_Utils.eq(_p2, _user$project$Accio$quote) ? A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p2,
+				A3(
+					_user$project$Accio$formatString,
+					_elm_lang$core$Basics$not(isInQuotes),
+					indent,
+					A2(_elm_lang$core$String$dropLeft, 1, str))) : A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p2,
+				A3(
+					_user$project$Accio$formatString,
+					isInQuotes,
+					indent,
+					A2(_elm_lang$core$String$dropLeft, 1, str)))) : (A2(_elm_lang$core$String$contains, _p2, _user$project$Accio$newLineChars) ? A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p2,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_user$project$Accio$uniqueHead,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_user$project$Accio$pad(indent),
+						A3(
+							_user$project$Accio$formatString,
+							isInQuotes,
+							indent,
+							A2(_elm_lang$core$String$dropLeft, 1, str))))) : (A2(_elm_lang$core$String$contains, _p2, _user$project$Accio$indentChars) ? A2(
+				_elm_lang$core$Basics_ops['++'],
+				_user$project$Accio$uniqueHead,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_user$project$Accio$pad(indent + _user$project$Accio$incr),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_p2,
+						A3(
+							_user$project$Accio$formatString,
+							isInQuotes,
+							indent + _user$project$Accio$incr,
+							A2(_elm_lang$core$String$dropLeft, 1, str))))) : (A2(_elm_lang$core$String$contains, _p2, _user$project$Accio$outdentChars) ? A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p2,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_user$project$Accio$uniqueHead,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_user$project$Accio$pad(indent - _user$project$Accio$incr),
+						A3(
+							_user$project$Accio$formatString,
+							isInQuotes,
+							indent - _user$project$Accio$incr,
+							A2(_elm_lang$core$String$dropLeft, 1, str))))) : (_elm_lang$core$Native_Utils.eq(_p2, _user$project$Accio$quote) ? A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p2,
+				A3(
+					_user$project$Accio$formatString,
+					_elm_lang$core$Basics$not(isInQuotes),
+					indent,
+					A2(_elm_lang$core$String$dropLeft, 1, str))) : A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p2,
+				A3(
+					_user$project$Accio$formatString,
+					isInQuotes,
+					indent,
+					A2(_elm_lang$core$String$dropLeft, 1, str)))))));
+		}
 	});
+var _user$project$Accio$viewJson = function (json) {
+	var lines = A2(
+		_elm_lang$core$String$split,
+		_user$project$Accio$uniqueHead,
+		A3(_user$project$Accio$formatString, false, 0, json));
+	return A2(
+		_elm_lang$html$Html$pre,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		A2(_elm_lang$core$List$map, _user$project$Accio$viewLine, lines));
+};
+var _user$project$Accio$viewEntry = function (property) {
+	return A2(
+		_elm_lang$html$Html$section,
+		_elm_lang$core$Native_List.fromArray(
+			[]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_user$project$Accio$viewJson(property.value)
+			]));
+};
+var _user$project$Accio$viewKeyedEntry = function (property) {
+	return {
+		ctor: '_Tuple2',
+		_0: _elm_lang$core$Basics$toString(property.id),
+		_1: A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Accio$viewEntry, property)
+	};
+};
+var _user$project$Accio$viewEntries = function (properties) {
+	return A2(
+		_elm_lang$html$Html$section,
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_elm_lang$html$Html_Attributes$class('main')
+			]),
+		_elm_lang$core$Native_List.fromArray(
+			[
+				A2(
+				_elm_lang$html$Html_Keyed$ul,
+				_elm_lang$core$Native_List.fromArray(
+					[]),
+				A2(_elm_lang$core$List$map, _user$project$Accio$viewKeyedEntry, properties))
+			]));
+};
 var _user$project$Accio$newProperty = F2(
 	function (entry, id) {
 		return {value: entry, selected: false, id: id};
@@ -8888,58 +9056,6 @@ var _user$project$Accio$Property = F3(
 var _user$project$Accio$Select = function (a) {
 	return {ctor: 'Select', _0: a};
 };
-var _user$project$Accio$viewEntry = function (property) {
-	return A2(
-		_elm_lang$html$Html$p,
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$html$Html_Attributes$classList(
-				_elm_lang$core$Native_List.fromArray(
-					[
-						{ctor: '_Tuple2', _0: 'selected', _1: property.selected},
-						{
-						ctor: '_Tuple2',
-						_0: 'unselected',
-						_1: _elm_lang$core$Native_Utils.eq(property.selected, false)
-					}
-					])),
-				_elm_lang$html$Html_Events$onClick(
-				_user$project$Accio$Select(property.id))
-			]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$html$Html$text(property.value)
-			]));
-};
-var _user$project$Accio$viewKeyedEntry = function (property) {
-	return {
-		ctor: '_Tuple2',
-		_0: _elm_lang$core$Basics$toString(property.id),
-		_1: A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Accio$viewEntry, property)
-	};
-};
-var _user$project$Accio$viewEntries = function (properties) {
-	return A2(
-		_elm_lang$html$Html$section,
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$html$Html_Attributes$class('main')
-			]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				A2(
-				_elm_lang$html$Html_Keyed$ul,
-				_elm_lang$core$Native_List.fromArray(
-					[]),
-				A2(_elm_lang$core$List$map, _user$project$Accio$viewKeyedEntry, properties))
-			]));
-};
-var _user$project$Accio$Display = function (a) {
-	return {ctor: 'Display', _0: a};
-};
-var _user$project$Accio$subscriptions = function (model) {
-	return _user$project$Accio$javascriptValues(_user$project$Accio$Display);
-};
 var _user$project$Accio$FetchFail = function (a) {
 	return {ctor: 'FetchFail', _0: a};
 };
@@ -8956,22 +9072,26 @@ var _user$project$Accio$getJson = function (url) {
 };
 var _user$project$Accio$update = F2(
 	function (msg, model) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
 			case 'Add':
+				var _p4 = _p3._0;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
 							uid: model.uid + 1,
-							field: '',
-							properties: _elm_lang$core$String$isEmpty(model.field) ? model.properties : A2(
+							field: A2(_elm_lang$core$Debug$log, 'The jsonator', _p4),
+							properties: A2(
 								_elm_lang$core$Basics_ops['++'],
 								model.properties,
 								_elm_lang$core$Native_List.fromArray(
 									[
-										A2(_user$project$Accio$newProperty, model.field, model.uid)
+										A2(
+										_elm_lang$core$Debug$log,
+										'newProperty',
+										A2(_user$project$Accio$newProperty, _p4, model.uid))
 									]))
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
@@ -8981,7 +9101,7 @@ var _user$project$Accio$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{field: _p1._0}),
+						{field: _p3._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Url':
@@ -8989,7 +9109,7 @@ var _user$project$Accio$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{url: _p1._0}),
+						{url: _p3._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GetData':
@@ -9002,7 +9122,7 @@ var _user$project$Accio$update = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: _user$project$Accio$format(_p1._0)
+					_1: _user$project$Accio$format(_p3._0)
 				};
 			case 'FetchFail':
 				return {
@@ -9010,23 +9130,13 @@ var _user$project$Accio$update = F2(
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							response: _elm_lang$core$Basics$toString(_p1._0)
-						}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'Display':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							response: _user$project$Accio$prettify(_p1._0)
+							response: _elm_lang$core$Basics$toString(_p3._0)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
 				var updateSelected = function (t) {
-					return _elm_lang$core$Native_Utils.eq(t.id, _p1._0) ? _elm_lang$core$Native_Utils.update(
+					return _elm_lang$core$Native_Utils.eq(t.id, _p3._0) ? _elm_lang$core$Native_Utils.update(
 						t,
 						{
 							selected: _elm_lang$core$Basics$not(t.selected)
@@ -9047,38 +9157,11 @@ var _user$project$Accio$GetData = {ctor: 'GetData'};
 var _user$project$Accio$UpdateField = function (a) {
 	return {ctor: 'UpdateField', _0: a};
 };
-var _user$project$Accio$Add = {ctor: 'Add'};
-var _user$project$Accio$viewInput = function (task) {
-	return A2(
-		_elm_lang$html$Html$header,
-		_elm_lang$core$Native_List.fromArray(
-			[
-				_elm_lang$html$Html_Attributes$class('header')
-			]),
-		_elm_lang$core$Native_List.fromArray(
-			[
-				A2(
-				_elm_lang$html$Html$h1,
-				_elm_lang$core$Native_List.fromArray(
-					[]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html$text('Properties')
-					])),
-				A2(
-				_elm_lang$html$Html$input,
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html_Attributes$placeholder('What property do you want to add?'),
-						_elm_lang$html$Html_Attributes$autofocus(true),
-						_elm_lang$html$Html_Attributes$value(task),
-						_elm_lang$html$Html_Attributes$name('newTodo'),
-						_elm_lang$html$Html_Events$onInput(_user$project$Accio$UpdateField),
-						_elm_lang$html$Html_Events$onClick(_user$project$Accio$Add)
-					]),
-				_elm_lang$core$Native_List.fromArray(
-					[]))
-			]));
+var _user$project$Accio$Add = function (a) {
+	return {ctor: 'Add', _0: a};
+};
+var _user$project$Accio$subscriptions = function (model) {
+	return _user$project$Accio$javascriptValues(_user$project$Accio$Add);
 };
 var _user$project$Accio$Url = function (a) {
 	return {ctor: 'Url', _0: a};
@@ -9116,16 +9199,8 @@ var _user$project$Accio$view = function (model) {
 					[]),
 				_elm_lang$core$Native_List.fromArray(
 					[
-						A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Accio$viewInput, model.field),
-						A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Accio$viewEntries, model.properties)
-					])),
-				A2(
-				_elm_lang$html$Html$div,
-				_elm_lang$core$Native_List.fromArray(
-					[]),
-				_elm_lang$core$Native_List.fromArray(
-					[
-						_elm_lang$html$Html$text(model.response)
+						_user$project$Accio$viewEntries(
+						A2(_elm_lang$core$Debug$log, 'model props', model.properties))
 					]))
 			]));
 };

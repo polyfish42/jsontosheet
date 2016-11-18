@@ -58,12 +58,11 @@ init =
 
 type Msg
   = Url String
-  | Add
+  | Add String
   | UpdateField String
   | GetData
   | FetchSucceed String
   | FetchFail Http.Error
-  | Display String
   | Select Int
 
 port format : String -> Cmd msg
@@ -71,18 +70,15 @@ port format : String -> Cmd msg
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Add ->
+    Add json ->
       ({ model
         | uid = model.uid + 1
-        , field = ""
-        , properties =
-          if String.isEmpty model.field then
-                model.properties
-            else
-                model.properties ++ [ newProperty model.field model.uid ]
+        , field = Debug.log "The jsonator" json
+        , properties = model.properties ++ [ Debug.log "newProperty" (newProperty json model.uid) ]
       }
       , Cmd.none
       )
+
     UpdateField str ->
       ({ model | field = str }, Cmd.none)
 
@@ -98,9 +94,6 @@ update msg model =
     FetchFail error ->
       ({model | response = toString error}, Cmd.none)
 
-    Display javascriptValue ->
-      ({model | response = prettify javascriptValue}, Cmd.none)
-
     Select id ->
       let
         updateSelected t =
@@ -111,9 +104,6 @@ update msg model =
       in
       ({model | properties = List.map updateSelected model.properties}, Cmd.none)
 
-prettify : String -> String
-prettify = Regex.replace All(Regex.regex ",") (\_ -> ",</p><p>")
-
 -- VIEW
 
 view : Model -> Html Msg
@@ -121,28 +111,9 @@ view model =
   div []
     [ input [ type' "text", placeholder "url", onInput Url ] []
     , button [ onClick GetData ] [ text "Get Data"]
-    , section []
-              [ lazy viewInput model.field
-              , lazy viewEntries model.properties
-              ]
-    , div [] [ text model.response ]
+    , section [] [ viewEntries (Debug.log "model props" model.properties) ]
     ]
 
-viewInput : String -> Html Msg
-viewInput task =
-    header
-        [ class "header" ]
-        [ h1 [] [ text "Properties" ]
-        , input
-            [ placeholder "What property do you want to add?"
-            , autofocus True
-            , value task
-            , name "newTodo"
-            , onInput UpdateField
-            , onClick Add
-            ]
-            []
-        ]
 
 viewEntries : List Property -> Html Msg
 viewEntries properties =
@@ -158,19 +129,19 @@ viewKeyedEntry property =
 
 viewEntry : Property -> Html Msg
 viewEntry property =
-    p [ classList [ ("selected", property.selected)
-                  , ("unselected", property.selected == False)
-                  ]
-      , onClick (Select property.id)
-      ]
-      [text property.value]
+    -- p [ classList [ ("selected", property.selected)
+    --               , ("unselected", property.selected == False)
+    --               ]
+    --   , onClick (Select property.id)
+    --   ]
+    section [] [viewJson property.value]
 
 -- SUBSCRIPTIONS
 port javascriptValues : (String -> msg) -> Sub msg
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  javascriptValues Display
+  javascriptValues Add
 
 
 
@@ -180,4 +151,88 @@ subscriptions model =
 getJson : String -> Cmd Msg
 getJson url =
   Task.perform FetchFail FetchSucceed (Http.getString ("http://localhost:4000/response?url=" ++ url))
-  -- Task.perform FetchFail FetchSucceed (Http.getString (url))
+
+-- PARSER
+
+quote = "\""
+indentChars = "{["
+outdentChars = "}]"
+newLineChars = ","
+uniqueHead = "##FORMAT##"
+incr = 20
+
+testString = "[{\"id\":91541985,\"time\":\"2016-10-29 01:48:04 UTC\",\"anon_visitor_id\":\"a86adf6b-910b-2b08-e291-c682\",\"ip_address\":\"76.20.48.125\",\"identity\":null,\"page\":\"https://trueme.goodhire.com/member/report-shared?candidateid=4402330f-4636-4323-a049-5a43643e69f9\",\"referrer\":null,\"user_agent\":\"Mozilla/5.0 (iPad; CPU OS 9_3_4 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Mobile/13G35\",\"nudge_id\":167540,\"nudge_name\":\"Candidate Satisfaction\",\"answered_questions\":{\"321141\":{\"question_id\":321141,\"question_title\":\"How satisfied are you with your experience with GoodHire?\",\"question_type\":\"radio\",\"answer\":\"Very Satisfied\",\"selected_option_id\":919755}}}]"
+
+viewJson : String -> Html msg
+viewJson json =
+  let
+    lines =
+      json
+      |> formatString False 0
+      |> String.split uniqueHead
+  in
+  pre [] <| List.map viewLine lines
+
+viewLine : String -> Html msg
+viewLine lineStr =
+  let
+    (indent, lineTxt) = splitLine lineStr
+  in
+    p [style
+        [ ("paddingLeft", px (indent))
+        , ("marginTop", "0px")
+        , ("marginBottom", "0px")
+        ]
+      ]
+      [ text lineTxt ]
+
+px : Int -> String
+px int =
+  toString int
+  ++ "px"
+
+formatString : Bool -> Int -> String -> String
+formatString isInQuotes indent str =
+  case String.left 1 str of
+    "" -> ""
+
+    firstChar ->
+      if isInQuotes then
+        if firstChar == quote then
+          firstChar
+          ++ formatString (not isInQuotes) indent (String.dropLeft 1 str)
+        else
+          firstChar
+          ++ formatString isInQuotes indent (String.dropLeft 1 str)
+      else
+        if String.contains firstChar newLineChars then
+          firstChar ++ uniqueHead ++ pad indent
+          ++ formatString isInQuotes indent (String.dropLeft 1 str)
+        else if String.contains firstChar indentChars then
+          uniqueHead ++ pad (indent + incr) ++ firstChar
+          ++ formatString isInQuotes (indent + incr) (String.dropLeft 1 str)
+        else if String.contains firstChar outdentChars then
+          firstChar ++ uniqueHead ++ pad (indent - incr)
+          ++ formatString isInQuotes (indent - incr) (String.dropLeft 1 str)
+        else if firstChar == quote then
+          firstChar
+          ++ formatString (not isInQuotes) indent (String.dropLeft 1 str)
+        else
+          firstChar
+          ++ formatString isInQuotes indent (String.dropLeft 1 str)
+
+pad : Int -> String
+pad indent =
+  String.padLeft 5 '0' <| toString indent
+
+splitLine : String -> (Int, String)
+splitLine line =
+  let
+    indent =
+      String.left 5 line
+      |> String.toInt
+      |> Result.withDefault 0
+    newLine =
+      String.dropLeft 5 line
+  in
+    (indent, newLine)

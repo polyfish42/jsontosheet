@@ -24,6 +24,6 @@ const elmDiv = document.getElementById('elm-main')
     , elmApp = Elm.Accio.embed(elmDiv)
 
     elmApp.ports.format.subscribe(function(res) {
-        var json = JSON.stringify(JSON.parse(res), undefined, 4);
+        var json = JSON.parse(res);
         elmApp.ports.javascriptValues.send(json);
     });
