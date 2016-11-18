@@ -29,7 +29,7 @@ main =
 
 type alias Model =
   { url : String
-  , response : String
+  , errorMessage : String
   , field : String
   , uid : Int
   , selected : Bool
@@ -41,6 +41,7 @@ type alias Property =
   , selected : Bool
   , id : Int
   }
+  
 
 newProperty : String -> Int -> Property
 newProperty entry id =
@@ -92,7 +93,7 @@ update msg model =
       (model, format response)
 
     FetchFail error ->
-      ({model | response = toString error}, Cmd.none)
+      ({model | errorMessage = toString error}, Cmd.none)
 
     Select id ->
       let

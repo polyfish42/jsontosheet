@@ -228,7 +228,7 @@ var _user$project$Accio$format = _elm_lang$core$Native_Platform.outgoingPort(
 var _user$project$Accio$javascriptValues = _elm_lang$core$Native_Platform.incomingPort('javascriptValues', _elm_lang$core$Json_Decode$string);
 var _user$project$Accio$Model = F6(
 	function (a, b, c, d, e, f) {
-		return {url: a, response: b, field: c, uid: d, selected: e, properties: f};
+		return {url: a, errorMessage: b, field: c, uid: d, selected: e, properties: f};
 	});
 var _user$project$Accio$init = {
 	ctor: '_Tuple2',
@@ -321,7 +321,7 @@ var _user$project$Accio$update = F2(
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							response: _elm_lang$core$Basics$toString(_p3._0)
+							errorMessage: _elm_lang$core$Basics$toString(_p3._0)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
