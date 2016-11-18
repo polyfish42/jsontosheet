@@ -73,8 +73,8 @@ update msg model =
     Add json ->
       ({ model
         | uid = model.uid + 1
-        , field = Debug.log "The jsonator" json
-        , properties = model.properties ++ [ Debug.log "newProperty" (newProperty json model.uid) ]
+        , field = json
+        , properties = model.properties ++ [ newProperty json model.uid ]
       }
       , Cmd.none
       )
@@ -111,7 +111,7 @@ view model =
   div []
     [ input [ type' "text", placeholder "url", onInput Url ] []
     , button [ onClick GetData ] [ text "Get Data"]
-    , section [] [ viewEntries (Debug.log "model props" model.properties) ]
+    , section [] [ viewEntries model.properties ]
     ]
 
 
@@ -168,7 +168,7 @@ viewJson json =
   let
     lines =
       json
-      |> formatString False 0
+      |> formatString "" False 0
       |> String.split uniqueHead
   in
   pre [] <| List.map viewLine lines
@@ -191,35 +191,28 @@ px int =
   toString int
   ++ "px"
 
-formatString : Bool -> Int -> String -> String
-formatString isInQuotes indent str =
+formatString : String -> Bool -> Int -> String -> String
+formatString acc isInQuotes indent str =
   case String.left 1 str of
-    "" -> ""
+    "" -> acc
 
     firstChar ->
       if isInQuotes then
         if firstChar == quote then
-          firstChar
-          ++ formatString (not isInQuotes) indent (String.dropLeft 1 str)
+          formatString (acc ++ firstChar) (not isInQuotes) indent (String.dropLeft 1 str)
         else
-          firstChar
-          ++ formatString isInQuotes indent (String.dropLeft 1 str)
+          formatString (acc ++ firstChar) isInQuotes indent (String.dropLeft 1 str)
       else
         if String.contains firstChar newLineChars then
-          firstChar ++ uniqueHead ++ pad indent
-          ++ formatString isInQuotes indent (String.dropLeft 1 str)
+          formatString (acc ++ firstChar ++ uniqueHead ++ pad indent) isInQuotes indent (String.dropLeft 1 str)
         else if String.contains firstChar indentChars then
-          uniqueHead ++ pad (indent + incr) ++ firstChar
-          ++ formatString isInQuotes (indent + incr) (String.dropLeft 1 str)
+          formatString (acc ++ uniqueHead ++ pad (indent + incr) ++ firstChar) isInQuotes (indent + incr) (String.dropLeft 1 str)
         else if String.contains firstChar outdentChars then
-          firstChar ++ uniqueHead ++ pad (indent - incr)
-          ++ formatString isInQuotes (indent - incr) (String.dropLeft 1 str)
+          formatString (acc ++ firstChar ++ uniqueHead ++ pad (indent - incr)) isInQuotes (indent - incr) (String.dropLeft 1 str)
         else if firstChar == quote then
-          firstChar
-          ++ formatString (not isInQuotes) indent (String.dropLeft 1 str)
+          formatString (acc ++ firstChar) (not isInQuotes) indent (String.dropLeft 1 str)
         else
-          firstChar
-          ++ formatString isInQuotes indent (String.dropLeft 1 str)
+          formatString (acc ++ firstChar) isInQuotes indent (String.dropLeft 1 str)
 
 pad : Int -> String
 pad indent =

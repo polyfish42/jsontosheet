@@ -8901,88 +8901,131 @@ var _user$project$Accio$newLineChars = ',';
 var _user$project$Accio$outdentChars = '}]';
 var _user$project$Accio$indentChars = '{[';
 var _user$project$Accio$quote = '\"';
-var _user$project$Accio$formatString = F3(
-	function (isInQuotes, indent, str) {
-		var _p1 = A2(_elm_lang$core$String$left, 1, str);
-		if (_p1 === '') {
-			return '';
-		} else {
-			var _p2 = _p1;
-			return isInQuotes ? (_elm_lang$core$Native_Utils.eq(_p2, _user$project$Accio$quote) ? A2(
-				_elm_lang$core$Basics_ops['++'],
-				_p2,
-				A3(
-					_user$project$Accio$formatString,
-					_elm_lang$core$Basics$not(isInQuotes),
-					indent,
-					A2(_elm_lang$core$String$dropLeft, 1, str))) : A2(
-				_elm_lang$core$Basics_ops['++'],
-				_p2,
-				A3(
-					_user$project$Accio$formatString,
-					isInQuotes,
-					indent,
-					A2(_elm_lang$core$String$dropLeft, 1, str)))) : (A2(_elm_lang$core$String$contains, _p2, _user$project$Accio$newLineChars) ? A2(
-				_elm_lang$core$Basics_ops['++'],
-				_p2,
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_user$project$Accio$uniqueHead,
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_user$project$Accio$pad(indent),
-						A3(
-							_user$project$Accio$formatString,
-							isInQuotes,
-							indent,
-							A2(_elm_lang$core$String$dropLeft, 1, str))))) : (A2(_elm_lang$core$String$contains, _p2, _user$project$Accio$indentChars) ? A2(
-				_elm_lang$core$Basics_ops['++'],
-				_user$project$Accio$uniqueHead,
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_user$project$Accio$pad(indent + _user$project$Accio$incr),
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_p2,
-						A3(
-							_user$project$Accio$formatString,
-							isInQuotes,
-							indent + _user$project$Accio$incr,
-							A2(_elm_lang$core$String$dropLeft, 1, str))))) : (A2(_elm_lang$core$String$contains, _p2, _user$project$Accio$outdentChars) ? A2(
-				_elm_lang$core$Basics_ops['++'],
-				_p2,
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_user$project$Accio$uniqueHead,
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						_user$project$Accio$pad(indent - _user$project$Accio$incr),
-						A3(
-							_user$project$Accio$formatString,
-							isInQuotes,
-							indent - _user$project$Accio$incr,
-							A2(_elm_lang$core$String$dropLeft, 1, str))))) : (_elm_lang$core$Native_Utils.eq(_p2, _user$project$Accio$quote) ? A2(
-				_elm_lang$core$Basics_ops['++'],
-				_p2,
-				A3(
-					_user$project$Accio$formatString,
-					_elm_lang$core$Basics$not(isInQuotes),
-					indent,
-					A2(_elm_lang$core$String$dropLeft, 1, str))) : A2(
-				_elm_lang$core$Basics_ops['++'],
-				_p2,
-				A3(
-					_user$project$Accio$formatString,
-					isInQuotes,
-					indent,
-					A2(_elm_lang$core$String$dropLeft, 1, str)))))));
+var _user$project$Accio$formatString = F4(
+	function (acc, isInQuotes, indent, str) {
+		formatString:
+		while (true) {
+			var _p1 = A2(_elm_lang$core$String$left, 1, str);
+			if (_p1 === '') {
+				return acc;
+			} else {
+				var _p2 = _p1;
+				if (isInQuotes) {
+					if (_elm_lang$core$Native_Utils.eq(_p2, _user$project$Accio$quote)) {
+						var _v1 = A2(_elm_lang$core$Basics_ops['++'], acc, _p2),
+							_v2 = _elm_lang$core$Basics$not(isInQuotes),
+							_v3 = indent,
+							_v4 = A2(_elm_lang$core$String$dropLeft, 1, str);
+						acc = _v1;
+						isInQuotes = _v2;
+						indent = _v3;
+						str = _v4;
+						continue formatString;
+					} else {
+						var _v5 = A2(_elm_lang$core$Basics_ops['++'], acc, _p2),
+							_v6 = isInQuotes,
+							_v7 = indent,
+							_v8 = A2(_elm_lang$core$String$dropLeft, 1, str);
+						acc = _v5;
+						isInQuotes = _v6;
+						indent = _v7;
+						str = _v8;
+						continue formatString;
+					}
+				} else {
+					if (A2(_elm_lang$core$String$contains, _p2, _user$project$Accio$newLineChars)) {
+						var _v9 = A2(
+							_elm_lang$core$Basics_ops['++'],
+							acc,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_p2,
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_user$project$Accio$uniqueHead,
+									_user$project$Accio$pad(indent)))),
+							_v10 = isInQuotes,
+							_v11 = indent,
+							_v12 = A2(_elm_lang$core$String$dropLeft, 1, str);
+						acc = _v9;
+						isInQuotes = _v10;
+						indent = _v11;
+						str = _v12;
+						continue formatString;
+					} else {
+						if (A2(_elm_lang$core$String$contains, _p2, _user$project$Accio$indentChars)) {
+							var _v13 = A2(
+								_elm_lang$core$Basics_ops['++'],
+								acc,
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_user$project$Accio$uniqueHead,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										_user$project$Accio$pad(indent + _user$project$Accio$incr),
+										_p2))),
+								_v14 = isInQuotes,
+								_v15 = indent + _user$project$Accio$incr,
+								_v16 = A2(_elm_lang$core$String$dropLeft, 1, str);
+							acc = _v13;
+							isInQuotes = _v14;
+							indent = _v15;
+							str = _v16;
+							continue formatString;
+						} else {
+							if (A2(_elm_lang$core$String$contains, _p2, _user$project$Accio$outdentChars)) {
+								var _v17 = A2(
+									_elm_lang$core$Basics_ops['++'],
+									acc,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										_p2,
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											_user$project$Accio$uniqueHead,
+											_user$project$Accio$pad(indent - _user$project$Accio$incr)))),
+									_v18 = isInQuotes,
+									_v19 = indent - _user$project$Accio$incr,
+									_v20 = A2(_elm_lang$core$String$dropLeft, 1, str);
+								acc = _v17;
+								isInQuotes = _v18;
+								indent = _v19;
+								str = _v20;
+								continue formatString;
+							} else {
+								if (_elm_lang$core$Native_Utils.eq(_p2, _user$project$Accio$quote)) {
+									var _v21 = A2(_elm_lang$core$Basics_ops['++'], acc, _p2),
+										_v22 = _elm_lang$core$Basics$not(isInQuotes),
+										_v23 = indent,
+										_v24 = A2(_elm_lang$core$String$dropLeft, 1, str);
+									acc = _v21;
+									isInQuotes = _v22;
+									indent = _v23;
+									str = _v24;
+									continue formatString;
+								} else {
+									var _v25 = A2(_elm_lang$core$Basics_ops['++'], acc, _p2),
+										_v26 = isInQuotes,
+										_v27 = indent,
+										_v28 = A2(_elm_lang$core$String$dropLeft, 1, str);
+									acc = _v25;
+									isInQuotes = _v26;
+									indent = _v27;
+									str = _v28;
+									continue formatString;
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	});
 var _user$project$Accio$viewJson = function (json) {
 	var lines = A2(
 		_elm_lang$core$String$split,
 		_user$project$Accio$uniqueHead,
-		A3(_user$project$Accio$formatString, false, 0, json));
+		A4(_user$project$Accio$formatString, '', false, 0, json));
 	return A2(
 		_elm_lang$html$Html$pre,
 		_elm_lang$core$Native_List.fromArray(
@@ -9082,16 +9125,13 @@ var _user$project$Accio$update = F2(
 						model,
 						{
 							uid: model.uid + 1,
-							field: A2(_elm_lang$core$Debug$log, 'The jsonator', _p4),
+							field: _p4,
 							properties: A2(
 								_elm_lang$core$Basics_ops['++'],
 								model.properties,
 								_elm_lang$core$Native_List.fromArray(
 									[
-										A2(
-										_elm_lang$core$Debug$log,
-										'newProperty',
-										A2(_user$project$Accio$newProperty, _p4, model.uid))
+										A2(_user$project$Accio$newProperty, _p4, model.uid)
 									]))
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
@@ -9199,8 +9239,7 @@ var _user$project$Accio$view = function (model) {
 					[]),
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_user$project$Accio$viewEntries(
-						A2(_elm_lang$core$Debug$log, 'model props', model.properties))
+						_user$project$Accio$viewEntries(model.properties)
 					]))
 			]));
 };
