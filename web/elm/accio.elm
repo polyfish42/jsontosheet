@@ -33,19 +33,19 @@ type alias Model =
   , field : String
   , uid : Int
   , selected : Bool
-  , properties : List Property
+  , responses : List Response
   }
 
-type alias Property =
-  { value : String
+type alias Response =
+  { text : String
   , selected : Bool
   , id : Int
   }
-  
 
-newProperty : String -> Int -> Property
-newProperty entry id =
-  { value = entry
+
+newResponse : String -> Int -> Response
+newResponse str id =
+  { text = str
   , selected = False
   , id = id
   }
@@ -75,7 +75,7 @@ update msg model =
       ({ model
         | uid = model.uid + 1
         , field = json
-        , properties = model.properties ++ [ newProperty json model.uid ]
+        , responses = model.responses ++ [ newResponse json model.uid ]
       }
       , Cmd.none
       )
@@ -103,7 +103,7 @@ update msg model =
           else
             t
       in
-      ({model | properties = List.map updateSelected model.properties}, Cmd.none)
+      ({model | responses = List.map updateSelected model.responses}, Cmd.none)
 
 -- VIEW
 
@@ -112,30 +112,30 @@ view model =
   div []
     [ input [ type' "text", placeholder "url", onInput Url ] []
     , button [ onClick GetData ] [ text "Get Data"]
-    , section [] [ viewEntries model.properties ]
+    , section [] [ viewEntries model.responses ]
     ]
 
 
-viewEntries : List Property -> Html Msg
-viewEntries properties =
+viewEntries : List Response -> Html Msg
+viewEntries responses =
         section
             [ class "main" ]
             [ Keyed.ul [] <|
-                List.map viewKeyedEntry properties
+                List.map viewKeyedEntry responses
             ]
 
-viewKeyedEntry : Property -> ( String, Html Msg )
-viewKeyedEntry property =
-    ( toString property.id, lazy viewEntry property )
+viewKeyedEntry : Response -> ( String, Html Msg )
+viewKeyedEntry response =
+    ( toString response.id, lazy viewEntry response )
 
-viewEntry : Property -> Html Msg
-viewEntry property =
+viewEntry : Response -> Html Msg
+viewEntry response =
     -- p [ classList [ ("selected", property.selected)
     --               , ("unselected", property.selected == False)
     --               ]
     --   , onClick (Select property.id)
     --   ]
-    section [] [viewJson property.value]
+    section [] [viewJson response.text]
 
 -- SUBSCRIPTIONS
 port javascriptValues : (String -> msg) -> Sub msg

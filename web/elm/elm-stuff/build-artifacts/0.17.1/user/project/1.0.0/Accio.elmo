@@ -183,24 +183,24 @@ var _user$project$Accio$viewJson = function (json) {
 			[]),
 		A2(_elm_lang$core$List$map, _user$project$Accio$viewLine, lines));
 };
-var _user$project$Accio$viewEntry = function (property) {
+var _user$project$Accio$viewEntry = function (response) {
 	return A2(
 		_elm_lang$html$Html$section,
 		_elm_lang$core$Native_List.fromArray(
 			[]),
 		_elm_lang$core$Native_List.fromArray(
 			[
-				_user$project$Accio$viewJson(property.value)
+				_user$project$Accio$viewJson(response.text)
 			]));
 };
-var _user$project$Accio$viewKeyedEntry = function (property) {
+var _user$project$Accio$viewKeyedEntry = function (response) {
 	return {
 		ctor: '_Tuple2',
-		_0: _elm_lang$core$Basics$toString(property.id),
-		_1: A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Accio$viewEntry, property)
+		_0: _elm_lang$core$Basics$toString(response.id),
+		_1: A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Accio$viewEntry, response)
 	};
 };
-var _user$project$Accio$viewEntries = function (properties) {
+var _user$project$Accio$viewEntries = function (responses) {
 	return A2(
 		_elm_lang$html$Html$section,
 		_elm_lang$core$Native_List.fromArray(
@@ -213,12 +213,12 @@ var _user$project$Accio$viewEntries = function (properties) {
 				_elm_lang$html$Html_Keyed$ul,
 				_elm_lang$core$Native_List.fromArray(
 					[]),
-				A2(_elm_lang$core$List$map, _user$project$Accio$viewKeyedEntry, properties))
+				A2(_elm_lang$core$List$map, _user$project$Accio$viewKeyedEntry, responses))
 			]));
 };
-var _user$project$Accio$newProperty = F2(
-	function (entry, id) {
-		return {value: entry, selected: false, id: id};
+var _user$project$Accio$newResponse = F2(
+	function (str, id) {
+		return {text: str, selected: false, id: id};
 	});
 var _user$project$Accio$format = _elm_lang$core$Native_Platform.outgoingPort(
 	'format',
@@ -228,7 +228,7 @@ var _user$project$Accio$format = _elm_lang$core$Native_Platform.outgoingPort(
 var _user$project$Accio$javascriptValues = _elm_lang$core$Native_Platform.incomingPort('javascriptValues', _elm_lang$core$Json_Decode$string);
 var _user$project$Accio$Model = F6(
 	function (a, b, c, d, e, f) {
-		return {url: a, errorMessage: b, field: c, uid: d, selected: e, properties: f};
+		return {url: a, errorMessage: b, field: c, uid: d, selected: e, responses: f};
 	});
 var _user$project$Accio$init = {
 	ctor: '_Tuple2',
@@ -243,9 +243,9 @@ var _user$project$Accio$init = {
 			[])),
 	_1: _elm_lang$core$Platform_Cmd$none
 };
-var _user$project$Accio$Property = F3(
+var _user$project$Accio$Response = F3(
 	function (a, b, c) {
-		return {value: a, selected: b, id: c};
+		return {text: a, selected: b, id: c};
 	});
 var _user$project$Accio$Select = function (a) {
 	return {ctor: 'Select', _0: a};
@@ -277,12 +277,12 @@ var _user$project$Accio$update = F2(
 						{
 							uid: model.uid + 1,
 							field: _p4,
-							properties: A2(
+							responses: A2(
 								_elm_lang$core$Basics_ops['++'],
-								model.properties,
+								model.responses,
 								_elm_lang$core$Native_List.fromArray(
 									[
-										A2(_user$project$Accio$newProperty, _p4, model.uid)
+										A2(_user$project$Accio$newResponse, _p4, model.uid)
 									]))
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
@@ -338,7 +338,7 @@ var _user$project$Accio$update = F2(
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							properties: A2(_elm_lang$core$List$map, updateSelected, model.properties)
+							responses: A2(_elm_lang$core$List$map, updateSelected, model.responses)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -390,7 +390,7 @@ var _user$project$Accio$view = function (model) {
 					[]),
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_user$project$Accio$viewEntries(model.properties)
+						_user$project$Accio$viewEntries(model.responses)
 					]))
 			]));
 };
