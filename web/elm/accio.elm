@@ -112,30 +112,72 @@ view model =
   div []
     [ input [ type' "text", placeholder "url", onInput Url ] []
     , button [ onClick GetData ] [ text "Get Data"]
-    , section [] [ viewEntries model.responses ]
+    , section [] [ viewResponses model.responses ]
     ]
 
 
-viewEntries : List Response -> Html Msg
-viewEntries responses =
+viewResponses : List Response -> Html Msg
+viewResponses responses =
         section
             [ class "main" ]
             [ Keyed.ul [] <|
-                List.map viewKeyedEntry responses
+                List.map viewKeyedResponse responses
             ]
 
-viewKeyedEntry : Response -> ( String, Html Msg )
-viewKeyedEntry response =
-    ( toString response.id, lazy viewEntry response )
+viewKeyedResponse : Response -> ( String, Html Msg )
+viewKeyedResponse response =
+    ( toString response.id, lazy viewResponse response )
 
-viewEntry : Response -> Html Msg
-viewEntry response =
+viewResponse : Response -> Html Msg
+viewResponse response =
     -- p [ classList [ ("selected", property.selected)
     --               , ("unselected", property.selected == False)
     --               ]
     --   , onClick (Select property.id)
     --   ]
-    section [] [viewJson response.text]
+    section [] [parseJson response.text]
+
+parseJson : String -> Html msg
+parseJson json =
+  let
+    lines =
+      json
+      |> formatString "" False 0
+      |> String.split uniqueHead
+  in
+  div [] <| List.map viewLine lines
+
+viewLine : String -> Html msg
+viewLine lineStr =
+  let
+    (indent, lineTxt) = splitLine lineStr
+  in
+    p [style
+        [ ("paddingLeft", px (indent))
+        , ("marginTop", "0px")
+        , ("marginBottom", "0px")
+        ]
+      ]
+      [ text lineTxt ]
+
+-- VIEW HELPERS
+
+px : Int -> String
+px int =
+  toString int
+  ++ "px"
+
+splitLine : String -> (Int, String)
+splitLine line =
+  let
+    indent =
+      String.left 5 line
+      |> String.toInt
+      |> Result.withDefault 0
+    newLine =
+      String.dropLeft 5 line
+  in
+    (indent, newLine)
 
 -- SUBSCRIPTIONS
 port javascriptValues : (String -> msg) -> Sub msg
@@ -161,36 +203,6 @@ outdentChars = "}]"
 newLineChars = ","
 uniqueHead = "##FORMAT##"
 incr = 20
-
-testString = "[{\"id\":91541985,\"time\":\"2016-10-29 01:48:04 UTC\",\"anon_visitor_id\":\"a86adf6b-910b-2b08-e291-c682\",\"ip_address\":\"76.20.48.125\",\"identity\":null,\"page\":\"https://trueme.goodhire.com/member/report-shared?candidateid=4402330f-4636-4323-a049-5a43643e69f9\",\"referrer\":null,\"user_agent\":\"Mozilla/5.0 (iPad; CPU OS 9_3_4 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Mobile/13G35\",\"nudge_id\":167540,\"nudge_name\":\"Candidate Satisfaction\",\"answered_questions\":{\"321141\":{\"question_id\":321141,\"question_title\":\"How satisfied are you with your experience with GoodHire?\",\"question_type\":\"radio\",\"answer\":\"Very Satisfied\",\"selected_option_id\":919755}}}]"
-
-viewJson : String -> Html msg
-viewJson json =
-  let
-    lines =
-      json
-      |> formatString "" False 0
-      |> String.split uniqueHead
-  in
-  div [] <| List.map viewLine lines
-
-viewLine : String -> Html msg
-viewLine lineStr =
-  let
-    (indent, lineTxt) = splitLine lineStr
-  in
-    p [style
-        [ ("paddingLeft", px (indent))
-        , ("marginTop", "0px")
-        , ("marginBottom", "0px")
-        ]
-      ]
-      [ text lineTxt ]
-
-px : Int -> String
-px int =
-  toString int
-  ++ "px"
 
 formatString : String -> Bool -> Int -> String -> String
 formatString acc isInQuotes indent str =
@@ -218,15 +230,3 @@ formatString acc isInQuotes indent str =
 pad : Int -> String
 pad indent =
   String.padLeft 5 '0' <| toString indent
-
-splitLine : String -> (Int, String)
-splitLine line =
-  let
-    indent =
-      String.left 5 line
-      |> String.toInt
-      |> Result.withDefault 0
-    newLine =
-      String.dropLeft 5 line
-  in
-    (indent, newLine)

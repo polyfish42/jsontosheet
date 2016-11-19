@@ -8847,6 +8847,139 @@ var _evancz$elm_http$Http$post = F3(
 			A2(_evancz$elm_http$Http$send, _evancz$elm_http$Http$defaultSettings, request));
 	});
 
+var _user$project$Accio$pad = function (indent) {
+	return A3(
+		_elm_lang$core$String$padLeft,
+		5,
+		_elm_lang$core$Native_Utils.chr('0'),
+		_elm_lang$core$Basics$toString(indent));
+};
+var _user$project$Accio$incr = 20;
+var _user$project$Accio$uniqueHead = '##FORMAT##';
+var _user$project$Accio$newLineChars = ',';
+var _user$project$Accio$outdentChars = '}]';
+var _user$project$Accio$indentChars = '{[';
+var _user$project$Accio$quote = '\"';
+var _user$project$Accio$formatString = F4(
+	function (acc, isInQuotes, indent, str) {
+		formatString:
+		while (true) {
+			var _p0 = A2(_elm_lang$core$String$left, 1, str);
+			if (_p0 === '') {
+				return acc;
+			} else {
+				var _p1 = _p0;
+				if (isInQuotes) {
+					if (_elm_lang$core$Native_Utils.eq(_p1, _user$project$Accio$quote)) {
+						var _v1 = A2(_elm_lang$core$Basics_ops['++'], acc, _p1),
+							_v2 = _elm_lang$core$Basics$not(isInQuotes),
+							_v3 = indent,
+							_v4 = A2(_elm_lang$core$String$dropLeft, 1, str);
+						acc = _v1;
+						isInQuotes = _v2;
+						indent = _v3;
+						str = _v4;
+						continue formatString;
+					} else {
+						var _v5 = A2(_elm_lang$core$Basics_ops['++'], acc, _p1),
+							_v6 = isInQuotes,
+							_v7 = indent,
+							_v8 = A2(_elm_lang$core$String$dropLeft, 1, str);
+						acc = _v5;
+						isInQuotes = _v6;
+						indent = _v7;
+						str = _v8;
+						continue formatString;
+					}
+				} else {
+					if (A2(_elm_lang$core$String$contains, _p1, _user$project$Accio$newLineChars)) {
+						var _v9 = A2(
+							_elm_lang$core$Basics_ops['++'],
+							acc,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_p1,
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_user$project$Accio$uniqueHead,
+									_user$project$Accio$pad(indent)))),
+							_v10 = isInQuotes,
+							_v11 = indent,
+							_v12 = A2(_elm_lang$core$String$dropLeft, 1, str);
+						acc = _v9;
+						isInQuotes = _v10;
+						indent = _v11;
+						str = _v12;
+						continue formatString;
+					} else {
+						if (A2(_elm_lang$core$String$contains, _p1, _user$project$Accio$indentChars)) {
+							var _v13 = A2(
+								_elm_lang$core$Basics_ops['++'],
+								acc,
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_user$project$Accio$uniqueHead,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										_user$project$Accio$pad(indent + _user$project$Accio$incr),
+										_p1))),
+								_v14 = isInQuotes,
+								_v15 = indent + _user$project$Accio$incr,
+								_v16 = A2(_elm_lang$core$String$dropLeft, 1, str);
+							acc = _v13;
+							isInQuotes = _v14;
+							indent = _v15;
+							str = _v16;
+							continue formatString;
+						} else {
+							if (A2(_elm_lang$core$String$contains, _p1, _user$project$Accio$outdentChars)) {
+								var _v17 = A2(
+									_elm_lang$core$Basics_ops['++'],
+									acc,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										_p1,
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											_user$project$Accio$uniqueHead,
+											_user$project$Accio$pad(indent - _user$project$Accio$incr)))),
+									_v18 = isInQuotes,
+									_v19 = indent - _user$project$Accio$incr,
+									_v20 = A2(_elm_lang$core$String$dropLeft, 1, str);
+								acc = _v17;
+								isInQuotes = _v18;
+								indent = _v19;
+								str = _v20;
+								continue formatString;
+							} else {
+								if (_elm_lang$core$Native_Utils.eq(_p1, _user$project$Accio$quote)) {
+									var _v21 = A2(_elm_lang$core$Basics_ops['++'], acc, _p1),
+										_v22 = _elm_lang$core$Basics$not(isInQuotes),
+										_v23 = indent,
+										_v24 = A2(_elm_lang$core$String$dropLeft, 1, str);
+									acc = _v21;
+									isInQuotes = _v22;
+									indent = _v23;
+									str = _v24;
+									continue formatString;
+								} else {
+									var _v25 = A2(_elm_lang$core$Basics_ops['++'], acc, _p1),
+										_v26 = isInQuotes,
+										_v27 = indent,
+										_v28 = A2(_elm_lang$core$String$dropLeft, 1, str);
+									acc = _v25;
+									isInQuotes = _v26;
+									indent = _v27;
+									str = _v28;
+									continue formatString;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	});
 var _user$project$Accio$splitLine = function (line) {
 	var newLine = A2(_elm_lang$core$String$dropLeft, 5, line);
 	var indent = A2(
@@ -8856,13 +8989,6 @@ var _user$project$Accio$splitLine = function (line) {
 			A2(_elm_lang$core$String$left, 5, line)));
 	return {ctor: '_Tuple2', _0: indent, _1: newLine};
 };
-var _user$project$Accio$pad = function (indent) {
-	return A3(
-		_elm_lang$core$String$padLeft,
-		5,
-		_elm_lang$core$Native_Utils.chr('0'),
-		_elm_lang$core$Basics$toString(indent));
-};
 var _user$project$Accio$px = function ($int) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
@@ -8870,9 +8996,9 @@ var _user$project$Accio$px = function ($int) {
 		'px');
 };
 var _user$project$Accio$viewLine = function (lineStr) {
-	var _p0 = _user$project$Accio$splitLine(lineStr);
-	var indent = _p0._0;
-	var lineTxt = _p0._1;
+	var _p2 = _user$project$Accio$splitLine(lineStr);
+	var indent = _p2._0;
+	var lineTxt = _p2._1;
 	return A2(
 		_elm_lang$html$Html$p,
 		_elm_lang$core$Native_List.fromArray(
@@ -8894,134 +9020,7 @@ var _user$project$Accio$viewLine = function (lineStr) {
 				_elm_lang$html$Html$text(lineTxt)
 			]));
 };
-var _user$project$Accio$testString = '[{\"id\":91541985,\"time\":\"2016-10-29 01:48:04 UTC\",\"anon_visitor_id\":\"a86adf6b-910b-2b08-e291-c682\",\"ip_address\":\"76.20.48.125\",\"identity\":null,\"page\":\"https://trueme.goodhire.com/member/report-shared?candidateid=4402330f-4636-4323-a049-5a43643e69f9\",\"referrer\":null,\"user_agent\":\"Mozilla/5.0 (iPad; CPU OS 9_3_4 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Mobile/13G35\",\"nudge_id\":167540,\"nudge_name\":\"Candidate Satisfaction\",\"answered_questions\":{\"321141\":{\"question_id\":321141,\"question_title\":\"How satisfied are you with your experience with GoodHire?\",\"question_type\":\"radio\",\"answer\":\"Very Satisfied\",\"selected_option_id\":919755}}}]';
-var _user$project$Accio$incr = 20;
-var _user$project$Accio$uniqueHead = '##FORMAT##';
-var _user$project$Accio$newLineChars = ',';
-var _user$project$Accio$outdentChars = '}]';
-var _user$project$Accio$indentChars = '{[';
-var _user$project$Accio$quote = '\"';
-var _user$project$Accio$formatString = F4(
-	function (acc, isInQuotes, indent, str) {
-		formatString:
-		while (true) {
-			var _p1 = A2(_elm_lang$core$String$left, 1, str);
-			if (_p1 === '') {
-				return acc;
-			} else {
-				var _p2 = _p1;
-				if (isInQuotes) {
-					if (_elm_lang$core$Native_Utils.eq(_p2, _user$project$Accio$quote)) {
-						var _v1 = A2(_elm_lang$core$Basics_ops['++'], acc, _p2),
-							_v2 = _elm_lang$core$Basics$not(isInQuotes),
-							_v3 = indent,
-							_v4 = A2(_elm_lang$core$String$dropLeft, 1, str);
-						acc = _v1;
-						isInQuotes = _v2;
-						indent = _v3;
-						str = _v4;
-						continue formatString;
-					} else {
-						var _v5 = A2(_elm_lang$core$Basics_ops['++'], acc, _p2),
-							_v6 = isInQuotes,
-							_v7 = indent,
-							_v8 = A2(_elm_lang$core$String$dropLeft, 1, str);
-						acc = _v5;
-						isInQuotes = _v6;
-						indent = _v7;
-						str = _v8;
-						continue formatString;
-					}
-				} else {
-					if (A2(_elm_lang$core$String$contains, _p2, _user$project$Accio$newLineChars)) {
-						var _v9 = A2(
-							_elm_lang$core$Basics_ops['++'],
-							acc,
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								_p2,
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									_user$project$Accio$uniqueHead,
-									_user$project$Accio$pad(indent)))),
-							_v10 = isInQuotes,
-							_v11 = indent,
-							_v12 = A2(_elm_lang$core$String$dropLeft, 1, str);
-						acc = _v9;
-						isInQuotes = _v10;
-						indent = _v11;
-						str = _v12;
-						continue formatString;
-					} else {
-						if (A2(_elm_lang$core$String$contains, _p2, _user$project$Accio$indentChars)) {
-							var _v13 = A2(
-								_elm_lang$core$Basics_ops['++'],
-								acc,
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									_user$project$Accio$uniqueHead,
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										_user$project$Accio$pad(indent + _user$project$Accio$incr),
-										_p2))),
-								_v14 = isInQuotes,
-								_v15 = indent + _user$project$Accio$incr,
-								_v16 = A2(_elm_lang$core$String$dropLeft, 1, str);
-							acc = _v13;
-							isInQuotes = _v14;
-							indent = _v15;
-							str = _v16;
-							continue formatString;
-						} else {
-							if (A2(_elm_lang$core$String$contains, _p2, _user$project$Accio$outdentChars)) {
-								var _v17 = A2(
-									_elm_lang$core$Basics_ops['++'],
-									acc,
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										_p2,
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											_user$project$Accio$uniqueHead,
-											_user$project$Accio$pad(indent - _user$project$Accio$incr)))),
-									_v18 = isInQuotes,
-									_v19 = indent - _user$project$Accio$incr,
-									_v20 = A2(_elm_lang$core$String$dropLeft, 1, str);
-								acc = _v17;
-								isInQuotes = _v18;
-								indent = _v19;
-								str = _v20;
-								continue formatString;
-							} else {
-								if (_elm_lang$core$Native_Utils.eq(_p2, _user$project$Accio$quote)) {
-									var _v21 = A2(_elm_lang$core$Basics_ops['++'], acc, _p2),
-										_v22 = _elm_lang$core$Basics$not(isInQuotes),
-										_v23 = indent,
-										_v24 = A2(_elm_lang$core$String$dropLeft, 1, str);
-									acc = _v21;
-									isInQuotes = _v22;
-									indent = _v23;
-									str = _v24;
-									continue formatString;
-								} else {
-									var _v25 = A2(_elm_lang$core$Basics_ops['++'], acc, _p2),
-										_v26 = isInQuotes,
-										_v27 = indent,
-										_v28 = A2(_elm_lang$core$String$dropLeft, 1, str);
-									acc = _v25;
-									isInQuotes = _v26;
-									indent = _v27;
-									str = _v28;
-									continue formatString;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	});
-var _user$project$Accio$viewJson = function (json) {
+var _user$project$Accio$parseJson = function (json) {
 	var lines = A2(
 		_elm_lang$core$String$split,
 		_user$project$Accio$uniqueHead,
@@ -9032,24 +9031,24 @@ var _user$project$Accio$viewJson = function (json) {
 			[]),
 		A2(_elm_lang$core$List$map, _user$project$Accio$viewLine, lines));
 };
-var _user$project$Accio$viewEntry = function (response) {
+var _user$project$Accio$viewResponse = function (response) {
 	return A2(
 		_elm_lang$html$Html$section,
 		_elm_lang$core$Native_List.fromArray(
 			[]),
 		_elm_lang$core$Native_List.fromArray(
 			[
-				_user$project$Accio$viewJson(response.text)
+				_user$project$Accio$parseJson(response.text)
 			]));
 };
-var _user$project$Accio$viewKeyedEntry = function (response) {
+var _user$project$Accio$viewKeyedResponse = function (response) {
 	return {
 		ctor: '_Tuple2',
 		_0: _elm_lang$core$Basics$toString(response.id),
-		_1: A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Accio$viewEntry, response)
+		_1: A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Accio$viewResponse, response)
 	};
 };
-var _user$project$Accio$viewEntries = function (responses) {
+var _user$project$Accio$viewResponses = function (responses) {
 	return A2(
 		_elm_lang$html$Html$section,
 		_elm_lang$core$Native_List.fromArray(
@@ -9062,7 +9061,7 @@ var _user$project$Accio$viewEntries = function (responses) {
 				_elm_lang$html$Html_Keyed$ul,
 				_elm_lang$core$Native_List.fromArray(
 					[]),
-				A2(_elm_lang$core$List$map, _user$project$Accio$viewKeyedEntry, responses))
+				A2(_elm_lang$core$List$map, _user$project$Accio$viewKeyedResponse, responses))
 			]));
 };
 var _user$project$Accio$newResponse = F2(
@@ -9239,7 +9238,7 @@ var _user$project$Accio$view = function (model) {
 					[]),
 				_elm_lang$core$Native_List.fromArray(
 					[
-						_user$project$Accio$viewEntries(model.responses)
+						_user$project$Accio$viewResponses(model.responses)
 					]))
 			]));
 };
