@@ -1,7 +1,6 @@
 port module Accio exposing (..)
 
 import Html exposing (..)
-import Html.App as App
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed as Keyed
@@ -16,7 +15,7 @@ import Regex exposing (..)
 import Array
 
 main =
-  App.program
+  Html.program
     { init = init
     , view = view
     , update = update
@@ -62,8 +61,7 @@ type Msg
   | Add String
   | UpdateField String
   | GetData
-  | FetchSucceed String
-  | FetchFail Http.Error
+  | Fetch (Result Http.Error String)
   | Select Int
 
 port format : String -> Cmd msg
@@ -89,11 +87,11 @@ update msg model =
     GetData ->
       (model, getJson model.url)
 
-    FetchSucceed response ->
+    Fetch (Ok response) ->
       (model, format response)
 
-    FetchFail error ->
-      ({model | errorMessage = toString error}, Cmd.none)
+    Fetch (Err _) ->
+      ({model | errorMessage = toString Err}, Cmd.none)
 
     Select id ->
       let
@@ -110,7 +108,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
   div []
-    [ input [ type' "text", placeholder "url", onInput Url ] []
+    [ input [ type_ "text", placeholder "url", onInput Url ] []
     , button [ onClick GetData ] [ text "Get Data"]
     , section [] [ viewResponses model.responses ]
     ]
@@ -193,7 +191,9 @@ subscriptions model =
 
 getJson : String -> Cmd Msg
 getJson url =
-  Task.perform FetchFail FetchSucceed (Http.getString ("http://localhost:4000/response?url=" ++ url))
+  Http.send Fetch <|
+    Http.getString("http://localhost:4000/response?url=" ++ url)
+  -- Task.perform FetchFail (FetchSucceed (Http.get("http://localhost:4000/response?url=" ++ url)))
 
 -- PARSER
 
