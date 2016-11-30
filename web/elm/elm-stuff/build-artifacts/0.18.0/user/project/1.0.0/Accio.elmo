@@ -146,10 +146,7 @@ var _user$project$Accio$px = function ($int) {
 		_elm_lang$core$Basics$toString($int),
 		'px');
 };
-var _user$project$Accio$viewLine = function (lineStr) {
-	var _p2 = _user$project$Accio$splitLine(lineStr);
-	var indent = _p2._0;
-	var lineTxt = _p2._1;
+var _user$project$Accio$viewLine = function (keyValue) {
 	return A2(
 		_elm_lang$html$Html$p,
 		{
@@ -160,7 +157,7 @@ var _user$project$Accio$viewLine = function (lineStr) {
 					_0: {
 						ctor: '_Tuple2',
 						_0: 'paddingLeft',
-						_1: _user$project$Accio$px(indent)
+						_1: _user$project$Accio$px(keyValue.indent)
 					},
 					_1: {
 						ctor: '::',
@@ -176,38 +173,28 @@ var _user$project$Accio$viewLine = function (lineStr) {
 		},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text(lineTxt),
+			_0: _elm_lang$html$Html$text(keyValue.key),
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$Accio$parseJson = function (json) {
-	var lines = A2(
-		_elm_lang$core$String$split,
-		_user$project$Accio$uniqueHead,
-		A4(_user$project$Accio$formatString, '', false, 0, json));
-	return A2(
-		_elm_lang$html$Html$div,
-		{ctor: '[]'},
-		A2(_elm_lang$core$List$map, _user$project$Accio$viewLine, lines));
-};
-var _user$project$Accio$viewResponse = function (response) {
+var _user$project$Accio$viewResponse = function (keyValue) {
 	return A2(
 		_elm_lang$html$Html$section,
 		{ctor: '[]'},
 		{
 			ctor: '::',
-			_0: _user$project$Accio$parseJson(response.text),
+			_0: _user$project$Accio$viewLine(keyValue),
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$Accio$viewKeyedResponse = function (response) {
+var _user$project$Accio$viewKeyedResponse = function (keyValue) {
 	return {
 		ctor: '_Tuple2',
-		_0: _elm_lang$core$Basics$toString(response.id),
-		_1: A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Accio$viewResponse, response)
+		_0: _elm_lang$core$Basics$toString(keyValue.value),
+		_1: A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Accio$viewResponse, keyValue)
 	};
 };
-var _user$project$Accio$viewResponses = function (responses) {
+var _user$project$Accio$viewKeyValues = function (keyValues) {
 	return A2(
 		_elm_lang$html$Html$section,
 		{
@@ -220,23 +207,46 @@ var _user$project$Accio$viewResponses = function (responses) {
 			_0: A2(
 				_elm_lang$html$Html_Keyed$ul,
 				{ctor: '[]'},
-				A2(_elm_lang$core$List$map, _user$project$Accio$viewKeyedResponse, responses)),
+				A2(_elm_lang$core$List$map, _user$project$Accio$viewKeyedResponse, keyValues)),
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$Accio$newResponse = F2(
-	function (str, id) {
-		return {text: str, selected: false, id: id};
-	});
+var _user$project$Accio$parseJson = function (json) {
+	return A2(
+		_elm_lang$core$String$split,
+		_user$project$Accio$uniqueHead,
+		A4(_user$project$Accio$formatString, '', false, 0, json));
+};
+var _user$project$Accio$newKeyValue = function (input) {
+	return {
+		key: A2(_elm_lang$core$String$dropLeft, 5, input),
+		value: 'empty',
+		selected: false,
+		indent: A2(
+			_elm_lang$core$Result$withDefault,
+			0,
+			_elm_lang$core$String$toInt(
+				A2(
+					_elm_lang$core$Debug$log,
+					'left',
+					A2(_elm_lang$core$String$left, 5, input))))
+	};
+};
+var _user$project$Accio$enterKeyValues = function (response) {
+	return A2(
+		_elm_lang$core$List$map,
+		_user$project$Accio$newKeyValue,
+		_user$project$Accio$parseJson(response));
+};
 var _user$project$Accio$format = _elm_lang$core$Native_Platform.outgoingPort(
 	'format',
 	function (v) {
 		return v;
 	});
-var _user$project$Accio$javascriptValues = _elm_lang$core$Native_Platform.incomingPort('javascriptValues', _elm_lang$core$Json_Decode$string);
+var _user$project$Accio$stringyfiedJson = _elm_lang$core$Native_Platform.incomingPort('stringyfiedJson', _elm_lang$core$Json_Decode$string);
 var _user$project$Accio$Model = F6(
 	function (a, b, c, d, e, f) {
-		return {url: a, errorMessage: b, field: c, uid: d, selected: e, responses: f};
+		return {url: a, errorMessage: b, uid: c, selected: d, responses: e, keyValues: f};
 	});
 var _user$project$Accio$init = {
 	ctor: '_Tuple2',
@@ -244,19 +254,16 @@ var _user$project$Accio$init = {
 		_user$project$Accio$Model,
 		'',
 		'',
-		'',
 		0,
 		false,
+		'',
 		{ctor: '[]'}),
 	_1: _elm_lang$core$Platform_Cmd$none
 };
-var _user$project$Accio$Response = F3(
-	function (a, b, c) {
-		return {text: a, selected: b, id: c};
+var _user$project$Accio$KeyValue = F4(
+	function (a, b, c, d) {
+		return {key: a, value: b, selected: c, indent: d};
 	});
-var _user$project$Accio$Select = function (a) {
-	return {ctor: 'Select', _0: a};
-};
 var _user$project$Accio$Fetch = function (a) {
 	return {ctor: 'Fetch', _0: a};
 };
@@ -269,34 +276,20 @@ var _user$project$Accio$getJson = function (url) {
 };
 var _user$project$Accio$update = F2(
 	function (msg, model) {
-		var _p3 = msg;
-		switch (_p3.ctor) {
+		var _p2 = msg;
+		switch (_p2.ctor) {
 			case 'Add':
-				var _p4 = _p3._0;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
 							uid: model.uid + 1,
-							field: _p4,
-							responses: A2(
+							keyValues: A2(
 								_elm_lang$core$Basics_ops['++'],
-								model.responses,
-								{
-									ctor: '::',
-									_0: A2(_user$project$Accio$newResponse, _p4, model.uid),
-									_1: {ctor: '[]'}
-								})
+								model.keyValues,
+								_user$project$Accio$enterKeyValues(_p2._0))
 						}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
-			case 'UpdateField':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{field: _p3._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Url':
@@ -304,7 +297,7 @@ var _user$project$Accio$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{url: _p3._0}),
+						{url: _p2._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GetData':
@@ -313,12 +306,12 @@ var _user$project$Accio$update = F2(
 					_0: model,
 					_1: _user$project$Accio$getJson(model.url)
 				};
-			case 'Fetch':
-				if (_p3._0.ctor === 'Ok') {
+			default:
+				if (_p2._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: model,
-						_1: _user$project$Accio$format(_p3._0._0)
+						_1: _user$project$Accio$format(_p2._0._0)
 					};
 				} else {
 					return {
@@ -331,33 +324,9 @@ var _user$project$Accio$update = F2(
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
-			default:
-				var updateSelected = function (t) {
-					return _elm_lang$core$Native_Utils.eq(t.id, _p3._0) ? _elm_lang$core$Native_Utils.update(
-						t,
-						{selected: !t.selected}) : t;
-				};
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							responses: A2(_elm_lang$core$List$map, updateSelected, model.responses)
-						}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
 		}
 	});
 var _user$project$Accio$GetData = {ctor: 'GetData'};
-var _user$project$Accio$UpdateField = function (a) {
-	return {ctor: 'UpdateField', _0: a};
-};
-var _user$project$Accio$Add = function (a) {
-	return {ctor: 'Add', _0: a};
-};
-var _user$project$Accio$subscriptions = function (model) {
-	return _user$project$Accio$javascriptValues(_user$project$Accio$Add);
-};
 var _user$project$Accio$Url = function (a) {
 	return {ctor: 'Url', _0: a};
 };
@@ -404,13 +373,19 @@ var _user$project$Accio$view = function (model) {
 						{ctor: '[]'},
 						{
 							ctor: '::',
-							_0: _user$project$Accio$viewResponses(model.responses),
+							_0: _user$project$Accio$viewKeyValues(model.keyValues),
 							_1: {ctor: '[]'}
 						}),
 					_1: {ctor: '[]'}
 				}
 			}
 		});
+};
+var _user$project$Accio$Add = function (a) {
+	return {ctor: 'Add', _0: a};
+};
+var _user$project$Accio$subscriptions = function (model) {
+	return _user$project$Accio$stringyfiedJson(_user$project$Accio$Add);
 };
 var _user$project$Accio$main = _elm_lang$html$Html$program(
 	{init: _user$project$Accio$init, view: _user$project$Accio$view, update: _user$project$Accio$update, subscriptions: _user$project$Accio$subscriptions})();

@@ -13,6 +13,7 @@ import Debug
 import String
 import Regex exposing (..)
 import Array
+import Platform.Cmd exposing (..)
 
 main =
   Html.program
@@ -29,58 +30,55 @@ main =
 type alias Model =
   { url : String
   , errorMessage : String
-  , field : String
   , uid : Int
   , selected : Bool
-  , responses : List Response
+  , responses : String
+  , keyValues : List KeyValue
   }
 
-type alias Response =
-  { text : String
+type alias KeyValue =
+  { key : String
+  , value : String
   , selected : Bool
-  , id : Int
+  , indent : Int
   }
 
 
-newResponse : String -> Int -> Response
-newResponse str id =
-  { text = str
-  , selected = False
-  , id = id
-  }
+newKeyValue : String -> KeyValue
+newKeyValue input =
+    { key = String.dropLeft 5 input
+    , value = "empty"
+    , selected = False
+    , indent =
+      (Debug.log "left" (String.left 5 input))
+        |> String.toInt
+        |> Result.withDefault 0
+    }
 
 init : (Model, Cmd Msg)
 init =
-  ( Model "" "" "" 0 False [], Cmd.none )
+  ( Model "" "" 0 False "" [], Cmd.none )
 
 
 -- UPDATE
 
 type Msg
-  = Url String
-  | Add String
-  | UpdateField String
+  = Add String
+  | Url String
   | GetData
   | Fetch (Result Http.Error String)
-  | Select Int
+  -- | Select Int
 
 port format : String -> Cmd msg
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    Add json ->
-      ({ model
+    Add response ->
+        ({ model
         | uid = model.uid + 1
-        , field = json
-        , responses = model.responses ++ [ newResponse json model.uid ]
-      }
-      , Cmd.none
-      )
-
-    UpdateField str ->
-      ({ model | field = str }, Cmd.none)
-
+        , keyValues = model.keyValues ++ enterKeyValues response
+        }, Cmd.none)
     Url url ->
       ({ model | url = url }, Cmd.none)
 
@@ -93,16 +91,26 @@ update msg model =
     Fetch (Err _) ->
       ({model | errorMessage = toString Err}, Cmd.none)
 
-    Select id ->
-      let
-        updateSelected t =
-          if t.id == id then
-            { t | selected = not t.selected}
-          else
-            t
-      in
-      ({model | responses = List.map updateSelected model.responses}, Cmd.none)
+    -- Select id ->
+    --   let
+    --     updateSelected t =
+    --       if t.id == id then
+    --         { t | selected = not t.selected}
+    --       else
+    --         t
+    --   in
+    --   ({model | responses = List.map updateSelected model.responses}, Cmd.none)
 
+enterKeyValues : String -> (List KeyValue)
+enterKeyValues response =
+  List.map newKeyValue (parseJson response)
+
+
+parseJson : String -> (List String)
+parseJson json =
+      json
+      |> formatString "" False 0
+      |> String.split uniqueHead
 -- VIEW
 
 view : Model -> Html Msg
@@ -110,53 +118,40 @@ view model =
   div []
     [ input [ type_ "text", placeholder "url", onInput Url ] []
     , button [ onClick GetData ] [ text "Get Data"]
-    , section [] [ viewResponses model.responses ]
+    , section [] [ viewKeyValues model.keyValues ]
     ]
 
 
-viewResponses : List Response -> Html Msg
-viewResponses responses =
+viewKeyValues : List KeyValue -> Html Msg
+viewKeyValues keyValues =
         section
             [ class "main" ]
             [ Keyed.ul [] <|
-                List.map viewKeyedResponse responses
+                List.map viewKeyedResponse keyValues
             ]
 
-viewKeyedResponse : Response -> ( String, Html Msg )
-viewKeyedResponse response =
-    ( toString response.id, lazy viewResponse response )
+viewKeyedResponse : KeyValue -> ( String, Html Msg )
+viewKeyedResponse keyValue =
+    ( toString keyValue.value, lazy viewResponse keyValue )
 
-viewResponse : Response -> Html Msg
-viewResponse response =
+viewResponse : KeyValue -> Html Msg
+viewResponse keyValue =
     -- p [ classList [ ("selected", property.selected)
     --               , ("unselected", property.selected == False)
     --               ]
     --   , onClick (Select property.id)
     --   ]
-    section [] [parseJson response.text]
+    section [] [viewLine keyValue]
 
-parseJson : String -> Html msg
-parseJson json =
-  let
-    lines =
-      json
-      |> formatString "" False 0
-      |> String.split uniqueHead
-  in
-  div [] <| List.map viewLine lines
-
-viewLine : String -> Html msg
-viewLine lineStr =
-  let
-    (indent, lineTxt) = splitLine lineStr
-  in
+viewLine : KeyValue -> Html msg
+viewLine keyValue =
     p [style
-        [ ("paddingLeft", px (indent))
+        [ ("paddingLeft", px (keyValue.indent))
         , ("marginTop", "0px")
         , ("marginBottom", "0px")
         ]
       ]
-      [ text lineTxt ]
+      [ text keyValue.key ]
 
 -- VIEW HELPERS
 
@@ -178,22 +173,22 @@ splitLine line =
     (indent, newLine)
 
 -- SUBSCRIPTIONS
-port javascriptValues : (String -> msg) -> Sub msg
+
+port stringyfiedJson : (String -> msg) -> Sub msg
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  javascriptValues Add
-
+     stringyfiedJson Add
 
 
 -- HTTP
-
 
 getJson : String -> Cmd Msg
 getJson url =
   Http.send Fetch <|
     Http.getString("http://localhost:4000/response?url=" ++ url)
-  -- Task.perform FetchFail (FetchSucceed (Http.get("http://localhost:4000/response?url=" ++ url)))
+    -- Http.getString(url)
+
 
 -- PARSER
 
