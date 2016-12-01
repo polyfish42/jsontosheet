@@ -1,5 +1,0 @@
-var _user$project$Repl$t_s_o_l = {ctor: '_Tuple0'};
-var _user$project$Repl$Property = F3(
-	function (a, b, c) {
-		return {value: a, selected: b, id: c};
-	});

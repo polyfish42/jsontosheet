@@ -1,7 +1,7 @@
 /* This file is for your main application css. */
 .unselected {
-  color: red;
+  color: black;
 }
 .selected {
-  color: green;
+  color: blue;
 }

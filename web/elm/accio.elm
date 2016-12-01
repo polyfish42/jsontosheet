@@ -40,15 +40,17 @@ type alias KeyValue =
   { key : String
   , value : String
   , selected : Bool
+  , id : Int
   , indent : Int
   }
 
 
-newKeyValue : String -> KeyValue
-newKeyValue input =
+newKeyValue : String -> Int -> KeyValue
+newKeyValue input id =
     { key = String.dropLeft 5 input
     , value = "empty"
     , selected = False
+    , id = id
     , indent =
       (Debug.log "left" (String.left 5 input))
         |> String.toInt
@@ -67,7 +69,7 @@ type Msg
   | Url String
   | GetData
   | Fetch (Result Http.Error String)
-  -- | Select Int
+  | Select Int
 
 port format : String -> Cmd msg
 
@@ -77,8 +79,9 @@ update msg model =
     Add response ->
         ({ model
         | uid = model.uid + 1
-        , keyValues = model.keyValues ++ enterKeyValues response
+        , keyValues = List.append model.keyValues (enterKeyValues response)
         }, Cmd.none)
+
     Url url ->
       ({ model | url = url }, Cmd.none)
 
@@ -91,19 +94,30 @@ update msg model =
     Fetch (Err _) ->
       ({model | errorMessage = toString Err}, Cmd.none)
 
-    -- Select id ->
-    --   let
-    --     updateSelected t =
-    --       if t.id == id then
-    --         { t | selected = not t.selected}
-    --       else
-    --         t
-    --   in
-    --   ({model | responses = List.map updateSelected model.responses}, Cmd.none)
+    Select id ->
+      let
+        updateSelected t =
+          if t.id == id then
+            { t | selected = not t.selected}
+          else
+            t
+      in
+      ({model | keyValues = List.map updateSelected model.keyValues}, Cmd.none)
 
-enterKeyValues : String -> (List KeyValue)
+enterKeyValues : String -> List KeyValue
 enterKeyValues response =
-  List.map newKeyValue (parseJson response)
+  -- List.map newKeyValue (parseJson response)
+
+  listKeyValues (parseJson response) 1 []
+
+listKeyValues : (List String) -> Int -> List KeyValue -> List KeyValue
+listKeyValues response uid acc =
+  case response of
+    [] -> List.reverse acc
+
+    x::xs ->
+      listKeyValues xs (uid +1) ((newKeyValue x uid)::acc)
+  -- call newkeyvalue recrusively through the list while incrementing the id
 
 
 parseJson : String -> (List String)
@@ -132,24 +146,20 @@ viewKeyValues keyValues =
 
 viewKeyedResponse : KeyValue -> ( String, Html Msg )
 viewKeyedResponse keyValue =
-    ( toString keyValue.value, lazy viewResponse keyValue )
+    ( toString keyValue.id, lazy viewLine keyValue )
 
-viewResponse : KeyValue -> Html Msg
-viewResponse keyValue =
-    -- p [ classList [ ("selected", property.selected)
-    --               , ("unselected", property.selected == False)
-    --               ]
-    --   , onClick (Select property.id)
-    --   ]
-    section [] [viewLine keyValue]
-
-viewLine : KeyValue -> Html msg
+viewLine : KeyValue -> Html Msg
 viewLine keyValue =
-    p [style
+    p [ classList
+        [("selected", keyValue.selected)
+        ,("unselected", keyValue.selected == False)
+        ]
+      , style
         [ ("paddingLeft", px (keyValue.indent))
         , ("marginTop", "0px")
         , ("marginBottom", "0px")
         ]
+      , onClick (Select keyValue.id)
       ]
       [ text keyValue.key ]
 
