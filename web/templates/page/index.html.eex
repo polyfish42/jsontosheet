@@ -1,6 +1,6 @@
 <div class="jumbotron">
   <h2>Welcome to Accio</h2>
-  <p class="lead">Use your software's APIs<br />with no programming skills.</p>
+  <p class="lead">Turn JSON into a Google Sheet.</p>
 </div>
 
 <div id="elm-main"></div>

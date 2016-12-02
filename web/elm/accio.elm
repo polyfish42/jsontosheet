@@ -46,9 +46,9 @@ type alias KeyValue =
 
 newKeyValue : String -> Int -> KeyValue
 newKeyValue str id =
-    case String.split "\":\"" str of
+    case String.split "\":" str of
       [key, value] ->
-        { key = String.dropLeft 5 key
+        { key = (String.dropLeft 5 key) ++ "\""
         , value = value
         , selected = False
         , id = id
@@ -144,8 +144,7 @@ parseJson json =
 view : Model -> Html Msg
 view model =
   div []
-    [ p [] [Html.text (Parser.parsedJson) ]
-    , input [ type_ "text", placeholder "url", onInput Url ] []
+    [ input [ type_ "text", placeholder "url", onInput Url ] []
     , button [ onClick GetData ] [ text "Get Data"]
     , section [] [ viewKeyValues model.keyValues ]
     ]
@@ -176,7 +175,7 @@ viewLine keyValue =
         ]
       , onClick (Select keyValue.key)
       ]
-      [ text (keyValue.key ++ "  " ++ keyValue.value) ]
+      [ text (keyValue.key ++ ":" ++ keyValue.value) ]
 
 -- VIEW HELPERS
 

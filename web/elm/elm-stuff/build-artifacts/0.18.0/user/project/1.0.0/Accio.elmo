@@ -145,11 +145,14 @@ var _user$project$Accio$parseJson = function (json) {
 };
 var _user$project$Accio$newKeyValue = F2(
 	function (str, id) {
-		var _p2 = A2(_elm_lang$core$String$split, '\":\"', str);
+		var _p2 = A2(_elm_lang$core$String$split, '\":', str);
 		if (_p2.ctor === '::') {
 			if ((_p2._1.ctor === '::') && (_p2._1._1.ctor === '[]')) {
 				return {
-					key: A2(_elm_lang$core$String$dropLeft, 5, _p2._0),
+					key: A2(
+						_elm_lang$core$Basics_ops['++'],
+						A2(_elm_lang$core$String$dropLeft, 5, _p2._0),
+						'\"'),
 					value: _p2._1._0,
 					selected: false,
 					id: id,
@@ -284,7 +287,7 @@ var _user$project$Accio$viewLine = function (keyValue) {
 				A2(
 					_elm_lang$core$Basics_ops['++'],
 					keyValue.key,
-					A2(_elm_lang$core$Basics_ops['++'], '  ', keyValue.value))),
+					A2(_elm_lang$core$Basics_ops['++'], ':', keyValue.value))),
 			_1: {ctor: '[]'}
 		});
 };
@@ -399,57 +402,46 @@ var _user$project$Accio$view = function (model) {
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$p,
-				{ctor: '[]'},
+				_elm_lang$html$Html$input,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(_user$project$Parser$parsedJson),
-					_1: {ctor: '[]'}
-				}),
+					_0: _elm_lang$html$Html_Attributes$type_('text'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$placeholder('url'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
+							_1: {ctor: '[]'}
+						}
+					}
+				},
+				{ctor: '[]'}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$input,
+					_elm_lang$html$Html$button,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$type_('text'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$placeholder('url'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
-								_1: {ctor: '[]'}
-							}
-						}
+						_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
+						_1: {ctor: '[]'}
 					},
-					{ctor: '[]'}),
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Get Data'),
+						_1: {ctor: '[]'}
+					}),
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$button,
+						_elm_lang$html$Html$section,
+						{ctor: '[]'},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Get Data'),
+							_0: _user$project$Accio$viewKeyValues(model.keyValues),
 							_1: {ctor: '[]'}
 						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$section,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _user$project$Accio$viewKeyValues(model.keyValues),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}
+					_1: {ctor: '[]'}
 				}
 			}
 		});
