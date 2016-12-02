@@ -14,6 +14,8 @@ import String
 import Regex exposing (..)
 import Array
 import Platform.Cmd exposing (..)
+import Parser exposing (..)
+import Maybe exposing (..)
 
 main =
   Html.program
@@ -30,9 +32,6 @@ main =
 type alias Model =
   { url : String
   , errorMessage : String
-  , uid : Int
-  , selected : Bool
-  , responses : String
   , keyValues : List KeyValue
   }
 
@@ -46,20 +45,39 @@ type alias KeyValue =
 
 
 newKeyValue : String -> Int -> KeyValue
-newKeyValue input id =
-    { key = String.dropLeft 5 input
-    , value = "empty"
-    , selected = False
-    , id = id
-    , indent =
-      (Debug.log "left" (String.left 5 input))
-        |> String.toInt
-        |> Result.withDefault 0
-    }
+newKeyValue str id =
+    case String.split "\":\"" str of
+      [key, value] ->
+        { key = String.dropLeft 5 key
+        , value = value
+        , selected = False
+        , id = id
+        , indent =
+          String.left 5 str
+            |> String.toInt
+            |> Result.withDefault 0
+        }
+      char::xs ->
+        { key = String.dropLeft 5 char
+        , value = ""
+        , selected = False
+        , id = id
+        , indent =
+          String.left 5 str
+            |> String.toInt
+            |> Result.withDefault 0
+        }
+      [] ->
+        { key = "something"
+        , value = " is worng"
+        , selected = False
+        , id = id
+        , indent = 1
+        }
 
 init : (Model, Cmd Msg)
 init =
-  ( Model "" "" 0 False "" [], Cmd.none )
+  ( Model "" "" [], Cmd.none )
 
 
 -- UPDATE
@@ -69,7 +87,7 @@ type Msg
   | Url String
   | GetData
   | Fetch (Result Http.Error String)
-  | Select Int
+  | Select String
 
 port format : String -> Cmd msg
 
@@ -78,8 +96,7 @@ update msg model =
   case msg of
     Add response ->
         ({ model
-        | uid = model.uid + 1
-        , keyValues = List.append model.keyValues (enterKeyValues response)
+        | keyValues = List.append model.keyValues (enterKeyValues response)
         }, Cmd.none)
 
     Url url ->
@@ -94,10 +111,10 @@ update msg model =
     Fetch (Err _) ->
       ({model | errorMessage = toString Err}, Cmd.none)
 
-    Select id ->
+    Select key ->
       let
         updateSelected t =
-          if t.id == id then
+          if t.key == key then
             { t | selected = not t.selected}
           else
             t
@@ -106,31 +123,29 @@ update msg model =
 
 enterKeyValues : String -> List KeyValue
 enterKeyValues response =
-  -- List.map newKeyValue (parseJson response)
+  formatKeyValues (parseJson response) 1 []
 
-  listKeyValues (parseJson response) 1 []
-
-listKeyValues : (List String) -> Int -> List KeyValue -> List KeyValue
-listKeyValues response uid acc =
+formatKeyValues : (List String) -> Int -> List KeyValue -> List KeyValue
+formatKeyValues response uid acc =
   case response of
     [] -> List.reverse acc
 
     x::xs ->
-      listKeyValues xs (uid +1) ((newKeyValue x uid)::acc)
-  -- call newkeyvalue recrusively through the list while incrementing the id
-
+      formatKeyValues xs (uid +1) ((newKeyValue x uid)::acc)
 
 parseJson : String -> (List String)
 parseJson json =
       json
       |> formatString "" False 0
       |> String.split uniqueHead
+
 -- VIEW
 
 view : Model -> Html Msg
 view model =
   div []
-    [ input [ type_ "text", placeholder "url", onInput Url ] []
+    [ p [] [Html.text (Parser.parsedJson) ]
+    , input [ type_ "text", placeholder "url", onInput Url ] []
     , button [ onClick GetData ] [ text "Get Data"]
     , section [] [ viewKeyValues model.keyValues ]
     ]
@@ -141,11 +156,11 @@ viewKeyValues keyValues =
         section
             [ class "main" ]
             [ Keyed.ul [] <|
-                List.map viewKeyedResponse keyValues
+                List.map viewKeyedLi keyValues
             ]
 
-viewKeyedResponse : KeyValue -> ( String, Html Msg )
-viewKeyedResponse keyValue =
+viewKeyedLi : KeyValue -> ( String, Html Msg )
+viewKeyedLi keyValue =
     ( toString keyValue.id, lazy viewLine keyValue )
 
 viewLine : KeyValue -> Html Msg
@@ -159,9 +174,9 @@ viewLine keyValue =
         , ("marginTop", "0px")
         , ("marginBottom", "0px")
         ]
-      , onClick (Select keyValue.id)
+      , onClick (Select keyValue.key)
       ]
-      [ text keyValue.key ]
+      [ text (keyValue.key ++ "  " ++ keyValue.value) ]
 
 -- VIEW HELPERS
 
@@ -169,18 +184,6 @@ px : Int -> String
 px int =
   toString int
   ++ "px"
-
-splitLine : String -> (Int, String)
-splitLine line =
-  let
-    indent =
-      String.left 5 line
-      |> String.toInt
-      |> Result.withDefault 0
-    newLine =
-      String.dropLeft 5 line
-  in
-    (indent, newLine)
 
 -- SUBSCRIPTIONS
 

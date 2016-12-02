@@ -9174,6 +9174,9 @@ var _elm_lang$http$Http$StringPart = F2(
 	});
 var _elm_lang$http$Http$stringPart = _elm_lang$http$Http$StringPart;
 
+var _user$project$Parser$testJson = '\n[\n  { \"id\":91541985,\n    \"time\":\"2016-10-29 01:48:04 UTC\",\n    \"anon_visitor_id\":\"a86adf6b-910b-2b08-e291-c682\",\n    \"ip_address\":\"76.20.48.125\",\n    \"identity\":null,\n    \"page\":\"https://trueme.goodhire.com/member/report-shared?candidateid=4402330f-4636-4323-a049-5a43643e69f9\",\n    \"referrer\":null,\n    \"user_agent\":\"Mozilla/5.0 (iPad; CPU OS 9_3_4 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Mobile/13G35\",\n    \"nudge_id\":167540,\n    \"nudge_name\":\"Candidate Satisfaction\",\n    \"answered_questions\":\n      { \"321141\":\n        { \"question_id\":321141,\n          \"question_title\":\"How satisfied are you with your experience with GoodHire?\",\n          \"question_type\":\"radio\",\n          \"answer\":\"Very Satisfied\",\n          \"selected_option_id\":919755\n        }\n      }\n  }\n]\n';
+var _user$project$Parser$parsedJson = _user$project$Parser$testJson;
+
 var _user$project$Accio$pad = function (indent) {
 	return A3(
 		_elm_lang$core$String$padLeft,
@@ -9307,15 +9310,6 @@ var _user$project$Accio$formatString = F4(
 			}
 		}
 	});
-var _user$project$Accio$splitLine = function (line) {
-	var newLine = A2(_elm_lang$core$String$dropLeft, 5, line);
-	var indent = A2(
-		_elm_lang$core$Result$withDefault,
-		0,
-		_elm_lang$core$String$toInt(
-			A2(_elm_lang$core$String$left, 5, line)));
-	return {ctor: '_Tuple2', _0: indent, _1: newLine};
-};
 var _user$project$Accio$px = function ($int) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
@@ -9329,47 +9323,63 @@ var _user$project$Accio$parseJson = function (json) {
 		A4(_user$project$Accio$formatString, '', false, 0, json));
 };
 var _user$project$Accio$newKeyValue = F2(
-	function (input, id) {
-		return {
-			key: A2(_elm_lang$core$String$dropLeft, 5, input),
-			value: 'empty',
-			selected: false,
-			id: id,
-			indent: A2(
-				_elm_lang$core$Result$withDefault,
-				0,
-				_elm_lang$core$String$toInt(
-					A2(
-						_elm_lang$core$Debug$log,
-						'left',
-						A2(_elm_lang$core$String$left, 5, input))))
-		};
+	function (str, id) {
+		var _p2 = A2(_elm_lang$core$String$split, '\":\"', str);
+		if (_p2.ctor === '::') {
+			if ((_p2._1.ctor === '::') && (_p2._1._1.ctor === '[]')) {
+				return {
+					key: A2(_elm_lang$core$String$dropLeft, 5, _p2._0),
+					value: _p2._1._0,
+					selected: false,
+					id: id,
+					indent: A2(
+						_elm_lang$core$Result$withDefault,
+						0,
+						_elm_lang$core$String$toInt(
+							A2(_elm_lang$core$String$left, 5, str)))
+				};
+			} else {
+				return {
+					key: A2(_elm_lang$core$String$dropLeft, 5, _p2._0),
+					value: '',
+					selected: false,
+					id: id,
+					indent: A2(
+						_elm_lang$core$Result$withDefault,
+						0,
+						_elm_lang$core$String$toInt(
+							A2(_elm_lang$core$String$left, 5, str)))
+				};
+			}
+		} else {
+			return {key: 'something', value: ' is worng', selected: false, id: id, indent: 1};
+		}
 	});
-var _user$project$Accio$listKeyValues = F3(
+var _user$project$Accio$formatKeyValues = F3(
 	function (response, uid, acc) {
-		listKeyValues:
+		formatKeyValues:
 		while (true) {
-			var _p2 = response;
-			if (_p2.ctor === '[]') {
+			var _p3 = response;
+			if (_p3.ctor === '[]') {
 				return _elm_lang$core$List$reverse(acc);
 			} else {
-				var _v30 = _p2._1,
-					_v31 = uid + 1,
-					_v32 = {
+				var _v31 = _p3._1,
+					_v32 = uid + 1,
+					_v33 = {
 					ctor: '::',
-					_0: A2(_user$project$Accio$newKeyValue, _p2._0, uid),
+					_0: A2(_user$project$Accio$newKeyValue, _p3._0, uid),
 					_1: acc
 				};
-				response = _v30;
-				uid = _v31;
-				acc = _v32;
-				continue listKeyValues;
+				response = _v31;
+				uid = _v32;
+				acc = _v33;
+				continue formatKeyValues;
 			}
 		}
 	});
 var _user$project$Accio$enterKeyValues = function (response) {
 	return A3(
-		_user$project$Accio$listKeyValues,
+		_user$project$Accio$formatKeyValues,
 		_user$project$Accio$parseJson(response),
 		1,
 		{ctor: '[]'});
@@ -9380,18 +9390,15 @@ var _user$project$Accio$format = _elm_lang$core$Native_Platform.outgoingPort(
 		return v;
 	});
 var _user$project$Accio$stringyfiedJson = _elm_lang$core$Native_Platform.incomingPort('stringyfiedJson', _elm_lang$core$Json_Decode$string);
-var _user$project$Accio$Model = F6(
-	function (a, b, c, d, e, f) {
-		return {url: a, errorMessage: b, uid: c, selected: d, responses: e, keyValues: f};
+var _user$project$Accio$Model = F3(
+	function (a, b, c) {
+		return {url: a, errorMessage: b, keyValues: c};
 	});
 var _user$project$Accio$init = {
 	ctor: '_Tuple2',
-	_0: A6(
+	_0: A3(
 		_user$project$Accio$Model,
 		'',
-		'',
-		0,
-		false,
 		'',
 		{ctor: '[]'}),
 	_1: _elm_lang$core$Platform_Cmd$none
@@ -9445,18 +9452,22 @@ var _user$project$Accio$viewLine = function (keyValue) {
 				_1: {
 					ctor: '::',
 					_0: _elm_lang$html$Html_Events$onClick(
-						_user$project$Accio$Select(keyValue.id)),
+						_user$project$Accio$Select(keyValue.key)),
 					_1: {ctor: '[]'}
 				}
 			}
 		},
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html$text(keyValue.key),
+			_0: _elm_lang$html$Html$text(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					keyValue.key,
+					A2(_elm_lang$core$Basics_ops['++'], '  ', keyValue.value))),
 			_1: {ctor: '[]'}
 		});
 };
-var _user$project$Accio$viewKeyedResponse = function (keyValue) {
+var _user$project$Accio$viewKeyedLi = function (keyValue) {
 	return {
 		ctor: '_Tuple2',
 		_0: _elm_lang$core$Basics$toString(keyValue.id),
@@ -9476,7 +9487,7 @@ var _user$project$Accio$viewKeyValues = function (keyValues) {
 			_0: A2(
 				_elm_lang$html$Html_Keyed$ul,
 				{ctor: '[]'},
-				A2(_elm_lang$core$List$map, _user$project$Accio$viewKeyedResponse, keyValues)),
+				A2(_elm_lang$core$List$map, _user$project$Accio$viewKeyedLi, keyValues)),
 			_1: {ctor: '[]'}
 		});
 };
@@ -9492,19 +9503,18 @@ var _user$project$Accio$getJson = function (url) {
 };
 var _user$project$Accio$update = F2(
 	function (msg, model) {
-		var _p3 = msg;
-		switch (_p3.ctor) {
+		var _p4 = msg;
+		switch (_p4.ctor) {
 			case 'Add':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							uid: model.uid + 1,
 							keyValues: A2(
 								_elm_lang$core$List$append,
 								model.keyValues,
-								_user$project$Accio$enterKeyValues(_p3._0))
+								_user$project$Accio$enterKeyValues(_p4._0))
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -9513,7 +9523,7 @@ var _user$project$Accio$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{url: _p3._0}),
+						{url: _p4._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GetData':
@@ -9523,11 +9533,11 @@ var _user$project$Accio$update = F2(
 					_1: _user$project$Accio$getJson(model.url)
 				};
 			case 'Fetch':
-				if (_p3._0.ctor === 'Ok') {
+				if (_p4._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: model,
-						_1: _user$project$Accio$format(_p3._0._0)
+						_1: _user$project$Accio$format(_p4._0._0)
 					};
 				} else {
 					return {
@@ -9542,7 +9552,7 @@ var _user$project$Accio$update = F2(
 				}
 			default:
 				var updateSelected = function (t) {
-					return _elm_lang$core$Native_Utils.eq(t.id, _p3._0) ? _elm_lang$core$Native_Utils.update(
+					return _elm_lang$core$Native_Utils.eq(t.key, _p4._0) ? _elm_lang$core$Native_Utils.update(
 						t,
 						{selected: !t.selected}) : t;
 				};
@@ -9568,46 +9578,57 @@ var _user$project$Accio$view = function (model) {
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$input,
+				_elm_lang$html$Html$p,
+				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$type_('text'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$placeholder('url'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
-							_1: {ctor: '[]'}
-						}
-					}
-				},
-				{ctor: '[]'}),
+					_0: _elm_lang$html$Html$text(_user$project$Parser$parsedJson),
+					_1: {ctor: '[]'}
+				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$button,
+					_elm_lang$html$Html$input,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
-						_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$type_('text'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$placeholder('url'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
+								_1: {ctor: '[]'}
+							}
+						}
 					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text('Get Data'),
-						_1: {ctor: '[]'}
-					}),
+					{ctor: '[]'}),
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$section,
-						{ctor: '[]'},
+						_elm_lang$html$Html$button,
 						{
 							ctor: '::',
-							_0: _user$project$Accio$viewKeyValues(model.keyValues),
+							_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Get Data'),
 							_1: {ctor: '[]'}
 						}),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$section,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _user$project$Accio$viewKeyValues(model.keyValues),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		});
