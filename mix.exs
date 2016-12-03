@@ -39,7 +39,8 @@ defmodule Accio.Mixfile do
      {:gettext, "~> 0.11"},
      {:cowboy, "~> 1.0"},
      {:httpoison, "~> 0.9.0"},
-     {:poison, "~> 2.0"}
+     {:poison, "~> 2.0"},
+     {:csv, "~> 1.4.2"}
    ]
   end
 

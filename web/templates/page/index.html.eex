@@ -2,5 +2,5 @@
   <h2>Welcome to Accio</h2>
   <p class="lead">Turn JSON into a Google Sheet.</p>
 </div>
-
+<%= link "Download CSV", to: csv_path(@conn, :export) %>
 <div id="elm-main"></div>

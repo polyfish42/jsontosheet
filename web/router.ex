@@ -17,6 +17,7 @@ defmodule Accio.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
+    get "/csv", CsvController, :export
     # get "/response", APIController, :request
   end
 

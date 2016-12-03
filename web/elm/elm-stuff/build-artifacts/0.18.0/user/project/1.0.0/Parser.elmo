@@ -1,2 +1,114 @@
-var _user$project$Parser$testJson = '\n[\n  { \"id\":91541985,\n    \"time\":\"2016-10-29 01:48:04 UTC\",\n    \"anon_visitor_id\":\"a86adf6b-910b-2b08-e291-c682\",\n    \"ip_address\":\"76.20.48.125\",\n    \"identity\":null,\n    \"page\":\"https://trueme.goodhire.com/member/report-shared?candidateid=4402330f-4636-4323-a049-5a43643e69f9\",\n    \"referrer\":null,\n    \"user_agent\":\"Mozilla/5.0 (iPad; CPU OS 9_3_4 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Mobile/13G35\",\n    \"nudge_id\":167540,\n    \"nudge_name\":\"Candidate Satisfaction\",\n    \"answered_questions\":\n      { \"321141\":\n        { \"question_id\":321141,\n          \"question_title\":\"How satisfied are you with your experience with GoodHire?\",\n          \"question_type\":\"radio\",\n          \"answer\":\"Very Satisfied\",\n          \"selected_option_id\":919755\n        }\n      }\n  }\n]\n';
-var _user$project$Parser$parsedJson = _user$project$Parser$testJson;
+var _user$project$Parser$testList = {
+	ctor: '::',
+	_0: {
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 1, _1: 'yellow'},
+		_1: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 2, _1: '19'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 6, _1: 'cat'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 11, _1: 'sex'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 14, _1: 'tv'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 15, _1: '7'},
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		}
+	},
+	_1: {
+		ctor: '::',
+		_0: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 1, _1: 'red'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 2, _1: '13'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 6, _1: 'dog'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 11, _1: 'drugs'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 14, _1: 'movie'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 15, _1: '7'},
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}
+			}
+		},
+		_1: {
+			ctor: '::',
+			_0: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 1, _1: 'blue'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 2, _1: '12'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 6, _1: 'rat'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 11, _1: 'rock'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 14, _1: 'book'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 15, _1: '7'},
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				}
+			},
+			_1: {
+				ctor: '::',
+				_0: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 1, _1: 'orange'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 2, _1: '1'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 6, _1: 'bear'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 11, _1: 'roll'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 14, _1: 'comic'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 15, _1: '7'},
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
+					}
+				},
+				_1: {ctor: '[]'}
+			}
+		}
+	}
+};
+var _user$project$Parser$output = _user$project$Parser$testList;
