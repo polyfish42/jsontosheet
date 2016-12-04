@@ -5,8 +5,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Html.Keyed as Keyed
 import Html.Lazy exposing (lazy, lazy2)
-import Http
-import Json.Decode as Json
+import Http exposing (..)
+import Json.Decode exposing (..)
 import Json.Encode
 import Task
 import Debug
@@ -16,6 +16,8 @@ import Array
 import Platform.Cmd exposing (..)
 import Parser exposing (..)
 import Maybe exposing (..)
+import OAuth
+import OAuth.Config
 
 main =
   Html.program
@@ -88,6 +90,8 @@ type Msg
   | GetData
   | Fetch (Result Http.Error String)
   | Select String
+  | GetCsv
+  | PostCsv (Result Http.Error ())
 
 port format : String -> Cmd msg
 
@@ -121,6 +125,15 @@ update msg model =
       in
       ({model | keyValues = List.map updateSelected model.keyValues}, Cmd.none)
 
+    GetCsv ->
+      (model, requestCsv)
+
+    PostCsv (Ok response) ->
+      (model, Cmd.none)
+
+    PostCsv (Err _) ->
+      (model, Cmd.none)
+
 enterKeyValues : String -> List KeyValue
 enterKeyValues response =
   formatKeyValues (parseJson response) 1 []
@@ -146,6 +159,7 @@ view model =
   div []
     [ input [ type_ "text", placeholder "url", onInput Url ] []
     , button [ onClick GetData ] [ text "Get Data"]
+    , button [ onClick GetCsv ] [ text "Create Google Sheet"]
     , section [] [ viewKeyValues model.keyValues ]
     ]
 
@@ -160,7 +174,7 @@ viewKeyValues keyValues =
 
 viewKeyedLi : KeyValue -> ( String, Html Msg )
 viewKeyedLi keyValue =
-    ( toString keyValue.id, lazy viewLine keyValue )
+    ( toString keyValue.id, Html.Lazy.lazy viewLine keyValue )
 
 viewLine : KeyValue -> Html Msg
 viewLine keyValue =
@@ -199,8 +213,35 @@ getJson : String -> Cmd Msg
 getJson url =
   Http.send Fetch <|
     Http.getString("http://localhost:4000/response?url=" ++ url)
-    -- Http.getString(url)
 
+requestCsv : Cmd Msg
+requestCsv =
+  Http.send PostCsv putRequest
+
+putRequest : Http.Request ()
+putRequest =
+  Http.request
+        { method = "PUT"
+        , headers = []
+        , url = "https://sheets.googleapis.com/v4/spreadsheets/1EQzBkARU0V7vMbZaRu8u-iz9TxmcGX-dG-7lYnGqNlY/values/Sheet1!A1%3AE5?includeValuesInResponse=true&responseDateTimeRenderOption=SERIAL_NUMBER&responseValueRenderOption=FORMATTED_VALUE&valueInputOption=RAW&key=1EQzBkARU0V7vMbZaRu8u-iz9TxmcGX-dG-7lYnGqNlY"
+        , body = Http.multipartBody
+                      [ Http.stringPart "ValueRange" """
+                                { "range": "Sheet1!A1:D5",
+                                  "majorDimension": "ROWS",
+                                  "values": [
+                                    ["Item", "Cost", "Stocked", "Ship Date"],
+                                    ["Wheel", "$20.50", "4", "3/1/2016"],
+                                    ["Door", "$15", "2", "3/15/2016"],
+                                    ["Engine", "$100", "1", "30/20/2016"],
+                                    ["Totals", "=SUM(B2:B4)", "=SUM(C2:C4)", "=MAX(D2:D4)"]
+                                  ],
+                                }
+                                """
+                      , Http.stringPart "majorDimension" "ROWS"]
+        , expect = expectStringResponse (\_ -> Ok ())
+        , timeout = Nothing
+        , withCredentials = False
+        }
 
 -- PARSER
 

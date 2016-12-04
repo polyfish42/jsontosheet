@@ -16,5 +16,3 @@ defmodule Accio.APIController do
     render conn, "response.json", response: res
   end
 end
-
-# Poison.Encoder.encode(body, pretty: true)

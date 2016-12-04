@@ -9,7 +9,7 @@ defmodule Accio.CsvController do
   end
 
   defp csv_content do
-    csv_content = [['a','list'],['of','lists']]
+    [['a','list'],['of','lists']]
     |> CSV.encode
     |> Enum.to_list
     |> to_string
