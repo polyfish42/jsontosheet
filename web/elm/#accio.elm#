@@ -118,7 +118,7 @@ update msg model =
       (model, Cmd.none)
     Validated ->
         ({model | errorMessage = "Validated" }, Cmd.none)
-
+            
     Token (Ok t) ->
       {model
           | token = Just t

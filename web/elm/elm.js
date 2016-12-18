@@ -10071,37 +10071,39 @@ var _user$project$Accio$formatString = F4(
 	});
 var _user$project$Accio$getHeaders = function (token) {
 	var _p2 = token;
-	return A2(
-		_elm_lang$http$Http$header,
-		'Authorization',
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'Bearer ',
-			A2(_elm_lang$core$Debug$log, 'token regex', _p2._0)));
+	return {
+		ctor: '::',
+		_0: A2(
+			_elm_lang$http$Http$header,
+			'Authorization',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'Bearer ',
+				A2(
+					_elm_lang$core$Debug$log,
+					'token regex',
+					A2(
+						_elm_lang$core$String$left,
+						72,
+						A2(_elm_lang$core$String$dropLeft, 11, _p2._0))))),
+		_1: {ctor: '[]'}
+	};
 };
 var _user$project$Accio$putRequest = function (token) {
 	return _elm_lang$http$Http$request(
 		{
 			method: 'POST',
-			headers: {
-				ctor: '::',
-				_0: _user$project$Accio$getHeaders(
-					A2(_elm_lang$core$Debug$log, 'token', token)),
-				_1: {ctor: '[]'}
-			},
-			url: 'https://sheets.googleapis.com/v4/spreadsheets',
+			headers: _user$project$Accio$getHeaders(
+				A2(_elm_lang$core$Debug$log, 'token', token)),
+			url: 'https://sheets.googleapis.com/v4/spreadsheets/1wykP28o36MdBEJy7ITkftpp-Z4UFRX8GOP3AQAxzLw4/values/Sheet1!A1%3AE5?includeValuesInResponse=true&responseDateTimeRenderOption=SERIAL_NUMBER&responseValueRenderOption=FORMATTED_VALUE&valueInputOption=RAW&key=1EQzBkARU0V7vMbZaRu8u-iz9TxmcGX-dG-7lYnGqNlY',
 			body: _elm_lang$http$Http$multipartBody(
 				{
 					ctor: '::',
-					_0: A2(_elm_lang$http$Http$stringPart, 'spreadsheetID', ''),
+					_0: A2(_elm_lang$http$Http$stringPart, 'ValueRange', '\n                                { \"range\": \"Sheet1!A1:D5\",\n                                  \"majorDimension\": \"ROWS\",\n                                  \"values\": [\n                                    [\"Item\", \"Cost\", \"Stocked\", \"Ship Date\"],\n                                    [\"Wheel\", \"$20.50\", \"4\", \"3/1/2016\"],\n                                    [\"Door\", \"$15\", \"2\", \"3/15/2016\"],\n                                    [\"Engine\", \"$100\", \"1\", \"30/20/2016\"],\n                                    [\"Totals\", \"=SUM(B2:B4)\", \"=SUM(C2:C4)\", \"=MAX(D2:D4)\"]\n                                  ],\n                                }\n                                '),
 					_1: {
 						ctor: '::',
-						_0: A2(_elm_lang$http$Http$stringPart, 'properties', '\n                                { \"title\": \"test\"}\n                                '),
-						_1: {
-							ctor: '::',
-							_0: A2(_elm_lang$http$Http$stringPart, 'sheets', '\n                                {\"data\":[{\"startRow\" :0}]}\n                                '),
-							_1: {ctor: '[]'}
-						}
+						_0: A2(_elm_lang$http$Http$stringPart, 'majorDimension', 'ROWS'),
+						_1: {ctor: '[]'}
 					}
 				}),
 			expect: _elm_lang$http$Http$expectStringResponse(
@@ -10220,7 +10222,6 @@ var _user$project$Accio$KeyValue = F5(
 	function (a, b, c, d, e) {
 		return {key: a, value: b, selected: c, id: d, indent: e};
 	});
-var _user$project$Accio$Validated = {ctor: 'Validated'};
 var _user$project$Accio$PostCsv = function (a) {
 	return {ctor: 'PostCsv', _0: a};
 };
@@ -10336,14 +10337,6 @@ var _user$project$Accio$update = F2(
 		switch (_p7.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-			case 'Validated':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{errorMessage: 'Validated'}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
 			case 'Token':
 				if (_p7._0.ctor === 'Ok') {
 					return A2(
@@ -10475,72 +10468,60 @@ var _user$project$Accio$view = function (model) {
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$p,
-						{ctor: '[]'},
+						_elm_lang$html$Html$input,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(
-								_elm_lang$core$Basics$toString(model.errorMessage)),
-							_1: {ctor: '[]'}
-						}),
+							_0: _elm_lang$html$Html_Attributes$type_('text'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$placeholder('url'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
 					_1: {
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$input,
+							_elm_lang$html$Html$button,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$type_('text'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$placeholder('url'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
-										_1: {ctor: '[]'}
-									}
-								}
+								_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
+								_1: {ctor: '[]'}
 							},
-							{ctor: '[]'}),
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Get Data'),
+								_1: {ctor: '[]'}
+							}),
 						_1: {
 							ctor: '::',
 							_0: A2(
 								_elm_lang$html$Html$button,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
+									_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetCsv),
 									_1: {ctor: '[]'}
 								},
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html$text('Get Data'),
+									_0: _elm_lang$html$Html$text('Create Google Sheet'),
 									_1: {ctor: '[]'}
 								}),
 							_1: {
 								ctor: '::',
 								_0: A2(
-									_elm_lang$html$Html$button,
+									_elm_lang$html$Html$section,
+									{ctor: '[]'},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetCsv),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Create Google Sheet'),
+										_0: _user$project$Accio$viewKeyValues(model.keyValues),
 										_1: {ctor: '[]'}
 									}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$section,
-										{ctor: '[]'},
-										{
-											ctor: '::',
-											_0: _user$project$Accio$viewKeyValues(model.keyValues),
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								}
+								_1: {ctor: '[]'}
 							}
 						}
 					}

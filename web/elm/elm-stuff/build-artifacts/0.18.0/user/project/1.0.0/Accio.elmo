@@ -131,29 +131,50 @@ var _user$project$Accio$formatString = F4(
 			}
 		}
 	});
-var _user$project$Accio$putRequest = _elm_lang$http$Http$request(
-	{
-		method: 'PUT',
-		headers: {ctor: '[]'},
-		url: 'https://sheets.googleapis.com/v4/spreadsheets/1EQzBkARU0V7vMbZaRu8u-iz9TxmcGX-dG-7lYnGqNlY/values/Sheet1!A1%3AE5?includeValuesInResponse=true&responseDateTimeRenderOption=SERIAL_NUMBER&responseValueRenderOption=FORMATTED_VALUE&valueInputOption=RAW&key=1EQzBkARU0V7vMbZaRu8u-iz9TxmcGX-dG-7lYnGqNlY',
-		body: _elm_lang$http$Http$multipartBody(
-			{
+var _user$project$Accio$getHeaders = function (token) {
+	var _p2 = token;
+	return A2(
+		_elm_lang$http$Http$header,
+		'Authorization',
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'Bearer ',
+			A2(_elm_lang$core$Debug$log, 'token regex', _p2._0)));
+};
+var _user$project$Accio$putRequest = function (token) {
+	return _elm_lang$http$Http$request(
+		{
+			method: 'POST',
+			headers: {
 				ctor: '::',
-				_0: A2(_elm_lang$http$Http$stringPart, 'ValueRange', '\n                                { \"range\": \"Sheet1!A1:D5\",\n                                  \"majorDimension\": \"ROWS\",\n                                  \"values\": [\n                                    [\"Item\", \"Cost\", \"Stocked\", \"Ship Date\"],\n                                    [\"Wheel\", \"$20.50\", \"4\", \"3/1/2016\"],\n                                    [\"Door\", \"$15\", \"2\", \"3/15/2016\"],\n                                    [\"Engine\", \"$100\", \"1\", \"30/20/2016\"],\n                                    [\"Totals\", \"=SUM(B2:B4)\", \"=SUM(C2:C4)\", \"=MAX(D2:D4)\"]\n                                  ],\n                                }\n                                '),
-				_1: {
+				_0: _user$project$Accio$getHeaders(
+					A2(_elm_lang$core$Debug$log, 'token', token)),
+				_1: {ctor: '[]'}
+			},
+			url: 'https://sheets.googleapis.com/v4/spreadsheets',
+			body: _elm_lang$http$Http$multipartBody(
+				{
 					ctor: '::',
-					_0: A2(_elm_lang$http$Http$stringPart, 'majorDimension', 'ROWS'),
-					_1: {ctor: '[]'}
-				}
-			}),
-		expect: _elm_lang$http$Http$expectStringResponse(
-			function (_p2) {
-				return _elm_lang$core$Result$Ok(
-					{ctor: '_Tuple0'});
-			}),
-		timeout: _elm_lang$core$Maybe$Nothing,
-		withCredentials: false
-	});
+					_0: A2(_elm_lang$http$Http$stringPart, 'spreadsheetID', ''),
+					_1: {
+						ctor: '::',
+						_0: A2(_elm_lang$http$Http$stringPart, 'properties', '\n                                { \"title\": \"test\"}\n                                '),
+						_1: {
+							ctor: '::',
+							_0: A2(_elm_lang$http$Http$stringPart, 'sheets', '\n                                {\"data\":[{\"startRow\" :0}]}\n                                '),
+							_1: {ctor: '[]'}
+						}
+					}
+				}),
+			expect: _elm_lang$http$Http$expectStringResponse(
+				function (_p3) {
+					return _elm_lang$core$Result$Ok(
+						{ctor: '_Tuple0'});
+				}),
+			timeout: _elm_lang$core$Maybe$Nothing,
+			withCredentials: false
+		});
+};
 var _user$project$Accio$px = function ($int) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
@@ -166,17 +187,33 @@ var _user$project$Accio$parseJson = function (json) {
 		_user$project$Accio$uniqueHead,
 		A4(_user$project$Accio$formatString, '', false, 0, json));
 };
+var _user$project$Accio$googleAuthClient = A2(
+	_tiziano88$elm_oauth$OAuth$newClient,
+	_tiziano88$elm_oauth$OAuth_Config$google,
+	{
+		clientId: '591745061791-69jpb1uina8sp60eq8c0125dm5nb5hhd.apps.googleusercontent.com',
+		scopes: {
+			ctor: '::',
+			_0: 'https://www.googleapis.com/auth/spreadsheets',
+			_1: {
+				ctor: '::',
+				_0: 'https://www.googleapis.com/auth/drive',
+				_1: {ctor: '[]'}
+			}
+		},
+		redirectUrl: 'http://localhost:4000'
+	});
 var _user$project$Accio$newKeyValue = F2(
 	function (str, id) {
-		var _p3 = A2(_elm_lang$core$String$split, '\":', str);
-		if (_p3.ctor === '::') {
-			if ((_p3._1.ctor === '::') && (_p3._1._1.ctor === '[]')) {
+		var _p4 = A2(_elm_lang$core$String$split, '\":', str);
+		if (_p4.ctor === '::') {
+			if ((_p4._1.ctor === '::') && (_p4._1._1.ctor === '[]')) {
 				return {
 					key: A2(
 						_elm_lang$core$Basics_ops['++'],
-						A2(_elm_lang$core$String$dropLeft, 5, _p3._0),
+						A2(_elm_lang$core$String$dropLeft, 5, _p4._0),
 						'\"'),
-					value: _p3._1._0,
+					value: _p4._1._0,
 					selected: false,
 					id: id,
 					indent: A2(
@@ -187,7 +224,7 @@ var _user$project$Accio$newKeyValue = F2(
 				};
 			} else {
 				return {
-					key: A2(_elm_lang$core$String$dropLeft, 5, _p3._0),
+					key: A2(_elm_lang$core$String$dropLeft, 5, _p4._0),
 					value: '',
 					selected: false,
 					id: id,
@@ -206,20 +243,20 @@ var _user$project$Accio$formatKeyValues = F3(
 	function (response, uid, acc) {
 		formatKeyValues:
 		while (true) {
-			var _p4 = response;
-			if (_p4.ctor === '[]') {
+			var _p5 = response;
+			if (_p5.ctor === '[]') {
 				return _elm_lang$core$List$reverse(acc);
 			} else {
-				var _v31 = _p4._1,
-					_v32 = uid + 1,
-					_v33 = {
+				var _v32 = _p5._1,
+					_v33 = uid + 1,
+					_v34 = {
 					ctor: '::',
-					_0: A2(_user$project$Accio$newKeyValue, _p4._0, uid),
+					_0: A2(_user$project$Accio$newKeyValue, _p5._0, uid),
 					_1: acc
 				};
-				response = _v31;
-				uid = _v32;
-				acc = _v33;
+				response = _v32;
+				uid = _v33;
+				acc = _v34;
 				continue formatKeyValues;
 			}
 		}
@@ -237,27 +274,29 @@ var _user$project$Accio$format = _elm_lang$core$Native_Platform.outgoingPort(
 		return v;
 	});
 var _user$project$Accio$stringyfiedJson = _elm_lang$core$Native_Platform.incomingPort('stringyfiedJson', _elm_lang$core$Json_Decode$string);
-var _user$project$Accio$Model = F3(
-	function (a, b, c) {
-		return {url: a, errorMessage: b, keyValues: c};
+var _user$project$Accio$Model = F4(
+	function (a, b, c, d) {
+		return {url: a, errorMessage: b, keyValues: c, token: d};
 	});
-var _user$project$Accio$init = {
-	ctor: '_Tuple2',
-	_0: A3(
-		_user$project$Accio$Model,
-		'',
-		'',
-		{ctor: '[]'}),
-	_1: _elm_lang$core$Platform_Cmd$none
-};
 var _user$project$Accio$KeyValue = F5(
 	function (a, b, c, d, e) {
 		return {key: a, value: b, selected: c, id: d, indent: e};
 	});
+var _user$project$Accio$Validated = {ctor: 'Validated'};
 var _user$project$Accio$PostCsv = function (a) {
 	return {ctor: 'PostCsv', _0: a};
 };
-var _user$project$Accio$requestCsv = A2(_elm_lang$http$Http$send, _user$project$Accio$PostCsv, _user$project$Accio$putRequest);
+var _user$project$Accio$requestCsv = function (token) {
+	var _p6 = token;
+	if (_p6.ctor === 'Just') {
+		return A2(
+			_elm_lang$http$Http$send,
+			_user$project$Accio$PostCsv,
+			_user$project$Accio$putRequest(_p6._0));
+	} else {
+		return _elm_lang$core$Platform_Cmd$none;
+	}
+};
 var _user$project$Accio$GetCsv = {ctor: 'GetCsv'};
 var _user$project$Accio$Select = function (a) {
 	return {ctor: 'Select', _0: a};
@@ -355,8 +394,38 @@ var _user$project$Accio$getJson = function (url) {
 };
 var _user$project$Accio$update = F2(
 	function (msg, model) {
-		var _p5 = msg;
-		switch (_p5.ctor) {
+		var _p7 = msg;
+		switch (_p7.ctor) {
+			case 'NoOp':
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			case 'Validated':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{errorMessage: 'Validated'}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'Token':
+				if (_p7._0.ctor === 'Ok') {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{
+								token: _elm_lang$core$Maybe$Just(_p7._0._0)
+							}),
+						{
+							ctor: '::',
+							_0: _elm_lang$navigation$Navigation$modifyUrl('#'),
+							_1: {ctor: '[]'}
+						});
+				} else {
+					return A2(
+						_elm_lang$core$Platform_Cmd_ops['!'],
+						model,
+						{ctor: '[]'});
+				}
 			case 'Add':
 				return {
 					ctor: '_Tuple2',
@@ -366,7 +435,7 @@ var _user$project$Accio$update = F2(
 							keyValues: A2(
 								_elm_lang$core$List$append,
 								model.keyValues,
-								_user$project$Accio$enterKeyValues(_p5._0))
+								_user$project$Accio$enterKeyValues(_p7._0))
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -375,7 +444,7 @@ var _user$project$Accio$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{url: _p5._0}),
+						{url: _p7._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GetData':
@@ -385,11 +454,11 @@ var _user$project$Accio$update = F2(
 					_1: _user$project$Accio$getJson(model.url)
 				};
 			case 'Fetch':
-				if (_p5._0.ctor === 'Ok') {
+				if (_p7._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: model,
-						_1: _user$project$Accio$format(_p5._0._0)
+						_1: _user$project$Accio$format(_p7._0._0)
 					};
 				} else {
 					return {
@@ -404,7 +473,7 @@ var _user$project$Accio$update = F2(
 				}
 			case 'Select':
 				var updateSelected = function (t) {
-					return _elm_lang$core$Native_Utils.eq(t.key, _p5._0) ? _elm_lang$core$Native_Utils.update(
+					return _elm_lang$core$Native_Utils.eq(t.key, _p7._0) ? _elm_lang$core$Native_Utils.update(
 						t,
 						{selected: !t.selected}) : t;
 				};
@@ -418,9 +487,13 @@ var _user$project$Accio$update = F2(
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GetCsv':
-				return {ctor: '_Tuple2', _0: model, _1: _user$project$Accio$requestCsv};
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _user$project$Accio$requestCsv(model.token)
+				};
 			default:
-				if (_p5._0.ctor === 'Ok') {
+				if (_p7._0.ctor === 'Ok') {
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				} else {
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
@@ -438,60 +511,100 @@ var _user$project$Accio$view = function (model) {
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$input,
+				_elm_lang$html$Html$a,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$type_('text'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$placeholder('url'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
-							_1: {ctor: '[]'}
-						}
-					}
+					_0: _elm_lang$html$Html_Attributes$href(
+						_tiziano88$elm_oauth$OAuth$buildAuthUrl(_user$project$Accio$googleAuthClient)),
+					_1: {ctor: '[]'}
 				},
-				{ctor: '[]'}),
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Google'),
+					_1: {ctor: '[]'}
+				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$button,
+					_elm_lang$html$Html$p,
+					{ctor: '[]'},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html$text('Get Data'),
+						_0: _elm_lang$html$Html$text(
+							_elm_lang$core$Basics$toString(model.token)),
 						_1: {ctor: '[]'}
 					}),
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$button,
+						_elm_lang$html$Html$p,
+						{ctor: '[]'},
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetCsv),
-							_1: {ctor: '[]'}
-						},
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html$text('Create Google Sheet'),
+							_0: _elm_lang$html$Html$text(
+								_elm_lang$core$Basics$toString(model.errorMessage)),
 							_1: {ctor: '[]'}
 						}),
 					_1: {
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$section,
-							{ctor: '[]'},
+							_elm_lang$html$Html$input,
 							{
 								ctor: '::',
-								_0: _user$project$Accio$viewKeyValues(model.keyValues),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
+								_0: _elm_lang$html$Html_Attributes$type_('text'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$placeholder('url'),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
+										_1: {ctor: '[]'}
+									}
+								}
+							},
+							{ctor: '[]'}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$button,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
+									_1: {ctor: '[]'}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Get Data'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetCsv),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Create Google Sheet'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$section,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _user$project$Accio$viewKeyValues(model.keyValues),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
 					}
 				}
 			}
@@ -503,5 +616,26 @@ var _user$project$Accio$Add = function (a) {
 var _user$project$Accio$subscriptions = function (model) {
 	return _user$project$Accio$stringyfiedJson(_user$project$Accio$Add);
 };
-var _user$project$Accio$main = _elm_lang$html$Html$program(
+var _user$project$Accio$Token = function (a) {
+	return {ctor: 'Token', _0: a};
+};
+var _user$project$Accio$init = function (location) {
+	return {
+		ctor: '_Tuple2',
+		_0: A4(
+			_user$project$Accio$Model,
+			'',
+			'',
+			{ctor: '[]'},
+			_elm_lang$core$Maybe$Nothing),
+		_1: A2(
+			_elm_lang$core$Platform_Cmd$map,
+			_user$project$Accio$Token,
+			A2(_tiziano88$elm_oauth$OAuth$init, _user$project$Accio$googleAuthClient, location))
+	};
+};
+var _user$project$Accio$NoOp = {ctor: 'NoOp'};
+var _user$project$Accio$main = A2(
+	_elm_lang$navigation$Navigation$program,
+	_elm_lang$core$Basics$always(_user$project$Accio$NoOp),
 	{init: _user$project$Accio$init, view: _user$project$Accio$view, update: _user$project$Accio$update, subscriptions: _user$project$Accio$subscriptions})();
