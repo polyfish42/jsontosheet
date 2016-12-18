@@ -9670,156 +9670,256 @@ var _elm_lang$navigation$Navigation$subMap = F2(
 	});
 _elm_lang$core$Native_Platform.effectManagers['Navigation'] = {pkg: 'elm-lang/navigation', init: _elm_lang$navigation$Navigation$init, onEffects: _elm_lang$navigation$Navigation$onEffects, onSelfMsg: _elm_lang$navigation$Navigation$onSelfMsg, tag: 'fx', cmdMap: _elm_lang$navigation$Navigation$cmdMap, subMap: _elm_lang$navigation$Navigation$subMap};
 
-var _tiziano88$elm_oauth$OAuth$queryPair = function (_p0) {
-	var _p1 = _p0;
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		_elm_lang$http$Http$encodeUri(_p1._0),
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'=',
-			_elm_lang$http$Http$encodeUri(_p1._1)));
-};
-var _tiziano88$elm_oauth$OAuth$url = F2(
-	function (baseUrl, args) {
-		var _p2 = args;
-		if (_p2.ctor === '[]') {
-			return baseUrl;
-		} else {
-			return A2(
-				_elm_lang$core$Basics_ops['++'],
-				baseUrl,
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					'?',
-					A2(
-						_elm_lang$core$String$join,
-						'&',
-						A2(_elm_lang$core$List$map, _tiziano88$elm_oauth$OAuth$queryPair, args))));
-		}
-	});
-var _tiziano88$elm_oauth$OAuth$parseSingleParam = function (p) {
-	var s = A2(_elm_lang$core$String$split, '=', p);
-	var _p3 = s;
-	if (((_p3.ctor === '::') && (_p3._1.ctor === '::')) && (_p3._1._1.ctor === '[]')) {
-		return {ctor: '_Tuple2', _0: _p3._0, _1: _p3._1._0};
+var _evancz$url_parser$UrlParser$toKeyValuePair = function (segment) {
+	var _p0 = A2(_elm_lang$core$String$split, '=', segment);
+	if (((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '[]')) {
+		return A3(
+			_elm_lang$core$Maybe$map2,
+			F2(
+				function (v0, v1) {
+					return {ctor: '_Tuple2', _0: v0, _1: v1};
+				}),
+			_elm_lang$http$Http$decodeUri(_p0._0),
+			_elm_lang$http$Http$decodeUri(_p0._1._0));
 	} else {
-		return {ctor: '_Tuple2', _0: '', _1: ''};
+		return _elm_lang$core$Maybe$Nothing;
 	}
 };
-var _tiziano88$elm_oauth$OAuth$parseUrlParams = function (s) {
+var _evancz$url_parser$UrlParser$parseParams = function (queryString) {
 	return _elm_lang$core$Dict$fromList(
 		A2(
-			_elm_lang$core$List$map,
-			_tiziano88$elm_oauth$OAuth$parseSingleParam,
+			_elm_lang$core$List$filterMap,
+			_evancz$url_parser$UrlParser$toKeyValuePair,
 			A2(
 				_elm_lang$core$String$split,
 				'&',
-				A2(_elm_lang$core$String$dropLeft, 1, s))));
+				A2(_elm_lang$core$String$dropLeft, 1, queryString))));
 };
-var _tiziano88$elm_oauth$OAuth$getTokenFromHash = function (s) {
-	var params = _tiziano88$elm_oauth$OAuth$parseUrlParams(s);
-	return A2(
-		_elm_lang$core$Maybe$withDefault,
-		'',
-		A2(_elm_lang$core$Dict$get, 'access_token', params));
+var _evancz$url_parser$UrlParser$splitUrl = function (url) {
+	var _p1 = A2(_elm_lang$core$String$split, '/', url);
+	if ((_p1.ctor === '::') && (_p1._0 === '')) {
+		return _p1._1;
+	} else {
+		return _p1;
+	}
 };
-var _tiziano88$elm_oauth$OAuth$buildValidateUrl = F2(
-	function (client, token) {
-		return A2(
-			_tiziano88$elm_oauth$OAuth$url,
-			client.serverConfig.validateUrl,
-			{
-				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'input_token', _1: token},
-				_1: {
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'access_token', _1: token},
-					_1: {ctor: '[]'}
+var _evancz$url_parser$UrlParser$parseHelp = function (states) {
+	parseHelp:
+	while (true) {
+		var _p2 = states;
+		if (_p2.ctor === '[]') {
+			return _elm_lang$core$Maybe$Nothing;
+		} else {
+			var _p4 = _p2._0;
+			var _p3 = _p4.unvisited;
+			if (_p3.ctor === '[]') {
+				return _elm_lang$core$Maybe$Just(_p4.value);
+			} else {
+				if ((_p3._0 === '') && (_p3._1.ctor === '[]')) {
+					return _elm_lang$core$Maybe$Just(_p4.value);
+				} else {
+					var _v4 = _p2._1;
+					states = _v4;
+					continue parseHelp;
 				}
-			});
+			}
+		}
+	}
+};
+var _evancz$url_parser$UrlParser$parse = F3(
+	function (_p5, url, params) {
+		var _p6 = _p5;
+		return _evancz$url_parser$UrlParser$parseHelp(
+			_p6._0(
+				{
+					visited: {ctor: '[]'},
+					unvisited: _evancz$url_parser$UrlParser$splitUrl(url),
+					params: params,
+					value: _elm_lang$core$Basics$identity
+				}));
 	});
-var _tiziano88$elm_oauth$OAuth$buildAuthUrl = function (client) {
-	return A2(
-		_tiziano88$elm_oauth$OAuth$url,
-		client.serverConfig.endpointUrl,
-		{
-			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: 'response_type', _1: 'token'},
-			_1: {
-				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'immediate', _1: 'true'},
-				_1: {
+var _evancz$url_parser$UrlParser$parseHash = F2(
+	function (parser, location) {
+		return A3(
+			_evancz$url_parser$UrlParser$parse,
+			parser,
+			A2(_elm_lang$core$String$dropLeft, 1, location.hash),
+			_evancz$url_parser$UrlParser$parseParams(location.search));
+	});
+var _evancz$url_parser$UrlParser$parsePath = F2(
+	function (parser, location) {
+		return A3(
+			_evancz$url_parser$UrlParser$parse,
+			parser,
+			location.pathname,
+			_evancz$url_parser$UrlParser$parseParams(location.search));
+	});
+var _evancz$url_parser$UrlParser$intParamHelp = function (maybeValue) {
+	var _p7 = maybeValue;
+	if (_p7.ctor === 'Nothing') {
+		return _elm_lang$core$Maybe$Nothing;
+	} else {
+		return _elm_lang$core$Result$toMaybe(
+			_elm_lang$core$String$toInt(_p7._0));
+	}
+};
+var _evancz$url_parser$UrlParser$mapHelp = F2(
+	function (func, _p8) {
+		var _p9 = _p8;
+		return {
+			visited: _p9.visited,
+			unvisited: _p9.unvisited,
+			params: _p9.params,
+			value: func(_p9.value)
+		};
+	});
+var _evancz$url_parser$UrlParser$State = F4(
+	function (a, b, c, d) {
+		return {visited: a, unvisited: b, params: c, value: d};
+	});
+var _evancz$url_parser$UrlParser$Parser = function (a) {
+	return {ctor: 'Parser', _0: a};
+};
+var _evancz$url_parser$UrlParser$s = function (str) {
+	return _evancz$url_parser$UrlParser$Parser(
+		function (_p10) {
+			var _p11 = _p10;
+			var _p12 = _p11.unvisited;
+			if (_p12.ctor === '[]') {
+				return {ctor: '[]'};
+			} else {
+				var _p13 = _p12._0;
+				return _elm_lang$core$Native_Utils.eq(_p13, str) ? {
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'approval_prompt', _1: 'auto'},
-					_1: {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'client_id', _1: client.clientConfig.clientId},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'redirect_uri', _1: client.clientConfig.redirectUrl},
-							_1: {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: 'scope',
-									_1: A2(_elm_lang$core$String$join, ' ', client.clientConfig.scopes)
-								},
-								_1: {ctor: '[]'}
-							}
-						}
-					}
-				}
+					_0: A4(
+						_evancz$url_parser$UrlParser$State,
+						{ctor: '::', _0: _p13, _1: _p11.visited},
+						_p12._1,
+						_p11.params,
+						_p11.value),
+					_1: {ctor: '[]'}
+				} : {ctor: '[]'};
 			}
 		});
 };
-var _tiziano88$elm_oauth$OAuth$newClient = F2(
-	function (serverConfig, clientConfig) {
-		return {serverConfig: serverConfig, clientConfig: clientConfig};
+var _evancz$url_parser$UrlParser$custom = F2(
+	function (tipe, stringToSomething) {
+		return _evancz$url_parser$UrlParser$Parser(
+			function (_p14) {
+				var _p15 = _p14;
+				var _p16 = _p15.unvisited;
+				if (_p16.ctor === '[]') {
+					return {ctor: '[]'};
+				} else {
+					var _p18 = _p16._0;
+					var _p17 = stringToSomething(_p18);
+					if (_p17.ctor === 'Ok') {
+						return {
+							ctor: '::',
+							_0: A4(
+								_evancz$url_parser$UrlParser$State,
+								{ctor: '::', _0: _p18, _1: _p15.visited},
+								_p16._1,
+								_p15.params,
+								_p15.value(_p17._0)),
+							_1: {ctor: '[]'}
+						};
+					} else {
+						return {ctor: '[]'};
+					}
+				}
+			});
 	});
-var _tiziano88$elm_oauth$OAuth$ServerConfig = F2(
-	function (a, b) {
-		return {endpointUrl: a, validateUrl: b};
+var _evancz$url_parser$UrlParser$string = A2(_evancz$url_parser$UrlParser$custom, 'STRING', _elm_lang$core$Result$Ok);
+var _evancz$url_parser$UrlParser$int = A2(_evancz$url_parser$UrlParser$custom, 'NUMBER', _elm_lang$core$String$toInt);
+var _evancz$url_parser$UrlParser_ops = _evancz$url_parser$UrlParser_ops || {};
+_evancz$url_parser$UrlParser_ops['</>'] = F2(
+	function (_p20, _p19) {
+		var _p21 = _p20;
+		var _p22 = _p19;
+		return _evancz$url_parser$UrlParser$Parser(
+			function (state) {
+				return A2(
+					_elm_lang$core$List$concatMap,
+					_p22._0,
+					_p21._0(state));
+			});
 	});
-var _tiziano88$elm_oauth$OAuth$ClientConfig = F3(
-	function (a, b, c) {
-		return {clientId: a, scopes: b, redirectUrl: c};
+var _evancz$url_parser$UrlParser$map = F2(
+	function (subValue, _p23) {
+		var _p24 = _p23;
+		return _evancz$url_parser$UrlParser$Parser(
+			function (_p25) {
+				var _p26 = _p25;
+				return A2(
+					_elm_lang$core$List$map,
+					_evancz$url_parser$UrlParser$mapHelp(_p26.value),
+					_p24._0(
+						{visited: _p26.visited, unvisited: _p26.unvisited, params: _p26.params, value: subValue}));
+			});
 	});
-var _tiziano88$elm_oauth$OAuth$Client = F2(
-	function (a, b) {
-		return {serverConfig: a, clientConfig: b};
-	});
-var _tiziano88$elm_oauth$OAuth$Validated = function (a) {
-	return {ctor: 'Validated', _0: a};
+var _evancz$url_parser$UrlParser$oneOf = function (parsers) {
+	return _evancz$url_parser$UrlParser$Parser(
+		function (state) {
+			return A2(
+				_elm_lang$core$List$concatMap,
+				function (_p27) {
+					var _p28 = _p27;
+					return _p28._0(state);
+				},
+				parsers);
+		});
 };
-var _tiziano88$elm_oauth$OAuth$validateToken = F2(
-	function (client, token) {
-		return A2(
-			_elm_lang$core$Platform_Cmd$map,
-			_elm_lang$core$Result$map(_tiziano88$elm_oauth$OAuth$Validated),
-			A2(
-				_elm_lang$http$Http$send,
-				_elm_lang$core$Basics$identity,
-				_elm_lang$http$Http$getString(
-					A2(_tiziano88$elm_oauth$OAuth$buildValidateUrl, client, token))));
+var _evancz$url_parser$UrlParser$top = _evancz$url_parser$UrlParser$Parser(
+	function (state) {
+		return {
+			ctor: '::',
+			_0: state,
+			_1: {ctor: '[]'}
+		};
 	});
-var _tiziano88$elm_oauth$OAuth$init = function (client) {
-	return function (_p4) {
-		return A2(
-			_tiziano88$elm_oauth$OAuth$validateToken,
-			client,
-			_tiziano88$elm_oauth$OAuth$getTokenFromHash(
-				function (_) {
-					return _.hash;
-				}(_p4)));
-	};
+var _evancz$url_parser$UrlParser_ops = _evancz$url_parser$UrlParser_ops || {};
+_evancz$url_parser$UrlParser_ops['<?>'] = F2(
+	function (_p30, _p29) {
+		var _p31 = _p30;
+		var _p32 = _p29;
+		return _evancz$url_parser$UrlParser$Parser(
+			function (state) {
+				return A2(
+					_elm_lang$core$List$concatMap,
+					_p32._0,
+					_p31._0(state));
+			});
+	});
+var _evancz$url_parser$UrlParser$QueryParser = function (a) {
+	return {ctor: 'QueryParser', _0: a};
 };
-
-var _tiziano88$elm_oauth$OAuth_Config$stackExchange = {endpointUrl: 'https://stackexchange.com/oauth/dialog', validateUrl: ''};
-var _tiziano88$elm_oauth$OAuth_Config$gitHub = {endpointUrl: 'https://github.com/login/oauth/authorize', validateUrl: ''};
-var _tiziano88$elm_oauth$OAuth_Config$digitalOcean = {endpointUrl: 'https://cloud.digitalocean.com/v1/oauth/authorize', validateUrl: ''};
-var _tiziano88$elm_oauth$OAuth_Config$facebook = {endpointUrl: 'https://www.facebook.com/dialog/oauth', validateUrl: 'https://graph.facebook.com/debug_token'};
-var _tiziano88$elm_oauth$OAuth_Config$google = {endpointUrl: 'https://accounts.google.com/o/oauth2/v2/auth', validateUrl: 'https://www.googleapis.com/oauth2/v3/tokeninfo'};
+var _evancz$url_parser$UrlParser$customParam = F2(
+	function (key, func) {
+		return _evancz$url_parser$UrlParser$QueryParser(
+			function (_p33) {
+				var _p34 = _p33;
+				var _p35 = _p34.params;
+				return {
+					ctor: '::',
+					_0: A4(
+						_evancz$url_parser$UrlParser$State,
+						_p34.visited,
+						_p34.unvisited,
+						_p35,
+						_p34.value(
+							func(
+								A2(_elm_lang$core$Dict$get, key, _p35)))),
+					_1: {ctor: '[]'}
+				};
+			});
+	});
+var _evancz$url_parser$UrlParser$stringParam = function (name) {
+	return A2(_evancz$url_parser$UrlParser$customParam, name, _elm_lang$core$Basics$identity);
+};
+var _evancz$url_parser$UrlParser$intParam = function (name) {
+	return A2(_evancz$url_parser$UrlParser$customParam, name, _evancz$url_parser$UrlParser$intParamHelp);
+};
 
 var _user$project$Parser$testList = {
 	ctor: '::',
@@ -9935,6 +10035,60 @@ var _user$project$Parser$testList = {
 	}
 };
 var _user$project$Parser$output = _user$project$Parser$testList;
+
+var _user$project$OAuth$queryPair = function (_p0) {
+	var _p1 = _p0;
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$http$Http$encodeUri(_p1._0),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'=',
+			_elm_lang$http$Http$encodeUri(_p1._1)));
+};
+var _user$project$OAuth$url = F2(
+	function (endPoint, args) {
+		var _p2 = args;
+		if (_p2.ctor === '[]') {
+			return endPoint;
+		} else {
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				endPoint,
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					'?',
+					A2(
+						_elm_lang$core$String$join,
+						'&',
+						A2(_elm_lang$core$List$map, _user$project$OAuth$queryPair, args))));
+		}
+	});
+var _user$project$OAuth$formUrl = A2(
+	_user$project$OAuth$url,
+	'https://accounts.google.com/o/oauth2/v2/auth',
+	{
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 'response_type', _1: 'token'},
+		_1: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'client_id', _1: '591745061791-69jpb1uina8sp60eq8c0125dm5nb5hhd.apps.googleusercontent.com'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'redirect_uri', _1: 'http://localhost:4000'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'scope', _1: 'https://www.googleapis.com/auth/spreadsheets'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'prompt', _1: 'consent'},
+						_1: {ctor: '[]'}
+					}
+				}
+			}
+		}
+	});
+var _user$project$OAuth$requestToken = _user$project$OAuth$formUrl;
 
 var _user$project$Accio$pad = function (indent) {
 	return A3(
@@ -10069,50 +10223,6 @@ var _user$project$Accio$formatString = F4(
 			}
 		}
 	});
-var _user$project$Accio$getHeaders = function (token) {
-	var _p2 = token;
-	return A2(
-		_elm_lang$http$Http$header,
-		'Authorization',
-		A2(
-			_elm_lang$core$Basics_ops['++'],
-			'Bearer ',
-			A2(_elm_lang$core$Debug$log, 'token regex', _p2._0)));
-};
-var _user$project$Accio$putRequest = function (token) {
-	return _elm_lang$http$Http$request(
-		{
-			method: 'POST',
-			headers: {
-				ctor: '::',
-				_0: _user$project$Accio$getHeaders(
-					A2(_elm_lang$core$Debug$log, 'token', token)),
-				_1: {ctor: '[]'}
-			},
-			url: 'https://sheets.googleapis.com/v4/spreadsheets',
-			body: _elm_lang$http$Http$multipartBody(
-				{
-					ctor: '::',
-					_0: A2(_elm_lang$http$Http$stringPart, 'spreadsheetID', ''),
-					_1: {
-						ctor: '::',
-						_0: A2(_elm_lang$http$Http$stringPart, 'properties', '\n                                { \"title\": \"test\"}\n                                '),
-						_1: {
-							ctor: '::',
-							_0: A2(_elm_lang$http$Http$stringPart, 'sheets', '\n                                {\"data\":[{\"startRow\" :0}]}\n                                '),
-							_1: {ctor: '[]'}
-						}
-					}
-				}),
-			expect: _elm_lang$http$Http$expectStringResponse(
-				function (_p3) {
-					return _elm_lang$core$Result$Ok(
-						{ctor: '_Tuple0'});
-				}),
-			timeout: _elm_lang$core$Maybe$Nothing,
-			withCredentials: false
-		});
-};
 var _user$project$Accio$px = function ($int) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
@@ -10125,22 +10235,38 @@ var _user$project$Accio$parseJson = function (json) {
 		_user$project$Accio$uniqueHead,
 		A4(_user$project$Accio$formatString, '', false, 0, json));
 };
-var _user$project$Accio$googleAuthClient = A2(
-	_tiziano88$elm_oauth$OAuth$newClient,
-	_tiziano88$elm_oauth$OAuth_Config$google,
-	{
-		clientId: '591745061791-69jpb1uina8sp60eq8c0125dm5nb5hhd.apps.googleusercontent.com',
-		scopes: {
-			ctor: '::',
-			_0: 'https://www.googleapis.com/auth/spreadsheets',
-			_1: {
-				ctor: '::',
-				_0: 'https://www.googleapis.com/auth/drive',
-				_1: {ctor: '[]'}
-			}
-		},
-		redirectUrl: 'http://localhost:4000'
-	});
+var _user$project$Accio$toKeyValuePair = function (segment) {
+	var _p2 = A2(_elm_lang$core$String$split, '=', segment);
+	if (((_p2.ctor === '::') && (_p2._1.ctor === '::')) && (_p2._1._1.ctor === '[]')) {
+		return A3(
+			_elm_lang$core$Maybe$map2,
+			F2(
+				function (v0, v1) {
+					return {ctor: '_Tuple2', _0: v0, _1: v1};
+				}),
+			_elm_lang$http$Http$decodeUri(_p2._0),
+			_elm_lang$http$Http$decodeUri(_p2._1._0));
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _user$project$Accio$parseToken = function (location) {
+	var _p3 = A2(_evancz$url_parser$UrlParser$parseHash, _evancz$url_parser$UrlParser$string, location);
+	if (_p3.ctor === 'Just') {
+		return A4(
+			_elm_lang$core$Debug$log,
+			'Dict',
+			_elm_lang$core$Dict$get,
+			'access_token',
+			_elm_lang$core$Dict$fromList(
+				A2(
+					_elm_lang$core$List$filterMap,
+					_user$project$Accio$toKeyValuePair,
+					A2(_elm_lang$core$String$split, '&', _p3._0))));
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
 var _user$project$Accio$newKeyValue = F2(
 	function (str, id) {
 		var _p4 = A2(_elm_lang$core$String$split, '\":', str);
@@ -10185,16 +10311,16 @@ var _user$project$Accio$formatKeyValues = F3(
 			if (_p5.ctor === '[]') {
 				return _elm_lang$core$List$reverse(acc);
 			} else {
-				var _v32 = _p5._1,
-					_v33 = uid + 1,
-					_v34 = {
+				var _v33 = _p5._1,
+					_v34 = uid + 1,
+					_v35 = {
 					ctor: '::',
 					_0: A2(_user$project$Accio$newKeyValue, _p5._0, uid),
 					_1: acc
 				};
-				response = _v32;
-				uid = _v33;
-				acc = _v34;
+				response = _v33;
+				uid = _v34;
+				acc = _v35;
 				continue formatKeyValues;
 			}
 		}
@@ -10216,26 +10342,22 @@ var _user$project$Accio$Model = F4(
 	function (a, b, c, d) {
 		return {url: a, errorMessage: b, keyValues: c, token: d};
 	});
+var _user$project$Accio$init = function (location) {
+	return {
+		ctor: '_Tuple2',
+		_0: A4(
+			_user$project$Accio$Model,
+			'',
+			'',
+			{ctor: '[]'},
+			_user$project$Accio$parseToken(location)),
+		_1: _elm_lang$core$Platform_Cmd$none
+	};
+};
 var _user$project$Accio$KeyValue = F5(
 	function (a, b, c, d, e) {
 		return {key: a, value: b, selected: c, id: d, indent: e};
 	});
-var _user$project$Accio$Validated = {ctor: 'Validated'};
-var _user$project$Accio$PostCsv = function (a) {
-	return {ctor: 'PostCsv', _0: a};
-};
-var _user$project$Accio$requestCsv = function (token) {
-	var _p6 = token;
-	if (_p6.ctor === 'Just') {
-		return A2(
-			_elm_lang$http$Http$send,
-			_user$project$Accio$PostCsv,
-			_user$project$Accio$putRequest(_p6._0));
-	} else {
-		return _elm_lang$core$Platform_Cmd$none;
-	}
-};
-var _user$project$Accio$GetCsv = {ctor: 'GetCsv'};
 var _user$project$Accio$Select = function (a) {
 	return {ctor: 'Select', _0: a};
 };
@@ -10332,38 +10454,18 @@ var _user$project$Accio$getJson = function (url) {
 };
 var _user$project$Accio$update = F2(
 	function (msg, model) {
-		var _p7 = msg;
-		switch (_p7.ctor) {
+		var _p6 = msg;
+		switch (_p6.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-			case 'Validated':
+			case 'RequestToken':
 				return {
 					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{errorMessage: 'Validated'}),
-					_1: _elm_lang$core$Platform_Cmd$none
+					_0: model,
+					_1: _elm_lang$navigation$Navigation$newUrl(_user$project$OAuth$requestToken)
 				};
-			case 'Token':
-				if (_p7._0.ctor === 'Ok') {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						_elm_lang$core$Native_Utils.update(
-							model,
-							{
-								token: _elm_lang$core$Maybe$Just(_p7._0._0)
-							}),
-						{
-							ctor: '::',
-							_0: _elm_lang$navigation$Navigation$modifyUrl('#'),
-							_1: {ctor: '[]'}
-						});
-				} else {
-					return A2(
-						_elm_lang$core$Platform_Cmd_ops['!'],
-						model,
-						{ctor: '[]'});
-				}
+			case 'AddToken':
+				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Add':
 				return {
 					ctor: '_Tuple2',
@@ -10373,7 +10475,7 @@ var _user$project$Accio$update = F2(
 							keyValues: A2(
 								_elm_lang$core$List$append,
 								model.keyValues,
-								_user$project$Accio$enterKeyValues(_p7._0))
+								_user$project$Accio$enterKeyValues(_p6._0))
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -10382,7 +10484,7 @@ var _user$project$Accio$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{url: _p7._0}),
+						{url: _p6._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GetData':
@@ -10392,11 +10494,11 @@ var _user$project$Accio$update = F2(
 					_1: _user$project$Accio$getJson(model.url)
 				};
 			case 'Fetch':
-				if (_p7._0.ctor === 'Ok') {
+				if (_p6._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: model,
-						_1: _user$project$Accio$format(_p7._0._0)
+						_1: _user$project$Accio$format(_p6._0._0)
 					};
 				} else {
 					return {
@@ -10409,9 +10511,9 @@ var _user$project$Accio$update = F2(
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
-			case 'Select':
+			default:
 				var updateSelected = function (t) {
-					return _elm_lang$core$Native_Utils.eq(t.key, _p7._0) ? _elm_lang$core$Native_Utils.update(
+					return _elm_lang$core$Native_Utils.eq(t.key, _p6._0) ? _elm_lang$core$Native_Utils.update(
 						t,
 						{selected: !t.selected}) : t;
 				};
@@ -10424,18 +10526,6 @@ var _user$project$Accio$update = F2(
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'GetCsv':
-				return {
-					ctor: '_Tuple2',
-					_0: model,
-					_1: _user$project$Accio$requestCsv(model.token)
-				};
-			default:
-				if (_p7._0.ctor === 'Ok') {
-					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-				} else {
-					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-				}
 		}
 	});
 var _user$project$Accio$GetData = {ctor: 'GetData'};
@@ -10452,13 +10542,12 @@ var _user$project$Accio$view = function (model) {
 				_elm_lang$html$Html$a,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$href(
-						_tiziano88$elm_oauth$OAuth$buildAuthUrl(_user$project$Accio$googleAuthClient)),
+					_0: _elm_lang$html$Html_Attributes$href(_user$project$OAuth$requestToken),
 					_1: {ctor: '[]'}
 				},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('Google'),
+					_0: _elm_lang$html$Html$text('Authorize Google'),
 					_1: {ctor: '[]'}
 				}),
 			_1: {
@@ -10475,73 +10564,46 @@ var _user$project$Accio$view = function (model) {
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$p,
-						{ctor: '[]'},
+						_elm_lang$html$Html$input,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(
-								_elm_lang$core$Basics$toString(model.errorMessage)),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$input,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$type_('text'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$placeholder('url'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
-										_1: {ctor: '[]'}
-									}
-								}
-							},
-							{ctor: '[]'}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$button,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Get Data'),
-									_1: {ctor: '[]'}
-								}),
+							_0: _elm_lang$html$Html_Attributes$type_('text'),
 							_1: {
 								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$button,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetCsv),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Create Google Sheet'),
-										_1: {ctor: '[]'}
-									}),
+								_0: _elm_lang$html$Html_Attributes$placeholder('url'),
 								_1: {
 									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$section,
-										{ctor: '[]'},
-										{
-											ctor: '::',
-											_0: _user$project$Accio$viewKeyValues(model.keyValues),
-											_1: {ctor: '[]'}
-										}),
+									_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
 									_1: {ctor: '[]'}
 								}
 							}
+						},
+						{ctor: '[]'}),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$button,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Get Data'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$section,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _user$project$Accio$viewKeyValues(model.keyValues),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
 						}
 					}
 				}
@@ -10554,24 +10616,10 @@ var _user$project$Accio$Add = function (a) {
 var _user$project$Accio$subscriptions = function (model) {
 	return _user$project$Accio$stringyfiedJson(_user$project$Accio$Add);
 };
-var _user$project$Accio$Token = function (a) {
-	return {ctor: 'Token', _0: a};
+var _user$project$Accio$AddToken = function (a) {
+	return {ctor: 'AddToken', _0: a};
 };
-var _user$project$Accio$init = function (location) {
-	return {
-		ctor: '_Tuple2',
-		_0: A4(
-			_user$project$Accio$Model,
-			'',
-			'',
-			{ctor: '[]'},
-			_elm_lang$core$Maybe$Nothing),
-		_1: A2(
-			_elm_lang$core$Platform_Cmd$map,
-			_user$project$Accio$Token,
-			A2(_tiziano88$elm_oauth$OAuth$init, _user$project$Accio$googleAuthClient, location))
-	};
-};
+var _user$project$Accio$RequestToken = {ctor: 'RequestToken'};
 var _user$project$Accio$NoOp = {ctor: 'NoOp'};
 var _user$project$Accio$main = A2(
 	_elm_lang$navigation$Navigation$program,

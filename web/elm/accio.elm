@@ -16,10 +16,11 @@ import Array
 import Platform.Cmd exposing (..)
 import Parser exposing (..)
 import Maybe exposing (..)
-import OAuth
-import OAuth.Config
 import Navigation
 import Regex
+import OAuth
+import UrlParser exposing (parseHash, parsePath, s, (<?>), stringParam)
+import Dict
 
 main =
   Navigation.program
@@ -38,7 +39,7 @@ type alias Model =
   { url : String
   , errorMessage : String
   , keyValues : List KeyValue
-  , token : Maybe OAuth.Token
+  , token :  Maybe String
   }
 
 type alias KeyValue =
@@ -81,33 +82,46 @@ newKeyValue str id =
         , indent = 1
         }
 
-googleAuthClient : OAuth.Client
-googleAuthClient =
-  OAuth.newClient
-    OAuth.Config.google
-    { clientId = "591745061791-69jpb1uina8sp60eq8c0125dm5nb5hhd.apps.googleusercontent.com"
-    , scopes = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-    , redirectUrl = "http://localhost:4000"
-    }
 
 init : Navigation.Location -> (Model, Cmd Msg)
 init location =
-  ( Model "" "" [] Nothing, OAuth.init googleAuthClient location |> Cmd.map Token )
+  ( Model "" "" [] (parseToken location), Cmd.none )
 
+
+parseToken : Navigation.Location -> Maybe String
+parseToken location =
+  case (parseHash (UrlParser.string) location) of
+    Just str ->
+      str
+        |> String.split "&"
+        |> List.filterMap toKeyValuePair
+        |> Dict.fromList
+        |> (Debug.log "Dict" Dict.get "access_token")
+    _ ->
+      Nothing
+
+toKeyValuePair : String -> Maybe (String, String)
+toKeyValuePair segment =
+  case String.split "=" segment of
+    [key, value] ->
+      Maybe.map2 (,) (Http.decodeUri key) (Http.decodeUri value)
+
+    _ ->
+      Nothing
 
 -- UPDATE
 
 type Msg
   = NoOp
-  | Token (Result Http.Error OAuth.Token)
+  | RequestToken
+  | AddToken Navigation.Location
   | Add String
   | Url String
   | GetData
   | Fetch (Result Http.Error String)
   | Select String
-  | GetCsv
-  | PostCsv (Result Http.Error ())
-  | Validated
+  -- | GetCsv
+  -- | PostCsv (Result Http.Error ())
 
 port format : String -> Cmd msg
 
@@ -116,16 +130,20 @@ update msg model =
   case msg of
     NoOp ->
       (model, Cmd.none)
-    Validated ->
-        ({model | errorMessage = "Validated" }, Cmd.none)
 
-    Token (Ok t) ->
-      {model
-          | token = Just t
-      }
-          ! [Navigation.modifyUrl "#"]
-    Token (Err _) ->
-      model ! []
+    -- Token (Ok t) ->
+    --   {model
+    --       | token = Just t
+    --   }
+    --       ! [Navigation.modifyUrl "#"]
+    -- Token (Err _) ->
+    --   model ! []
+
+    RequestToken ->
+      (model, Navigation.newUrl OAuth.requestToken)
+
+    AddToken location ->
+      (model, Cmd.none)
 
     Add response ->
         ({ model
@@ -153,15 +171,15 @@ update msg model =
             t
       in
       ({model | keyValues = List.map updateSelected model.keyValues}, Cmd.none)
+    --
+    -- GetCsv ->
+    --   (model, requestCsv model.token )
 
-    GetCsv ->
-      (model, requestCsv model.token )
-
-    PostCsv (Ok response) ->
-      (model, Cmd.none)
-
-    PostCsv (Err _) ->
-      (model, Cmd.none)
+    -- PostCsv (Ok response) ->
+    --   (model, Cmd.none)
+    --
+    -- PostCsv (Err _) ->
+    --   (model, Cmd.none)
 
 enterKeyValues : String -> List KeyValue
 enterKeyValues response =
@@ -186,12 +204,12 @@ parseJson json =
 view : Model -> Html Msg
 view model =
   div []
-    [ a [ href <| OAuth.buildAuthUrl googleAuthClient ] [ text "Google" ]
+    [ a [ href <| OAuth.requestToken ] [ text "Authorize Google" ]
     , p [] [text (toString model.token) ]
-    , p [] [text (toString model.errorMessage) ]
+    -- , p [] [text (toString Navigation.Location) ]
     , input [ type_ "text", placeholder "url", onInput Url ] []
     , button [ onClick GetData ] [ text "Get Data"]
-    , button [ onClick GetCsv ] [ text "Create Google Sheet"]
+    -- , button [ onClick GetCsv ] [ text "Create Google Sheet"]
     , section [] [ viewKeyValues model.keyValues ]
     ]
 
@@ -246,40 +264,40 @@ getJson url =
   Http.send Fetch <|
     Http.getString("http://localhost:4000/response?url=" ++ url)
 
-requestCsv : Maybe OAuth.Token -> Cmd Msg
-requestCsv token =
-  case token of
-    Just token ->
-      Http.send PostCsv (putRequest token)
-
-    Nothing ->
-      Cmd.none
-
-putRequest : OAuth.Token -> Http.Request ()
-putRequest token =
-  Http.request
-        { method = "POST"
-        , headers = [getHeaders (Debug.log "token" token)]
-        , url = "https://sheets.googleapis.com/v4/spreadsheets"
-        , body = Http.multipartBody
-                      [ Http.stringPart "spreadsheetID" ""
-                      , Http.stringPart "properties" """
-                                { "title": "test"}
-                                """
-                      , Http.stringPart "sheets" """
-                                {"data":[{"startRow" :0}]}
-                                """
-                      ]
-        , expect = expectStringResponse (\_ -> Ok ())
-        , timeout = Nothing
-        , withCredentials = False
-        }
-
-getHeaders : OAuth.Token -> Http.Header
-getHeaders token =
-   case token of
-      OAuth.Validated t ->
-          Http.header "Authorization" ("Bearer " ++ (Debug.log "token regex" t ))
+-- requestCsv : Maybe OAuth.Token -> Cmd Msg
+-- requestCsv token =
+--   case token of
+--     Just token ->
+--       Http.send PostCsv (putRequest token)
+--
+--     Nothing ->
+--       Cmd.none
+--
+-- putRequest : OAuth.Token -> Http.Request ()
+-- putRequest token =
+--   Http.request
+--         { method = "POST"
+--         , headers = [getHeaders (Debug.log "token" token)]
+--         , url = "https://sheets.googleapis.com/v4/spreadsheets"
+--         , body = Http.multipartBody
+--                       [ Http.stringPart "spreadsheetID" ""
+--                       , Http.stringPart "properties" """
+--                                 { "title": "test"}
+--                                 """
+--                       , Http.stringPart "sheets" """
+--                                 {"data":[{"startRow" :0}]}
+--                                 """
+--                       ]
+--         , expect = expectStringResponse (\_ -> Ok ())
+--         , timeout = Nothing
+--         , withCredentials = False
+--         }
+--
+-- getHeaders : OAuth.Token -> Http.Header
+-- getHeaders token =
+--    case token of
+--       OAuth.Validated t ->
+--           Http.header "Authorization" ("Bearer " ++ (Debug.log "token regex" t ))
 
 
 
