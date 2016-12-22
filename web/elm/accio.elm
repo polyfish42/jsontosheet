@@ -34,7 +34,6 @@ main =
 
 -- MODEL
 
-
 type alias Model =
   { url : String
   , errorMessage : String
@@ -143,7 +142,7 @@ update msg model =
       (model, getJson model.url)
 
     Fetch (Ok response) ->
-      (model, format response)
+      (model, format (Debug.log "first response" response))
 
     Fetch (Err _) ->
       ({model | errorMessage = toString Err}, Cmd.none)
@@ -162,7 +161,7 @@ update msg model =
       (model, requestCsv model.token )
 
     PostCsv (Ok response) ->
-      ({ model | spreadsheetUrl = response }, Cmd.none) 
+      ({ model | spreadsheetUrl = response }, Cmd.none)
 
     PostCsv (Err _) ->
       (model, Cmd.none)
@@ -185,19 +184,14 @@ parseJson json =
       |> formatString "" False 0
       |> String.split uniqueHead
 
-spreadsheetUrl res =
-    case res of
-      Ok result ->
-         result
-      Err  _ ->
-         "no spreadsheet"
 -- VIEW
 
 view : Model -> Html Msg
 view model =
   div []
     [ a [ href <| OAuth.requestToken ] [ text "Authorize Google" ]
-    , p [] [text (toString model.spreadsheetUrl) ]
+    , a [ href model.spreadsheetUrl ] [text "Click here to see your spreadsheet" ]
+    , a [] [text (toString (model.keyValues))]
     , input [ type_ "text", placeholder "url", onInput Url ] []
     , button [ onClick GetData ] [ text "Get Data"]
     , button [ onClick GetCsv ] [ text "Create Google Sheet"]
@@ -288,9 +282,14 @@ getHeaders : String -> Http.Header
 getHeaders token =
           Http.header "Authorization" ("Bearer " ++ token)
 
+selectedToJson model =
+     Debug.log "selected keyValues" (List.filter (.selected) model.keyValues)
+         |> List.map encodeKeyValues
+        --  |> Json.Encode.object
+        --  |> Json.Encode.encode 0
 
-
-
+encodeKeyValues keyValues =
+  (toString keyValues.key, Json.Encode.string keyValues.value)
 
 -- PARSER
 

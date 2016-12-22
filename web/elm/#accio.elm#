@@ -185,19 +185,13 @@ parseJson json =
       |> formatString "" False 0
       |> String.split uniqueHead
 
-spreadsheetUrl res =
-    case res of
-      Ok result ->
-         result
-      Err  _ ->
-         "no spreadsheet"
 -- VIEW
 
 view : Model -> Html Msg
 view model =
   div []
     [ a [ href <| OAuth.requestToken ] [ text "Authorize Google" ]
-    , p [] [text (toString model.spreadsheetUrl) ]
+    , a [ href model.spreadsheetUrl ] [text "Click here to see your spreadsheet" ]
     , input [ type_ "text", placeholder "url", onInput Url ] []
     , button [ onClick GetData ] [ text "Get Data"]
     , button [ onClick GetCsv ] [ text "Create Google Sheet"]
@@ -288,6 +282,11 @@ getHeaders : String -> Http.Header
 getHeaders token =
           Http.header "Authorization" ("Bearer " ++ token)
 
+selectedToJson model =
+     List.filter (.selected == True) model.keyValues 
+         |> List.map (toString .key, Json.Encode.string .value)
+         |> Json.Encode.object
+         |> Json.Encode.encode 0
 
 
 
