@@ -43,8 +43,8 @@ type alias Model =
   }
 
 type alias KeyValue =
-  { key : String
-  , value : String
+  { key : Json.Decode.Value
+  , value : Json.Decode.Value
   , selected : Bool
   , id : Int
   , indent : Int
@@ -55,8 +55,8 @@ newKeyValue : String -> Int -> KeyValue
 newKeyValue str id =
     case String.split "\":" str of
       [key, value] ->
-        { key = (String.dropLeft 5 key) ++ "\""
-        , value = value
+        { key = Json.Encode.string ((String.dropLeft 5 key) ++ "\"")
+        , value = Json.Encode.string value
         , selected = False
         , id = id
         , indent =
@@ -65,8 +65,8 @@ newKeyValue str id =
             |> Result.withDefault 0
         }
       char::xs ->
-        { key = String.dropLeft 5 char
-        , value = ""
+        { key = Json.Encode.string (String.dropLeft 5 char)
+        , value = Json.Encode.string ""
         , selected = False
         , id = id
         , indent =
@@ -75,8 +75,8 @@ newKeyValue str id =
             |> Result.withDefault 0
         }
       [] ->
-        { key = "something"
-        , value = " is worng"
+        { key = Json.Encode.string "something"
+        , value = Json.Encode.string " is wrong"
         , selected = False
         , id = id
         , indent = 1
@@ -118,7 +118,7 @@ type Msg
   | Url String
   | GetData
   | Fetch (Result Http.Error String)
-  | Select String
+  | Select Json.Encode.Value
   | GetCsv
   | PostCsv (Result Http.Error String)
 
@@ -224,7 +224,7 @@ viewLine keyValue =
         ]
       , onClick (Select keyValue.key)
       ]
-      [ text (keyValue.key ++ ":" ++ keyValue.value) ]
+      [ text (valueToString keyValue.key ++ ":" ++ valueToString keyValue.value) ]
 
 -- VIEW HELPERS
 
@@ -232,6 +232,9 @@ px : Int -> String
 px int =
   toString int
   ++ "px"
+
+valueToString value =
+  toString value
 
 -- SUBSCRIPTIONS
 

@@ -10281,6 +10281,9 @@ var _user$project$Accio$putRequest = function (token) {
 			withCredentials: false
 		});
 };
+var _user$project$Accio$valueToString = function (value) {
+	return _elm_lang$core$Basics$toString(value);
+};
 var _user$project$Accio$px = function ($int) {
 	return A2(
 		_elm_lang$core$Basics_ops['++'],
@@ -10329,11 +10332,12 @@ var _user$project$Accio$newKeyValue = F2(
 		if (_p4.ctor === '::') {
 			if ((_p4._1.ctor === '::') && (_p4._1._1.ctor === '[]')) {
 				return {
-					key: A2(
-						_elm_lang$core$Basics_ops['++'],
-						A2(_elm_lang$core$String$dropLeft, 5, _p4._0),
-						'\"'),
-					value: _p4._1._0,
+					key: _elm_lang$core$Json_Encode$string(
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							A2(_elm_lang$core$String$dropLeft, 5, _p4._0),
+							'\"')),
+					value: _elm_lang$core$Json_Encode$string(_p4._1._0),
 					selected: false,
 					id: id,
 					indent: A2(
@@ -10344,8 +10348,9 @@ var _user$project$Accio$newKeyValue = F2(
 				};
 			} else {
 				return {
-					key: A2(_elm_lang$core$String$dropLeft, 5, _p4._0),
-					value: '',
+					key: _elm_lang$core$Json_Encode$string(
+						A2(_elm_lang$core$String$dropLeft, 5, _p4._0)),
+					value: _elm_lang$core$Json_Encode$string(''),
 					selected: false,
 					id: id,
 					indent: A2(
@@ -10356,7 +10361,13 @@ var _user$project$Accio$newKeyValue = F2(
 				};
 			}
 		} else {
-			return {key: 'something', value: ' is worng', selected: false, id: id, indent: 1};
+			return {
+				key: _elm_lang$core$Json_Encode$string('something'),
+				value: _elm_lang$core$Json_Encode$string(' is wrong'),
+				selected: false,
+				id: id,
+				indent: 1
+			};
 		}
 	});
 var _user$project$Accio$formatKeyValues = F3(
@@ -10485,8 +10496,11 @@ var _user$project$Accio$viewLine = function (keyValue) {
 			_0: _elm_lang$html$Html$text(
 				A2(
 					_elm_lang$core$Basics_ops['++'],
-					keyValue.key,
-					A2(_elm_lang$core$Basics_ops['++'], ':', keyValue.value))),
+					_user$project$Accio$valueToString(keyValue.key),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						':',
+						_user$project$Accio$valueToString(keyValue.value)))),
 			_1: {ctor: '[]'}
 		});
 };
