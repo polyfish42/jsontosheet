@@ -4,35 +4,62 @@ var _user$project$Accio$getHeaders = function (token) {
 		'Authorization',
 		A2(_elm_lang$core$Basics_ops['++'], 'Bearer ', token));
 };
-var _user$project$Accio$putRequest = function (token) {
-	return _elm_lang$http$Http$request(
-		{
-			method: 'POST',
-			headers: {
-				ctor: '::',
-				_0: _user$project$Accio$getHeaders(
-					A2(_elm_lang$core$Debug$log, 'token', token)),
-				_1: {ctor: '[]'}
-			},
-			url: 'https://sheets.googleapis.com/v4/spreadsheets',
-			body: _elm_lang$http$Http$multipartBody(
-				{
+var _user$project$Accio$putRequest = F2(
+	function (token, model) {
+		return _elm_lang$http$Http$request(
+			{
+				method: 'POST',
+				headers: {
 					ctor: '::',
-					_0: A2(_elm_lang$http$Http$stringPart, 'spreadsheetID', ''),
-					_1: {
+					_0: _user$project$Accio$getHeaders(
+						A2(_elm_lang$core$Debug$log, 'token', token)),
+					_1: {ctor: '[]'}
+				},
+				url: 'https://sheets.googleapis.com/v4/spreadsheets',
+				body: _elm_lang$http$Http$jsonBody(model.keyValues),
+				expect: _elm_lang$http$Http$expectJson(
+					A2(_elm_lang$core$Json_Decode$field, 'spreadsheetUrl', _elm_lang$core$Json_Decode$string)),
+				timeout: _elm_lang$core$Maybe$Nothing,
+				withCredentials: false
+			});
+	});
+var _user$project$Accio$googleSheetsRequestBody = function (rows) {
+	return _elm_lang$core$Json_Encode$array(
+		_elm_lang$core$Array$fromList(rows));
+};
+var _user$project$Accio$cells = function (cell) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'userEnteredValue',
+				_1: _elm_lang$core$Json_Encode$object(
+					{
 						ctor: '::',
-						_0: A2(_elm_lang$http$Http$stringPart, 'properties', '\n                                { \"title\": \"test\"}\n                                '),
-						_1: {
-							ctor: '::',
-							_0: A2(_elm_lang$http$Http$stringPart, 'sheets', '\n                                {\"data\":[{\"startRow\" :0}]}\n                                '),
-							_1: {ctor: '[]'}
-						}
-					}
-				}),
-			expect: _elm_lang$http$Http$expectJson(
-				A2(_elm_lang$core$Json_Decode$field, 'spreadsheetUrl', _elm_lang$core$Json_Decode$string)),
-			timeout: _elm_lang$core$Maybe$Nothing,
-			withCredentials: false
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'stringValue',
+							_1: _elm_lang$core$Json_Encode$string('id')
+						},
+						_1: {ctor: '[]'}
+					})
+			},
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Accio$createRow = function (row) {
+	return _elm_lang$core$Json_Encode$object(
+		{
+			ctor: '::',
+			_0: {
+				ctor: '_Tuple2',
+				_0: 'values',
+				_1: _elm_lang$core$Json_Encode$array(
+					_elm_lang$core$Array$fromList(
+						A2(_elm_lang$core$List$map, _user$project$Accio$cells, row)))
+			},
+			_1: {ctor: '[]'}
 		});
 };
 var _user$project$Accio$nestKeys = F2(
@@ -187,7 +214,7 @@ var _user$project$Accio$init = function (location) {
 			_user$project$Accio$Model,
 			'',
 			'',
-			{ctor: '[]'},
+			_elm_lang$core$Json_Encode$null,
 			_user$project$Accio$parseToken(location),
 			''),
 		_1: _elm_lang$core$Platform_Cmd$none
@@ -497,23 +524,28 @@ var _user$project$Accio$jsonDecoder = _elm_lang$core$Json_Decode$oneOf(
 		}
 	});
 var _user$project$Accio$createSheet = function (response) {
-	return _user$project$Accio$flattenAndEncode(
-		A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Accio$jsonDecoder, response));
+	return _user$project$Accio$googleSheetsRequestBody(
+		A2(
+			_elm_lang$core$List$map,
+			_user$project$Accio$createRow,
+			_user$project$Accio$flattenAndEncode(
+				A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Accio$jsonDecoder, response))));
 };
 var _user$project$Accio$PostCsv = function (a) {
 	return {ctor: 'PostCsv', _0: a};
 };
-var _user$project$Accio$requestCsv = function (token) {
-	var _p15 = token;
-	if (_p15.ctor === 'Just') {
-		return A2(
-			_elm_lang$http$Http$send,
-			_user$project$Accio$PostCsv,
-			_user$project$Accio$putRequest(_p15._0));
-	} else {
-		return _elm_lang$core$Platform_Cmd$none;
-	}
-};
+var _user$project$Accio$requestCsv = F2(
+	function (token, model) {
+		var _p15 = token;
+		if (_p15.ctor === 'Just') {
+			return A2(
+				_elm_lang$http$Http$send,
+				_user$project$Accio$PostCsv,
+				A2(_user$project$Accio$putRequest, _p15._0, model));
+		} else {
+			return _elm_lang$core$Platform_Cmd$none;
+		}
+	});
 var _user$project$Accio$GetCsv = {ctor: 'GetCsv'};
 var _user$project$Accio$Fetch = function (a) {
 	return {ctor: 'Fetch', _0: a};
@@ -570,7 +602,7 @@ var _user$project$Accio$update = F2(
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: _user$project$Accio$requestCsv(model.token)
+					_1: A2(_user$project$Accio$requestCsv, model.token, model)
 				};
 			default:
 				if (_p16._0.ctor === 'Ok') {

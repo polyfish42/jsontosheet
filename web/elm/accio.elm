@@ -41,7 +41,7 @@ main =
 type alias Model =
     { url : String
     , errorMessage : String
-    , keyValues : List (List (String, E.Value))
+    , keyValues : E.Value
     , token : Maybe String
     , spreadsheetUrl : String
     }
@@ -49,7 +49,7 @@ type alias Model =
 
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model "" "" [] (parseToken location) "", Cmd.none )
+    ( Model "" "" E.null (parseToken location) "", Cmd.none )
 
 
 parseToken : Navigation.Location -> Maybe String
@@ -117,7 +117,7 @@ update msg model =
             ( { model | errorMessage = toString Err }, Cmd.none )
 
         GetCsv ->
-            ( model, requestCsv model.token )
+            ( model, requestCsv model.token model )
 
         PostCsv (Ok response) ->
             ( { model | spreadsheetUrl = response }, Cmd.none )
@@ -126,10 +126,12 @@ update msg model =
             ( model, Cmd.none )
 
 
-createSheet : String -> List (List ( String, E.Value ))
+createSheet : String -> E.Value
 createSheet response =
     D.decodeString jsonDecoder response
         |> flattenAndEncode
+        |> List.map createRow
+        |> googleSheetsRequestBody
 
 
 jsonDecoder : Decoder JsonVal
@@ -245,6 +247,36 @@ destructureArray nestedName key list acc counter =
             acc
 
 
+createRow : List ( String, E.Value ) -> E.Value
+createRow row =
+    E.object
+        [ ( "values"
+          , E.array
+                (Array.fromList
+                    (List.map cells row)
+                )
+          )
+        ]
+
+
+cells cell =
+    E.object
+        [ ( "userEnteredValue"
+          , E.object
+                [ ( "stringValue", E.string "id" )
+                ]
+          )
+        ]
+
+
+googleSheetsRequestBody : List (E.Value) -> E.Value
+googleSheetsRequestBody rows =
+    E.array
+        (Array.fromList
+            rows
+        )
+
+
 
 -- VIEW
 
@@ -271,32 +303,32 @@ getJson url =
         Http.getString (url)
 
 
-requestCsv : Maybe String -> Cmd Msg
-requestCsv token =
+requestCsv : Maybe String -> Model -> Cmd Msg
+requestCsv token model =
     case token of
         Just token ->
-            Http.send PostCsv (putRequest token)
+            Http.send PostCsv (putRequest token model)
 
         Nothing ->
             Cmd.none
 
 
-putRequest : String -> Http.Request String
-putRequest token =
+putRequest : String -> Model -> Http.Request String
+putRequest token model =
     Http.request
         { method = "POST"
         , headers = [ getHeaders (Debug.log "token" token) ]
         , url = "https://sheets.googleapis.com/v4/spreadsheets"
-        , body =
-            Http.multipartBody
-                [ Http.stringPart "spreadsheetID" ""
-                , Http.stringPart "properties" """
-                                { "title": "test"}
-                                """
-                , Http.stringPart "sheets" """
-                                {"data":[{"startRow" :0}]}
-                                """
-                ]
+        , body = Http.jsonBody model.keyValues
+            -- Http.multipartBody
+            --     [ Http.stringPart "spreadsheetID" ""
+            --     , Http.stringPart "properties" """
+            --                     { "title": "test"}
+            --                     """
+            --     , Http.stringPart "sheets" """
+            --                     {"data":[{"startRow" :0}]}
+            --                     """
+            --     ]
         , expect = expectJson (D.field "spreadsheetUrl" D.string)
         , timeout = Nothing
         , withCredentials = False
