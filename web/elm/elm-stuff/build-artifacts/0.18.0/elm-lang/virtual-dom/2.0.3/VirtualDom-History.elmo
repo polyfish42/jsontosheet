@@ -1,5 +1,6 @@
 var _elm_lang$virtual_dom$VirtualDom_History$viewMessage = F3(
 	function (currentIndex, index, msg) {
+		var messageName = _elm_lang$virtual_dom$Native_Debug.messageToString(msg);
 		var className = _elm_lang$core$Native_Utils.eq(currentIndex, index) ? 'messages-entry messages-entry-selected' : 'messages-entry';
 		return A2(
 			_elm_lang$virtual_dom$VirtualDom_Helpers$div,
@@ -22,12 +23,15 @@ var _elm_lang$virtual_dom$VirtualDom_History$viewMessage = F3(
 					{
 						ctor: '::',
 						_0: _elm_lang$virtual_dom$VirtualDom_Helpers$class('messages-entry-content'),
-						_1: {ctor: '[]'}
+						_1: {
+							ctor: '::',
+							_0: A2(_elm_lang$virtual_dom$VirtualDom_Helpers$attribute, 'title', messageName),
+							_1: {ctor: '[]'}
+						}
 					},
 					{
 						ctor: '::',
-						_0: _elm_lang$virtual_dom$VirtualDom_Helpers$text(
-							_elm_lang$virtual_dom$Native_Debug.messageToString(msg)),
+						_0: _elm_lang$virtual_dom$VirtualDom_Helpers$text(messageName),
 						_1: {ctor: '[]'}
 					}),
 				_1: {

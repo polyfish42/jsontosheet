@@ -1,157 +1,3 @@
-var _user$project$Accio$pad = function (indent) {
-	return A3(
-		_elm_lang$core$String$padLeft,
-		5,
-		_elm_lang$core$Native_Utils.chr('0'),
-		_elm_lang$core$Basics$toString(indent));
-};
-var _user$project$Accio$incr = 20;
-var _user$project$Accio$uniqueHead = '##FORMAT##';
-var _user$project$Accio$newLineChars = ',';
-var _user$project$Accio$outdentChars = '}]';
-var _user$project$Accio$indentChars = '{[';
-var _user$project$Accio$quote = '\"';
-var _user$project$Accio$formatString = F4(
-	function (acc, isInQuotes, indent, str) {
-		formatString:
-		while (true) {
-			var _p0 = A2(_elm_lang$core$String$left, 1, str);
-			if (_p0 === '') {
-				return acc;
-			} else {
-				var _p1 = _p0;
-				if (isInQuotes) {
-					if (_elm_lang$core$Native_Utils.eq(_p1, _user$project$Accio$quote)) {
-						var _v1 = A2(_elm_lang$core$Basics_ops['++'], acc, _p1),
-							_v2 = !isInQuotes,
-							_v3 = indent,
-							_v4 = A2(_elm_lang$core$String$dropLeft, 1, str);
-						acc = _v1;
-						isInQuotes = _v2;
-						indent = _v3;
-						str = _v4;
-						continue formatString;
-					} else {
-						var _v5 = A2(_elm_lang$core$Basics_ops['++'], acc, _p1),
-							_v6 = isInQuotes,
-							_v7 = indent,
-							_v8 = A2(_elm_lang$core$String$dropLeft, 1, str);
-						acc = _v5;
-						isInQuotes = _v6;
-						indent = _v7;
-						str = _v8;
-						continue formatString;
-					}
-				} else {
-					if (A2(_elm_lang$core$String$contains, _p1, _user$project$Accio$newLineChars)) {
-						var _v9 = A2(
-							_elm_lang$core$Basics_ops['++'],
-							acc,
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								_p1,
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									_user$project$Accio$uniqueHead,
-									_user$project$Accio$pad(indent)))),
-							_v10 = isInQuotes,
-							_v11 = indent,
-							_v12 = A2(_elm_lang$core$String$dropLeft, 1, str);
-						acc = _v9;
-						isInQuotes = _v10;
-						indent = _v11;
-						str = _v12;
-						continue formatString;
-					} else {
-						if (A2(_elm_lang$core$String$contains, _p1, _user$project$Accio$indentChars)) {
-							var _v13 = A2(
-								_elm_lang$core$Basics_ops['++'],
-								acc,
-								A2(
-									_elm_lang$core$Basics_ops['++'],
-									_user$project$Accio$uniqueHead,
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										_user$project$Accio$pad(indent + _user$project$Accio$incr),
-										_p1))),
-								_v14 = isInQuotes,
-								_v15 = indent + _user$project$Accio$incr,
-								_v16 = A2(_elm_lang$core$String$dropLeft, 1, str);
-							acc = _v13;
-							isInQuotes = _v14;
-							indent = _v15;
-							str = _v16;
-							continue formatString;
-						} else {
-							if (A2(_elm_lang$core$String$contains, _p1, _user$project$Accio$outdentChars)) {
-								var _v17 = A2(
-									_elm_lang$core$Basics_ops['++'],
-									acc,
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										_p1,
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											_user$project$Accio$uniqueHead,
-											_user$project$Accio$pad(indent - _user$project$Accio$incr)))),
-									_v18 = isInQuotes,
-									_v19 = indent - _user$project$Accio$incr,
-									_v20 = A2(_elm_lang$core$String$dropLeft, 1, str);
-								acc = _v17;
-								isInQuotes = _v18;
-								indent = _v19;
-								str = _v20;
-								continue formatString;
-							} else {
-								if (_elm_lang$core$Native_Utils.eq(_p1, _user$project$Accio$quote)) {
-									var _v21 = A2(_elm_lang$core$Basics_ops['++'], acc, _p1),
-										_v22 = !isInQuotes,
-										_v23 = indent,
-										_v24 = A2(_elm_lang$core$String$dropLeft, 1, str);
-									acc = _v21;
-									isInQuotes = _v22;
-									indent = _v23;
-									str = _v24;
-									continue formatString;
-								} else {
-									var _v25 = A2(_elm_lang$core$Basics_ops['++'], acc, _p1),
-										_v26 = isInQuotes,
-										_v27 = indent,
-										_v28 = A2(_elm_lang$core$String$dropLeft, 1, str);
-									acc = _v25;
-									isInQuotes = _v26;
-									indent = _v27;
-									str = _v28;
-									continue formatString;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	});
-var _user$project$Accio$encodeKeyValues = function (keyValues) {
-	return {
-		ctor: '_Tuple2',
-		_0: _elm_lang$core$Basics$toString(keyValues.key),
-		_1: _elm_lang$core$Json_Encode$string(keyValues.value)
-	};
-};
-var _user$project$Accio$selectedToJson = function (model) {
-	return A2(
-		_elm_lang$core$List$map,
-		_user$project$Accio$encodeKeyValues,
-		A2(
-			_elm_lang$core$Debug$log,
-			'selected keyValues',
-			A2(
-				_elm_lang$core$List$filter,
-				function (_) {
-					return _.selected;
-				},
-				model.keyValues)));
-};
 var _user$project$Accio$getHeaders = function (token) {
 	return A2(
 		_elm_lang$http$Http$header,
@@ -189,39 +35,135 @@ var _user$project$Accio$putRequest = function (token) {
 			withCredentials: false
 		});
 };
-var _user$project$Accio$valueToString = function (value) {
-	return _elm_lang$core$Basics$toString(value);
-};
-var _user$project$Accio$px = function ($int) {
-	return A2(
-		_elm_lang$core$Basics_ops['++'],
-		_elm_lang$core$Basics$toString($int),
-		'px');
-};
-var _user$project$Accio$parseJson = function (json) {
-	return A2(
-		_elm_lang$core$String$split,
-		_user$project$Accio$uniqueHead,
-		A4(_user$project$Accio$formatString, '', false, 0, json));
-};
+var _user$project$Accio$nestKeys = F2(
+	function (nestedNames, key) {
+		var _p0 = nestedNames;
+		if (_p0 === '') {
+			return key;
+		} else {
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				_p0,
+				A2(_elm_lang$core$Basics_ops['++'], '/', key));
+		}
+	});
+var _user$project$Accio$destructureArray = F5(
+	function (nestedName, key, list, acc, counter) {
+		destructureArray:
+		while (true) {
+			var _p1 = list;
+			if (_p1.ctor === '::') {
+				var _p3 = _p1._1;
+				var _p2 = _p1._0;
+				switch (_p2.ctor) {
+					case 'JsonString':
+						var _v3 = nestedName,
+							_v4 = key,
+							_v5 = _p3,
+							_v6 = {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: A2(
+									_elm_lang$core$Basics_ops['++'],
+									A2(_user$project$Accio$nestKeys, nestedName, key),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										'/',
+										_elm_lang$core$Basics$toString(counter))),
+								_1: _elm_lang$core$Json_Encode$string(_p2._0)
+							},
+							_1: acc
+						},
+							_v7 = counter + 1;
+						nestedName = _v3;
+						key = _v4;
+						list = _v5;
+						acc = _v6;
+						counter = _v7;
+						continue destructureArray;
+					case 'JsonInt':
+						var _v8 = nestedName,
+							_v9 = key,
+							_v10 = _p3,
+							_v11 = {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: A2(
+									_elm_lang$core$Basics_ops['++'],
+									A2(_user$project$Accio$nestKeys, nestedName, key),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										'/',
+										_elm_lang$core$Basics$toString(counter))),
+								_1: _elm_lang$core$Json_Encode$int(_p2._0)
+							},
+							_1: acc
+						},
+							_v12 = counter + 1;
+						nestedName = _v8;
+						key = _v9;
+						list = _v10;
+						acc = _v11;
+						counter = _v12;
+						continue destructureArray;
+					case 'JsonNull':
+						var _v13 = nestedName,
+							_v14 = key,
+							_v15 = _p3,
+							_v16 = {
+							ctor: '::',
+							_0: {
+								ctor: '_Tuple2',
+								_0: A2(
+									_elm_lang$core$Basics_ops['++'],
+									A2(_user$project$Accio$nestKeys, nestedName, key),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										'/',
+										_elm_lang$core$Basics$toString(counter))),
+								_1: _elm_lang$core$Json_Encode$null
+							},
+							_1: acc
+						},
+							_v17 = counter + 1;
+						nestedName = _v13;
+						key = _v14;
+						list = _v15;
+						acc = _v16;
+						counter = _v17;
+						continue destructureArray;
+					default:
+						return {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'error', _1: _elm_lang$core$Json_Encode$null},
+							_1: {ctor: '[]'}
+						};
+				}
+			} else {
+				return acc;
+			}
+		}
+	});
 var _user$project$Accio$toKeyValuePair = function (segment) {
-	var _p2 = A2(_elm_lang$core$String$split, '=', segment);
-	if (((_p2.ctor === '::') && (_p2._1.ctor === '::')) && (_p2._1._1.ctor === '[]')) {
+	var _p4 = A2(_elm_lang$core$String$split, '=', segment);
+	if (((_p4.ctor === '::') && (_p4._1.ctor === '::')) && (_p4._1._1.ctor === '[]')) {
 		return A3(
 			_elm_lang$core$Maybe$map2,
 			F2(
 				function (v0, v1) {
 					return {ctor: '_Tuple2', _0: v0, _1: v1};
 				}),
-			_elm_lang$http$Http$decodeUri(_p2._0),
-			_elm_lang$http$Http$decodeUri(_p2._1._0));
+			_elm_lang$http$Http$decodeUri(_p4._0),
+			_elm_lang$http$Http$decodeUri(_p4._1._0));
 	} else {
 		return _elm_lang$core$Maybe$Nothing;
 	}
 };
 var _user$project$Accio$parseToken = function (location) {
-	var _p3 = A2(_evancz$url_parser$UrlParser$parseHash, _evancz$url_parser$UrlParser$string, location);
-	if (_p3.ctor === 'Just') {
+	var _p5 = A2(_evancz$url_parser$UrlParser$parseHash, _evancz$url_parser$UrlParser$string, location);
+	if (_p5.ctor === 'Just') {
 		return A2(
 			_elm_lang$core$Dict$get,
 			'access_token',
@@ -229,90 +171,11 @@ var _user$project$Accio$parseToken = function (location) {
 				A2(
 					_elm_lang$core$List$filterMap,
 					_user$project$Accio$toKeyValuePair,
-					A2(_elm_lang$core$String$split, '&', _p3._0))));
+					A2(_elm_lang$core$String$split, '&', _p5._0))));
 	} else {
 		return _elm_lang$core$Maybe$Nothing;
 	}
 };
-var _user$project$Accio$newKeyValue = F2(
-	function (str, id) {
-		var _p4 = A2(_elm_lang$core$String$split, '\":', str);
-		if (_p4.ctor === '::') {
-			if ((_p4._1.ctor === '::') && (_p4._1._1.ctor === '[]')) {
-				return {
-					key: _elm_lang$core$Json_Encode$string(
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							A2(_elm_lang$core$String$dropLeft, 5, _p4._0),
-							'\"')),
-					value: _elm_lang$core$Json_Encode$string(_p4._1._0),
-					selected: false,
-					id: id,
-					indent: A2(
-						_elm_lang$core$Result$withDefault,
-						0,
-						_elm_lang$core$String$toInt(
-							A2(_elm_lang$core$String$left, 5, str)))
-				};
-			} else {
-				return {
-					key: _elm_lang$core$Json_Encode$string(
-						A2(_elm_lang$core$String$dropLeft, 5, _p4._0)),
-					value: _elm_lang$core$Json_Encode$string(''),
-					selected: false,
-					id: id,
-					indent: A2(
-						_elm_lang$core$Result$withDefault,
-						0,
-						_elm_lang$core$String$toInt(
-							A2(_elm_lang$core$String$left, 5, str)))
-				};
-			}
-		} else {
-			return {
-				key: _elm_lang$core$Json_Encode$string('something'),
-				value: _elm_lang$core$Json_Encode$string(' is wrong'),
-				selected: false,
-				id: id,
-				indent: 1
-			};
-		}
-	});
-var _user$project$Accio$formatKeyValues = F3(
-	function (response, uid, acc) {
-		formatKeyValues:
-		while (true) {
-			var _p5 = response;
-			if (_p5.ctor === '[]') {
-				return _elm_lang$core$List$reverse(acc);
-			} else {
-				var _v33 = _p5._1,
-					_v34 = uid + 1,
-					_v35 = {
-					ctor: '::',
-					_0: A2(_user$project$Accio$newKeyValue, _p5._0, uid),
-					_1: acc
-				};
-				response = _v33;
-				uid = _v34;
-				acc = _v35;
-				continue formatKeyValues;
-			}
-		}
-	});
-var _user$project$Accio$enterKeyValues = function (response) {
-	return A3(
-		_user$project$Accio$formatKeyValues,
-		_user$project$Accio$parseJson(response),
-		1,
-		{ctor: '[]'});
-};
-var _user$project$Accio$format = _elm_lang$core$Native_Platform.outgoingPort(
-	'format',
-	function (v) {
-		return v;
-	});
-var _user$project$Accio$stringyfiedJson = _elm_lang$core$Native_Platform.incomingPort('stringyfiedJson', _elm_lang$core$Json_Decode$string);
 var _user$project$Accio$Model = F5(
 	function (a, b, c, d, e) {
 		return {url: a, errorMessage: b, keyValues: c, token: d, spreadsheetUrl: e};
@@ -330,112 +193,328 @@ var _user$project$Accio$init = function (location) {
 		_1: _elm_lang$core$Platform_Cmd$none
 	};
 };
-var _user$project$Accio$KeyValue = F5(
-	function (a, b, c, d, e) {
-		return {key: a, value: b, selected: c, id: d, indent: e};
+var _user$project$Accio$JsonArray = function (a) {
+	return {ctor: 'JsonArray', _0: a};
+};
+var _user$project$Accio$JsonNull = {ctor: 'JsonNull'};
+var _user$project$Accio$JsonInt = function (a) {
+	return {ctor: 'JsonInt', _0: a};
+};
+var _user$project$Accio$JsonFloat = function (a) {
+	return {ctor: 'JsonFloat', _0: a};
+};
+var _user$project$Accio$JsonObject = function (a) {
+	return {ctor: 'JsonObject', _0: a};
+};
+var _user$project$Accio$destructure = F3(
+	function (acc, nestedName, jsonVal) {
+		destructure:
+		while (true) {
+			var _p6 = jsonVal;
+			if (_p6.ctor === 'JsonObject') {
+				var _p7 = _elm_lang$core$Dict$toList(_p6._0);
+				if (_p7.ctor === '::') {
+					var _p9 = _p7._1;
+					var _p8 = _p7._0;
+					switch (_p8._1.ctor) {
+						case 'JsonString':
+							var _v23 = {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: A2(_user$project$Accio$nestKeys, nestedName, _p8._0),
+									_1: _elm_lang$core$Json_Encode$string(_p8._1._0)
+								},
+								_1: acc
+							},
+								_v24 = nestedName,
+								_v25 = _user$project$Accio$JsonObject(
+								_elm_lang$core$Dict$fromList(_p9));
+							acc = _v23;
+							nestedName = _v24;
+							jsonVal = _v25;
+							continue destructure;
+						case 'JsonInt':
+							var _v26 = {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: A2(_user$project$Accio$nestKeys, nestedName, _p8._0),
+									_1: _elm_lang$core$Json_Encode$int(_p8._1._0)
+								},
+								_1: acc
+							},
+								_v27 = nestedName,
+								_v28 = _user$project$Accio$JsonObject(
+								_elm_lang$core$Dict$fromList(_p9));
+							acc = _v26;
+							nestedName = _v27;
+							jsonVal = _v28;
+							continue destructure;
+						case 'JsonFloat':
+							var _v29 = {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: A2(_user$project$Accio$nestKeys, nestedName, _p8._0),
+									_1: _elm_lang$core$Json_Encode$float(_p8._1._0)
+								},
+								_1: acc
+							},
+								_v30 = nestedName,
+								_v31 = _user$project$Accio$JsonObject(
+								_elm_lang$core$Dict$fromList(_p9));
+							acc = _v29;
+							nestedName = _v30;
+							jsonVal = _v31;
+							continue destructure;
+						case 'JsonNull':
+							var _v32 = {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: A2(_user$project$Accio$nestKeys, nestedName, _p8._0),
+									_1: _elm_lang$core$Json_Encode$null
+								},
+								_1: acc
+							},
+								_v33 = nestedName,
+								_v34 = _user$project$Accio$JsonObject(
+								_elm_lang$core$Dict$fromList(_p9));
+							acc = _v32;
+							nestedName = _v33;
+							jsonVal = _v34;
+							continue destructure;
+						case 'JsonArray':
+							var _v35 = A2(
+								_elm_lang$core$Basics_ops['++'],
+								A5(
+									_user$project$Accio$destructureArray,
+									nestedName,
+									_p8._0,
+									_p8._1._0,
+									{ctor: '[]'},
+									0),
+								acc),
+								_v36 = nestedName,
+								_v37 = _user$project$Accio$JsonObject(
+								_elm_lang$core$Dict$fromList(_p9));
+							acc = _v35;
+							nestedName = _v36;
+							jsonVal = _v37;
+							continue destructure;
+						default:
+							return A2(
+								_elm_lang$core$Basics_ops['++'],
+								A3(
+									_user$project$Accio$destructure,
+									acc,
+									'',
+									_user$project$Accio$JsonObject(
+										_elm_lang$core$Dict$fromList(_p9))),
+								A3(
+									_user$project$Accio$destructure,
+									{ctor: '[]'},
+									A2(_user$project$Accio$nestKeys, nestedName, _p8._0),
+									_user$project$Accio$JsonObject(_p8._1._0)));
+					}
+				} else {
+					var _p10 = _p7;
+					if (((_p10.ctor === '::') && (_p10._0.ctor === '_Tuple2')) && (_p10._1.ctor === '[]')) {
+						switch (_p10._0._1.ctor) {
+							case 'JsonString':
+								return {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: A2(_user$project$Accio$nestKeys, nestedName, _p10._0._0),
+										_1: _elm_lang$core$Json_Encode$string(_p10._0._1._0)
+									},
+									_1: acc
+								};
+							case 'JsonInt':
+								return {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: A2(_user$project$Accio$nestKeys, nestedName, _p10._0._0),
+										_1: _elm_lang$core$Json_Encode$int(_p10._0._1._0)
+									},
+									_1: acc
+								};
+							case 'JsonFloat':
+								return {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: A2(_user$project$Accio$nestKeys, nestedName, _p10._0._0),
+										_1: _elm_lang$core$Json_Encode$float(_p10._0._1._0)
+									},
+									_1: acc
+								};
+							case 'JsonNull':
+								return {
+									ctor: '::',
+									_0: {
+										ctor: '_Tuple2',
+										_0: A2(_user$project$Accio$nestKeys, nestedName, _p10._0._0),
+										_1: _elm_lang$core$Json_Encode$null
+									},
+									_1: acc
+								};
+							case 'JsonArray':
+								return A2(
+									_elm_lang$core$Basics_ops['++'],
+									A5(
+										_user$project$Accio$destructureArray,
+										nestedName,
+										_p10._0._0,
+										_p10._0._1._0,
+										{ctor: '[]'},
+										0),
+									acc);
+							default:
+								var _v39 = acc,
+									_v40 = A2(_user$project$Accio$nestKeys, nestedName, _p10._0._0),
+									_v41 = _user$project$Accio$JsonObject(_p10._0._1._0);
+								acc = _v39;
+								nestedName = _v40;
+								jsonVal = _v41;
+								continue destructure;
+						}
+					} else {
+						return acc;
+					}
+				}
+			} else {
+				return {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'y',
+						_1: _elm_lang$core$Json_Encode$string('case')
+					},
+					_1: {ctor: '[]'}
+				};
+			}
+		}
 	});
+var _user$project$Accio$flattenAndEncode = function (json) {
+	var _p11 = json;
+	if (_p11.ctor === 'Ok') {
+		var _p12 = _p11._0;
+		switch (_p12.ctor) {
+			case 'JsonObject':
+				return {
+					ctor: '::',
+					_0: A3(
+						_user$project$Accio$destructure,
+						{ctor: '[]'},
+						'',
+						_user$project$Accio$JsonObject(_p12._0)),
+					_1: {ctor: '[]'}
+				};
+			case 'JsonArray':
+				return A2(
+					_elm_lang$core$List$map,
+					A2(
+						_user$project$Accio$destructure,
+						{ctor: '[]'},
+						''),
+					_p12._0);
+			default:
+				return {
+					ctor: '::',
+					_0: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: 'error',
+							_1: _elm_lang$core$Json_Encode$string('irregular json')
+						},
+						_1: {ctor: '[]'}
+					},
+					_1: {ctor: '[]'}
+				};
+		}
+	} else {
+		return {
+			ctor: '::',
+			_0: {
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'error',
+					_1: _elm_lang$core$Json_Encode$string(_p11._0)
+				},
+				_1: {ctor: '[]'}
+			},
+			_1: {ctor: '[]'}
+		};
+	}
+};
+var _user$project$Accio$JsonString = function (a) {
+	return {ctor: 'JsonString', _0: a};
+};
+var _user$project$Accio$jsonDecoder = _elm_lang$core$Json_Decode$oneOf(
+	{
+		ctor: '::',
+		_0: A2(_elm_lang$core$Json_Decode$map, _user$project$Accio$JsonString, _elm_lang$core$Json_Decode$string),
+		_1: {
+			ctor: '::',
+			_0: A2(_elm_lang$core$Json_Decode$map, _user$project$Accio$JsonInt, _elm_lang$core$Json_Decode$int),
+			_1: {
+				ctor: '::',
+				_0: A2(_elm_lang$core$Json_Decode$map, _user$project$Accio$JsonFloat, _elm_lang$core$Json_Decode$float),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$core$Json_Decode$map,
+						_user$project$Accio$JsonArray,
+						_elm_lang$core$Json_Decode$list(
+							_elm_lang$core$Json_Decode$lazy(
+								function (_p13) {
+									return _user$project$Accio$jsonDecoder;
+								}))),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$core$Json_Decode$map,
+							_user$project$Accio$JsonObject,
+							_elm_lang$core$Json_Decode$dict(
+								_elm_lang$core$Json_Decode$lazy(
+									function (_p14) {
+										return _user$project$Accio$jsonDecoder;
+									}))),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$core$Json_Decode$null(_user$project$Accio$JsonNull),
+							_1: {ctor: '[]'}
+						}
+					}
+				}
+			}
+		}
+	});
+var _user$project$Accio$createSheet = function (response) {
+	return _user$project$Accio$flattenAndEncode(
+		A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Accio$jsonDecoder, response));
+};
 var _user$project$Accio$PostCsv = function (a) {
 	return {ctor: 'PostCsv', _0: a};
 };
 var _user$project$Accio$requestCsv = function (token) {
-	var _p6 = token;
-	if (_p6.ctor === 'Just') {
+	var _p15 = token;
+	if (_p15.ctor === 'Just') {
 		return A2(
 			_elm_lang$http$Http$send,
 			_user$project$Accio$PostCsv,
-			_user$project$Accio$putRequest(_p6._0));
+			_user$project$Accio$putRequest(_p15._0));
 	} else {
 		return _elm_lang$core$Platform_Cmd$none;
 	}
 };
 var _user$project$Accio$GetCsv = {ctor: 'GetCsv'};
-var _user$project$Accio$Select = function (a) {
-	return {ctor: 'Select', _0: a};
-};
-var _user$project$Accio$viewLine = function (keyValue) {
-	return A2(
-		_elm_lang$html$Html$p,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$classList(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'selected', _1: keyValue.selected},
-					_1: {
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: 'unselected',
-							_1: _elm_lang$core$Native_Utils.eq(keyValue.selected, false)
-						},
-						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$style(
-					{
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: 'paddingLeft',
-							_1: _user$project$Accio$px(keyValue.indent)
-						},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'marginTop', _1: '0px'},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'marginBottom', _1: '0px'},
-								_1: {ctor: '[]'}
-							}
-						}
-					}),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(
-						_user$project$Accio$Select(keyValue.key)),
-					_1: {ctor: '[]'}
-				}
-			}
-		},
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html$text(
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					_user$project$Accio$valueToString(keyValue.key),
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						':',
-						_user$project$Accio$valueToString(keyValue.value)))),
-			_1: {ctor: '[]'}
-		});
-};
-var _user$project$Accio$viewKeyedLi = function (keyValue) {
-	return {
-		ctor: '_Tuple2',
-		_0: _elm_lang$core$Basics$toString(keyValue.id),
-		_1: A2(_elm_lang$html$Html_Lazy$lazy, _user$project$Accio$viewLine, keyValue)
-	};
-};
-var _user$project$Accio$viewKeyValues = function (keyValues) {
-	return A2(
-		_elm_lang$html$Html$section,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$class('main'),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html_Keyed$ul,
-				{ctor: '[]'},
-				A2(_elm_lang$core$List$map, _user$project$Accio$viewKeyedLi, keyValues)),
-			_1: {ctor: '[]'}
-		});
-};
 var _user$project$Accio$Fetch = function (a) {
 	return {ctor: 'Fetch', _0: a};
 };
@@ -443,34 +522,20 @@ var _user$project$Accio$getJson = function (url) {
 	return A2(
 		_elm_lang$http$Http$send,
 		_user$project$Accio$Fetch,
-		_elm_lang$http$Http$getString(
-			A2(_elm_lang$core$Basics_ops['++'], 'http://localhost:4000/response?url=', url)));
+		_elm_lang$http$Http$getString(url));
 };
 var _user$project$Accio$update = F2(
 	function (msg, model) {
-		var _p7 = msg;
-		switch (_p7.ctor) {
+		var _p16 = msg;
+		switch (_p16.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
-			case 'Add':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							keyValues: A2(
-								_elm_lang$core$List$append,
-								model.keyValues,
-								_user$project$Accio$enterKeyValues(_p7._0))
-						}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
 			case 'Url':
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{url: _p7._0}),
+						{url: _p16._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GetData':
@@ -480,12 +545,15 @@ var _user$project$Accio$update = F2(
 					_1: _user$project$Accio$getJson(model.url)
 				};
 			case 'Fetch':
-				if (_p7._0.ctor === 'Ok') {
+				if (_p16._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
-						_0: model,
-						_1: _user$project$Accio$format(
-							A2(_elm_lang$core$Debug$log, 'first response', _p7._0._0))
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								keyValues: _user$project$Accio$createSheet(_p16._0._0)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
 					return {
@@ -498,21 +566,6 @@ var _user$project$Accio$update = F2(
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
-			case 'Select':
-				var updateSelected = function (t) {
-					return _elm_lang$core$Native_Utils.eq(t.key, _p7._0) ? _elm_lang$core$Native_Utils.update(
-						t,
-						{selected: !t.selected}) : t;
-				};
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{
-							keyValues: A2(_elm_lang$core$List$map, updateSelected, model.keyValues)
-						}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
 			case 'GetCsv':
 				return {
 					ctor: '_Tuple2',
@@ -520,12 +573,12 @@ var _user$project$Accio$update = F2(
 					_1: _user$project$Accio$requestCsv(model.token)
 				};
 			default:
-				if (_p7._0.ctor === 'Ok') {
+				if (_p16._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{spreadsheetUrl: _p7._0._0}),
+							{spreadsheetUrl: _p16._0._0}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
@@ -626,18 +679,7 @@ var _user$project$Accio$view = function (model) {
 										_0: _elm_lang$html$Html$text('Create Google Sheet'),
 										_1: {ctor: '[]'}
 									}),
-								_1: {
-									ctor: '::',
-									_0: A2(
-										_elm_lang$html$Html$section,
-										{ctor: '[]'},
-										{
-											ctor: '::',
-											_0: _user$project$Accio$viewKeyValues(model.keyValues),
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								}
+								_1: {ctor: '[]'}
 							}
 						}
 					}
@@ -645,14 +687,15 @@ var _user$project$Accio$view = function (model) {
 			}
 		});
 };
-var _user$project$Accio$Add = function (a) {
-	return {ctor: 'Add', _0: a};
-};
-var _user$project$Accio$subscriptions = function (model) {
-	return _user$project$Accio$stringyfiedJson(_user$project$Accio$Add);
-};
 var _user$project$Accio$NoOp = {ctor: 'NoOp'};
 var _user$project$Accio$main = A2(
 	_elm_lang$navigation$Navigation$program,
 	_elm_lang$core$Basics$always(_user$project$Accio$NoOp),
-	{init: _user$project$Accio$init, view: _user$project$Accio$view, update: _user$project$Accio$update, subscriptions: _user$project$Accio$subscriptions})();
+	{
+		init: _user$project$Accio$init,
+		view: _user$project$Accio$view,
+		update: _user$project$Accio$update,
+		subscriptions: function (_p17) {
+			return _elm_lang$core$Platform_Sub$none;
+		}
+	})();

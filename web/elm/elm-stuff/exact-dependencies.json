@@ -1,6 +1,6 @@
 {
     "elm-lang/navigation": "2.0.1",
-    "elm-lang/virtual-dom": "2.0.2",
+    "elm-lang/virtual-dom": "2.0.3",
     "evancz/url-parser": "2.0.1",
     "elm-lang/dom": "1.1.1",
     "elm-lang/websocket": "1.0.2",

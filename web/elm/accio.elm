@@ -6,7 +6,8 @@ import Html.Events exposing (..)
 import Html.Keyed as Keyed
 import Html.Lazy exposing (lazy, lazy2)
 import Http exposing (..)
-import Json.Decode exposing (..)
+import Json.Encode as E exposing (..)
+import Json.Decode as D exposing (..)
 import Json.Encode
 import Task
 import Debug
@@ -22,310 +23,286 @@ import OAuth
 import UrlParser exposing (parseHash, parsePath, s, (<?>), stringParam)
 import Dict
 
+
 main =
-  Navigation.program
-    (always NoOp)
-    { init = init
-    , view = view
-    , update = update
-    , subscriptions = subscriptions
-    }
+    Navigation.program
+        (always NoOp)
+        { init = init
+        , view = view
+        , update = update
+        , subscriptions = \_ -> Sub.none
+        }
+
 
 
 -- MODEL
 
+
 type alias Model =
-  { url : String
-  , errorMessage : String
-  , keyValues : List KeyValue
-  , token : Maybe String
-  , spreadsheetUrl : String
-  }
-
-type alias KeyValue =
-  { key : Json.Decode.Value
-  , value : Json.Decode.Value
-  , selected : Bool
-  , id : Int
-  , indent : Int
-  }
+    { url : String
+    , errorMessage : String
+    , keyValues : List (List (String, E.Value))
+    , token : Maybe String
+    , spreadsheetUrl : String
+    }
 
 
-newKeyValue : String -> Int -> KeyValue
-newKeyValue str id =
-    case String.split "\":" str of
-      [key, value] ->
-        { key = Json.Encode.string ((String.dropLeft 5 key) ++ "\"")
-        , value = Json.Encode.string value
-        , selected = False
-        , id = id
-        , indent =
-          String.left 5 str
-            |> String.toInt
-            |> Result.withDefault 0
-        }
-      char::xs ->
-        { key = Json.Encode.string (String.dropLeft 5 char)
-        , value = Json.Encode.string ""
-        , selected = False
-        , id = id
-        , indent =
-          String.left 5 str
-            |> String.toInt
-            |> Result.withDefault 0
-        }
-      [] ->
-        { key = Json.Encode.string "something"
-        , value = Json.Encode.string " is wrong"
-        , selected = False
-        , id = id
-        , indent = 1
-        }
-
-
-init : Navigation.Location -> (Model, Cmd Msg)
+init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
-  ( Model "" "" [] (parseToken location) "", Cmd.none )
+    ( Model "" "" [] (parseToken location) "", Cmd.none )
 
 
 parseToken : Navigation.Location -> Maybe String
 parseToken location =
-  case (parseHash (UrlParser.string) location) of
-    Just str ->
-      str
-        |> String.split "&"
-        |> List.filterMap toKeyValuePair
-        |> Dict.fromList
-        |> Dict.get "access_token"
+    case (parseHash (UrlParser.string) location) of
+        Just str ->
+            str
+                |> String.split "&"
+                |> List.filterMap toKeyValuePair
+                |> Dict.fromList
+                |> Dict.get "access_token"
 
-    Nothing ->
-      Nothing
+        Nothing ->
+            Nothing
 
-toKeyValuePair : String -> Maybe (String, String)
+
+toKeyValuePair : String -> Maybe ( String, String )
 toKeyValuePair segment =
-  case String.split "=" segment of
-    [key, value] ->
-      Maybe.map2 (,) (Http.decodeUri key) (Http.decodeUri value)
+    case String.split "=" segment of
+        [ key, value ] ->
+            Maybe.map2 (,) (Http.decodeUri key) (Http.decodeUri value)
 
-    _ ->
-      Nothing
+        _ ->
+            Nothing
+
+
+type JsonVal
+    = JsonString String
+    | JsonObject (Dict.Dict String JsonVal)
+    | JsonFloat Float
+    | JsonInt Int
+    | JsonNull
+    | JsonArray (List JsonVal)
+
+
 
 -- UPDATE
 
+
 type Msg
-  = NoOp
-  | Add String
-  | Url String
-  | GetData
-  | Fetch (Result Http.Error String)
-  | Select Json.Encode.Value
-  | GetCsv
-  | PostCsv (Result Http.Error String)
+    = NoOp
+    | Url String
+    | GetData
+    | Fetch (Result Http.Error String)
+    | GetCsv
+    | PostCsv (Result Http.Error String)
 
-port format : String -> Cmd msg
 
-update : Msg -> Model -> (Model, Cmd Msg)
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-  case msg of
-    NoOp ->
-      (model, Cmd.none)
+    case msg of
+        NoOp ->
+            ( model, Cmd.none )
 
-    Add response ->
-        ({ model
-        | keyValues = List.append model.keyValues (enterKeyValues response)
-        }, Cmd.none)
+        Url url ->
+            ( { model | url = url }, Cmd.none )
 
-    Url url ->
-      ({ model | url = url }, Cmd.none)
+        GetData ->
+            ( model, getJson model.url )
 
-    GetData ->
-      (model, getJson model.url)
+        Fetch (Ok response) ->
+            ( { model | keyValues = createSheet response }, Cmd.none )
 
-    Fetch (Ok response) ->
-      (model, format (Debug.log "first response" response))
+        Fetch (Err _) ->
+            ( { model | errorMessage = toString Err }, Cmd.none )
 
-    Fetch (Err _) ->
-      ({model | errorMessage = toString Err}, Cmd.none)
+        GetCsv ->
+            ( model, requestCsv model.token )
 
-    Select key ->
-      let
-        updateSelected t =
-          if t.key == key then
-            { t | selected = not t.selected}
-          else
-            t
-      in
-      ({model | keyValues = List.map updateSelected model.keyValues}, Cmd.none)
+        PostCsv (Ok response) ->
+            ( { model | spreadsheetUrl = response }, Cmd.none )
 
-    GetCsv ->
-      (model, requestCsv model.token )
+        PostCsv (Err _) ->
+            ( model, Cmd.none )
 
-    PostCsv (Ok response) ->
-      ({ model | spreadsheetUrl = response }, Cmd.none)
 
-    PostCsv (Err _) ->
-      (model, Cmd.none)
+createSheet : String -> List (List ( String, E.Value ))
+createSheet response =
+    D.decodeString jsonDecoder response
+        |> flattenAndEncode
 
-enterKeyValues : String -> List KeyValue
-enterKeyValues response =
-  formatKeyValues (parseJson response) 1 []
 
-formatKeyValues : (List String) -> Int -> List KeyValue -> List KeyValue
-formatKeyValues response uid acc =
-  case response of
-    [] -> List.reverse acc
+jsonDecoder : Decoder JsonVal
+jsonDecoder =
+    D.oneOf
+        [ D.map JsonString D.string
+        , D.map JsonInt D.int
+        , D.map JsonFloat D.float
+        , D.list (D.lazy (\_ -> jsonDecoder)) |> D.map JsonArray
+        , D.dict (D.lazy (\_ -> jsonDecoder)) |> D.map JsonObject
+        , D.null JsonNull
+        ]
 
-    x::xs ->
-      formatKeyValues xs (uid +1) ((newKeyValue x uid)::acc)
 
-parseJson : String -> (List String)
-parseJson json =
-      json
-      |> formatString "" False 0
-      |> String.split uniqueHead
+flattenAndEncode : Result String JsonVal -> List (List ( String, E.Value ))
+flattenAndEncode json =
+    case json of
+        Ok response ->
+            case response of
+                JsonObject obj ->
+                    [ destructure [] "" (JsonObject obj) ]
+
+                JsonArray list ->
+                    List.map (destructure [] "") list
+
+                _ ->
+                    [ [ ( "error", E.string "irregular json" ) ] ]
+
+        Err message ->
+            [ [ ( "error", E.string message ) ] ]
+
+
+destructure : List ( String, E.Value ) -> String -> JsonVal -> List ( String, E.Value )
+destructure acc nestedName jsonVal =
+    case jsonVal of
+        JsonObject object ->
+            case (Dict.toList object) of
+                x :: xs ->
+                    case x of
+                        ( key, JsonString val ) ->
+                            destructure (( nestKeys nestedName key, E.string val ) :: acc) nestedName (JsonObject (Dict.fromList xs))
+
+                        ( key, JsonInt val ) ->
+                            destructure (( nestKeys nestedName key, E.int val ) :: acc) nestedName (JsonObject (Dict.fromList xs))
+
+                        ( key, JsonFloat val ) ->
+                            destructure (( nestKeys nestedName key, E.float val ) :: acc) nestedName (JsonObject (Dict.fromList xs))
+
+                        ( key, JsonNull ) ->
+                            destructure (( nestKeys nestedName key, E.null ) :: acc) nestedName (JsonObject (Dict.fromList xs))
+
+                        ( key, JsonArray list ) ->
+                            destructure ((destructureArray nestedName key list [] 0) ++ acc) nestedName (JsonObject (Dict.fromList xs))
+
+                        ( key, JsonObject obj ) ->
+                            (destructure acc "" (JsonObject (Dict.fromList xs))) ++ (destructure [] (nestKeys nestedName key) (JsonObject obj))
+
+                x ->
+                    case x of
+                        [ ( key, JsonString val ) ] ->
+                            ( nestKeys nestedName key, E.string val ) :: acc
+
+                        [ ( key, JsonInt val ) ] ->
+                            ( nestKeys nestedName key, E.int val ) :: acc
+
+                        [ ( key, JsonFloat val ) ] ->
+                            ( nestKeys nestedName key, E.float val ) :: acc
+
+                        [ ( key, JsonNull ) ] ->
+                            ( nestKeys nestedName key, E.null ) :: acc
+
+                        [ ( key, JsonArray list ) ] ->
+                            (destructureArray nestedName key list [] 0) ++ acc
+
+                        [ ( key, JsonObject obj ) ] ->
+                            destructure acc (nestKeys nestedName key) (JsonObject obj)
+
+                        _ ->
+                            acc
+
+        _ ->
+            [ ( "y", E.string "case" ) ]
+
+
+nestKeys : String -> String -> String
+nestKeys nestedNames key =
+    case nestedNames of
+        "" ->
+            key
+
+        str ->
+            str ++ "/" ++ key
+
+
+destructureArray : String -> String -> List JsonVal -> List ( String, E.Value ) -> Int -> List ( String, E.Value )
+destructureArray nestedName key list acc counter =
+    case list of
+        x :: xs ->
+            case x of
+                JsonString str ->
+                    destructureArray nestedName key xs (( (nestKeys nestedName key) ++ "/" ++ (toString counter), E.string str ) :: acc) (counter + 1)
+
+                JsonInt int ->
+                    destructureArray nestedName key xs (( (nestKeys nestedName key) ++ "/" ++ (toString counter), E.int int ) :: acc) (counter + 1)
+
+                JsonNull ->
+                    destructureArray nestedName key xs (( (nestKeys nestedName key) ++ "/" ++ (toString counter), E.null ) :: acc) (counter + 1)
+
+                _ ->
+                    [ ( "error", E.null ) ]
+
+        [] ->
+            acc
+
+
 
 -- VIEW
 
+
 view : Model -> Html Msg
 view model =
-  div []
-    [ a [ href <| OAuth.requestToken ] [ text "Authorize Google" ]
-    , a [ href model.spreadsheetUrl ] [text "Click here to see your spreadsheet" ]
-    , a [] [text (toString (model.keyValues))]
-    , input [ type_ "text", placeholder "url", onInput Url ] []
-    , button [ onClick GetData ] [ text "Get Data"]
-    , button [ onClick GetCsv ] [ text "Create Google Sheet"]
-    , section [] [ viewKeyValues model.keyValues ]
-    ]
-
-
-viewKeyValues : List KeyValue -> Html Msg
-viewKeyValues keyValues =
-        section
-            [ class "main" ]
-            [ Keyed.ul [] <|
-                List.map viewKeyedLi keyValues
-            ]
-
-viewKeyedLi : KeyValue -> ( String, Html Msg )
-viewKeyedLi keyValue =
-    ( toString keyValue.id, Html.Lazy.lazy viewLine keyValue )
-
-viewLine : KeyValue -> Html Msg
-viewLine keyValue =
-    p [ classList
-        [("selected", keyValue.selected)
-        ,("unselected", keyValue.selected == False)
+    div []
+        [ a [ href <| OAuth.requestToken ] [ text "Authorize Google" ]
+        , a [ href model.spreadsheetUrl ] [ text "Click here to see your spreadsheet" ]
+        , a [] [ text (toString (model.keyValues)) ]
+        , input [ type_ "text", placeholder "url", onInput Url ] []
+        , button [ onClick GetData ] [ text "Get Data" ]
+        , button [ onClick GetCsv ] [ text "Create Google Sheet" ]
         ]
-      , style
-        [ ("paddingLeft", px (keyValue.indent))
-        , ("marginTop", "0px")
-        , ("marginBottom", "0px")
-        ]
-      , onClick (Select keyValue.key)
-      ]
-      [ text (valueToString keyValue.key ++ ":" ++ valueToString keyValue.value) ]
 
--- VIEW HELPERS
-
-px : Int -> String
-px int =
-  toString int
-  ++ "px"
-
-valueToString value =
-  toString value
-
--- SUBSCRIPTIONS
-
-port stringyfiedJson : (String -> msg) -> Sub msg
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-     stringyfiedJson Add
 
 
 -- HTTP
 
+
 getJson : String -> Cmd Msg
 getJson url =
-  Http.send Fetch <|
-    Http.getString("http://localhost:4000/response?url=" ++ url)
+    Http.send Fetch <|
+        Http.getString (url)
+
 
 requestCsv : Maybe String -> Cmd Msg
 requestCsv token =
-  case token of
-    Just token ->
-      Http.send PostCsv (putRequest token)
+    case token of
+        Just token ->
+            Http.send PostCsv (putRequest token)
 
-    Nothing ->
-      Cmd.none
+        Nothing ->
+            Cmd.none
+
 
 putRequest : String -> Http.Request String
 putRequest token =
-  Http.request
+    Http.request
         { method = "POST"
-        , headers = [getHeaders (Debug.log "token" token)]
+        , headers = [ getHeaders (Debug.log "token" token) ]
         , url = "https://sheets.googleapis.com/v4/spreadsheets"
-        , body = Http.multipartBody
-                      [ Http.stringPart "spreadsheetID" ""
-                      , Http.stringPart "properties" """
+        , body =
+            Http.multipartBody
+                [ Http.stringPart "spreadsheetID" ""
+                , Http.stringPart "properties" """
                                 { "title": "test"}
                                 """
-                      , Http.stringPart "sheets" """
+                , Http.stringPart "sheets" """
                                 {"data":[{"startRow" :0}]}
                                 """
-                      ]
-        , expect = expectJson (Json.Decode.field "spreadsheetUrl" Json.Decode.string)
+                ]
+        , expect = expectJson (D.field "spreadsheetUrl" D.string)
         , timeout = Nothing
         , withCredentials = False
         }
 
+
 getHeaders : String -> Http.Header
 getHeaders token =
-          Http.header "Authorization" ("Bearer " ++ token)
-
-selectedToJson model =
-     Debug.log "selected keyValues" (List.filter (.selected) model.keyValues)
-         |> List.map encodeKeyValues
-        --  |> Json.Encode.object
-        --  |> Json.Encode.encode 0
-
-encodeKeyValues keyValues =
-  (toString keyValues.key, Json.Encode.string keyValues.value)
-
--- PARSER
-
-quote = "\""
-indentChars = "{["
-outdentChars = "}]"
-newLineChars = ","
-uniqueHead = "##FORMAT##"
-incr = 20
-
-formatString : String -> Bool -> Int -> String -> String
-formatString acc isInQuotes indent str =
-  case String.left 1 str of
-    "" -> acc
-
-    firstChar ->
-      if isInQuotes then
-        if firstChar == quote then
-          formatString (acc ++ firstChar) (not isInQuotes) indent (String.dropLeft 1 str)
-        else
-          formatString (acc ++ firstChar) isInQuotes indent (String.dropLeft 1 str)
-      else
-        if String.contains firstChar newLineChars then
-          formatString (acc ++ firstChar ++ uniqueHead ++ pad indent) isInQuotes indent (String.dropLeft 1 str)
-        else if String.contains firstChar indentChars then
-          formatString (acc ++ uniqueHead ++ pad (indent + incr) ++ firstChar) isInQuotes (indent + incr) (String.dropLeft 1 str)
-        else if String.contains firstChar outdentChars then
-          formatString (acc ++ firstChar ++ uniqueHead ++ pad (indent - incr)) isInQuotes (indent - incr) (String.dropLeft 1 str)
-        else if firstChar == quote then
-          formatString (acc ++ firstChar) (not isInQuotes) indent (String.dropLeft 1 str)
-        else
-          formatString (acc ++ firstChar) isInQuotes indent (String.dropLeft 1 str)
-
-pad : Int -> String
-pad indent =
-  String.padLeft 5 '0' <| toString indent
+    Http.header "Authorization" ("Bearer " ++ token)

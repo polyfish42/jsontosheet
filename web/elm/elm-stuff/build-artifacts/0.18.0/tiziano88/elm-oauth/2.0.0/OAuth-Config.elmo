@@ -1,5 +1,0 @@
-var _tiziano88$elm_oauth$OAuth_Config$stackExchange = {endpointUrl: 'https://stackexchange.com/oauth/dialog', validateUrl: ''};
-var _tiziano88$elm_oauth$OAuth_Config$gitHub = {endpointUrl: 'https://github.com/login/oauth/authorize', validateUrl: ''};
-var _tiziano88$elm_oauth$OAuth_Config$digitalOcean = {endpointUrl: 'https://cloud.digitalocean.com/v1/oauth/authorize', validateUrl: ''};
-var _tiziano88$elm_oauth$OAuth_Config$facebook = {endpointUrl: 'https://www.facebook.com/dialog/oauth', validateUrl: 'https://graph.facebook.com/debug_token'};
-var _tiziano88$elm_oauth$OAuth_Config$google = {endpointUrl: 'https://accounts.google.com/o/oauth2/v2/auth', validateUrl: 'https://www.googleapis.com/oauth2/v3/tokeninfo'};
