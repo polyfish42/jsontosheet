@@ -260,21 +260,62 @@ createRow row =
 
 
 cells cell =
-    E.object
-        [ ( "userEnteredValue"
-          , E.object
-                [ ( "stringValue", E.string "id" )
+    case cell of
+        ( key, str ) ->
+            E.object
+                [ ( "userEnteredValue"
+                  , E.object
+                        [ ( "stringValue", str )
+                        ]
+                  )
                 ]
+
+--
+-- (key, E.int int) ->
+--   E.object
+--       [ ( "userEnteredValue"
+--         , E.object
+--               [ ( "numberValue", E.int int )
+--               ]
+--         )
+--       ]
+--
+-- (key, E.float float) ->
+--   E.object
+--       [ ( "userEnteredValue"
+--         , E.object
+--               [ ( "numberValue", E.float float )
+--               ]
+--         )
+--       ]
+
+
+googleSheetsRequestBody : List E.Value -> E.Value
+googleSheetsRequestBody rows =
+    E.object
+        [ ( "sheets"
+          , E.array
+                (Array.fromList
+                    [ E.object
+                        [ ( "data"
+                          , E.array
+                                (Array.fromList
+                                    [ E.object
+                                        [ ( "rowData"
+                                          , E.array
+                                                (Array.fromList
+                                                    rows
+                                                )
+                                          )
+                                        ]
+                                    ]
+                                )
+                          )
+                        ]
+                    ]
+                )
           )
         ]
-
-
-googleSheetsRequestBody : List (E.Value) -> E.Value
-googleSheetsRequestBody rows =
-    E.array
-        (Array.fromList
-            rows
-        )
 
 
 
@@ -320,15 +361,6 @@ putRequest token model =
         , headers = [ getHeaders (Debug.log "token" token) ]
         , url = "https://sheets.googleapis.com/v4/spreadsheets"
         , body = Http.jsonBody model.keyValues
-            -- Http.multipartBody
-            --     [ Http.stringPart "spreadsheetID" ""
-            --     , Http.stringPart "properties" """
-            --                     { "title": "test"}
-            --                     """
-            --     , Http.stringPart "sheets" """
-            --                     {"data":[{"startRow" :0}]}
-            --                     """
-            --     ]
         , expect = expectJson (D.field "spreadsheetUrl" D.string)
         , timeout = Nothing
         , withCredentials = False
