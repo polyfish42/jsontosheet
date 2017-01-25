@@ -4,8 +4,8 @@ var _user$project$Accio$getHeaders = function (token) {
 		'Authorization',
 		A2(_elm_lang$core$Basics_ops['++'], 'Bearer ', token));
 };
-var _user$project$Accio$putRequest = F2(
-	function (token, model) {
+var _user$project$Accio$putRequest = F3(
+	function (token, model, requestBody) {
 		return _elm_lang$http$Http$request(
 			{
 				method: 'POST',
@@ -16,7 +16,7 @@ var _user$project$Accio$putRequest = F2(
 					_1: {ctor: '[]'}
 				},
 				url: 'https://sheets.googleapis.com/v4/spreadsheets',
-				body: _elm_lang$http$Http$jsonBody(model.keyValues),
+				body: _elm_lang$http$Http$jsonBody(requestBody),
 				expect: _elm_lang$http$Http$expectJson(
 					A2(_elm_lang$core$Json_Decode$field, 'spreadsheetUrl', _elm_lang$core$Json_Decode$string)),
 				timeout: _elm_lang$core$Maybe$Nothing,
@@ -73,19 +73,18 @@ var _user$project$Accio$init = function (location) {
 var _user$project$Accio$PostCsv = function (a) {
 	return {ctor: 'PostCsv', _0: a};
 };
-var _user$project$Accio$requestCsv = F2(
-	function (token, model) {
+var _user$project$Accio$requestCsv = F3(
+	function (token, model, requestBody) {
 		var _p2 = token;
 		if (_p2.ctor === 'Just') {
 			return A2(
 				_elm_lang$http$Http$send,
 				_user$project$Accio$PostCsv,
-				A2(_user$project$Accio$putRequest, _p2._0, model));
+				A3(_user$project$Accio$putRequest, _p2._0, model, requestBody));
 		} else {
 			return _elm_lang$core$Platform_Cmd$none;
 		}
 	});
-var _user$project$Accio$GetCsv = {ctor: 'GetCsv'};
 var _user$project$Accio$Fetch = function (a) {
 	return {ctor: 'Fetch', _0: a};
 };
@@ -119,12 +118,12 @@ var _user$project$Accio$update = F2(
 				if (_p3._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
+						_0: model,
+						_1: A3(
+							_user$project$Accio$requestCsv,
+							model.token,
 							model,
-							{
-								keyValues: _user$project$GoogleSheet$createSheet(_p3._0._0)
-							}),
-						_1: _elm_lang$core$Platform_Cmd$none
+							_user$project$GoogleSheet$createSheet(_p3._0._0))
 					};
 				} else {
 					return {
@@ -137,12 +136,6 @@ var _user$project$Accio$update = F2(
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
-			case 'GetCsv':
-				return {
-					ctor: '_Tuple2',
-					_0: model,
-					_1: A2(_user$project$Accio$requestCsv, model.token, model)
-				};
 			default:
 				if (_p3._0.ctor === 'Ok') {
 					return {
@@ -196,63 +189,36 @@ var _user$project$Accio$view = function (model) {
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$a,
-						{ctor: '[]'},
+						_elm_lang$html$Html$input,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text(
-								_elm_lang$core$Basics$toString(model.keyValues)),
-							_1: {ctor: '[]'}
-						}),
+							_0: _elm_lang$html$Html_Attributes$type_('text'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$placeholder('url'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
+									_1: {ctor: '[]'}
+								}
+							}
+						},
+						{ctor: '[]'}),
 					_1: {
 						ctor: '::',
 						_0: A2(
-							_elm_lang$html$Html$input,
+							_elm_lang$html$Html$button,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$type_('text'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$placeholder('url'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
-										_1: {ctor: '[]'}
-									}
-								}
-							},
-							{ctor: '[]'}),
-						_1: {
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$button,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Get Data'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$button,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetCsv),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Create Google Sheet'),
-										_1: {ctor: '[]'}
-									}),
+								_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
 								_1: {ctor: '[]'}
-							}
-						}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Create Sheet'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
 					}
 				}
 			}

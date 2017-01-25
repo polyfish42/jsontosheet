@@ -77,7 +77,6 @@ type Msg
     | Url String
     | GetData
     | Fetch (Result Http.Error String)
-    | GetCsv
     | PostCsv (Result Http.Error String)
 
 
@@ -94,13 +93,10 @@ update msg model =
             ( model, getJson model.url )
 
         Fetch (Ok response) ->
-            ( { model | keyValues = GoogleSheet.createSheet response }, Cmd.none )
+            ( model, requestCsv model.token model (GoogleSheet.createSheet response) )
 
         Fetch (Err _) ->
             ( { model | errorMessage = toString Err }, Cmd.none )
-
-        GetCsv ->
-            ( model, requestCsv model.token model )
 
         PostCsv (Ok response) ->
             ( { model | spreadsheetUrl = response }, Cmd.none )
@@ -119,10 +115,8 @@ view model =
     div []
         [ a [ href <| OAuth.requestToken ] [ text "Authorize Google" ]
         , a [ href model.spreadsheetUrl ] [ text "Click here to see your spreadsheet" ]
-        , a [] [ text (toString (model.keyValues)) ]
         , input [ type_ "text", placeholder "url", onInput Url ] []
-        , button [ onClick GetData ] [ text "Get Data" ]
-        , button [ onClick GetCsv ] [ text "Create Google Sheet" ]
+        , button [ onClick GetData ] [ text "Create Sheet" ]
         ]
 
 
@@ -136,23 +130,23 @@ getJson url =
         Http.getString (url)
 
 
-requestCsv : Maybe String -> Model -> Cmd Msg
-requestCsv token model =
+requestCsv : Maybe String -> Model -> E.Value -> Cmd Msg
+requestCsv token model requestBody =
     case token of
         Just token ->
-            Http.send PostCsv (putRequest token model)
+            Http.send PostCsv (putRequest token model requestBody)
 
         Nothing ->
             Cmd.none
 
 
-putRequest : String -> Model -> Http.Request String
-putRequest token model =
+putRequest : String -> Model -> E.Value -> Http.Request String
+putRequest token model requestBody =
     Http.request
         { method = "POST"
         , headers = [ getHeaders (Debug.log "token" token) ]
         , url = "https://sheets.googleapis.com/v4/spreadsheets"
-        , body = Http.jsonBody model.keyValues
+        , body = Http.jsonBody requestBody
         , expect = expectJson (D.field "spreadsheetUrl" D.string)
         , timeout = Nothing
         , withCredentials = False
