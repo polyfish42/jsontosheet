@@ -29,11 +29,3 @@ url endPoint args =
 queryPair : ( String, String ) -> String
 queryPair ( key, value ) =
     Http.encodeUri key ++ "=" ++ Http.encodeUri value
-
-
-
-
-
--- request token (authenticate user, buildurl)
--- validate token
--- call api

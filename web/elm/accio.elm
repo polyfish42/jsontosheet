@@ -1,27 +1,20 @@
 port module Accio exposing (..)
 
+import Array
+import Debug
+import Dict
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
-import Html.Keyed as Keyed
-import Html.Lazy exposing (lazy, lazy2)
 import Http exposing (..)
 import Json.Encode as E exposing (..)
 import Json.Decode as D exposing (..)
-import Json.Encode
-import Task
-import Debug
-import String
-import Regex exposing (..)
-import Array
-import Platform.Cmd exposing (..)
-import Parser exposing (..)
 import Maybe exposing (..)
 import Navigation
-import Regex
 import OAuth
-import UrlParser exposing (parseHash, parsePath, s, (<?>), stringParam)
-import Dict
+import Platform.Cmd exposing (..)
+import String
+import UrlParser exposing (parseHash)
 
 
 main =
