@@ -23,210 +23,24 @@ var _user$project$Accio$putRequest = F2(
 				withCredentials: false
 			});
 	});
-var _user$project$Accio$googleSheetsRequestBody = function (rows) {
-	return _elm_lang$core$Json_Encode$object(
-		{
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: 'sheets',
-				_1: _elm_lang$core$Json_Encode$array(
-					_elm_lang$core$Array$fromList(
-						{
-							ctor: '::',
-							_0: _elm_lang$core$Json_Encode$object(
-								{
-									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: 'data',
-										_1: _elm_lang$core$Json_Encode$array(
-											_elm_lang$core$Array$fromList(
-												{
-													ctor: '::',
-													_0: _elm_lang$core$Json_Encode$object(
-														{
-															ctor: '::',
-															_0: {
-																ctor: '_Tuple2',
-																_0: 'rowData',
-																_1: _elm_lang$core$Json_Encode$array(
-																	_elm_lang$core$Array$fromList(rows))
-															},
-															_1: {ctor: '[]'}
-														}),
-													_1: {ctor: '[]'}
-												}))
-									},
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}))
-			},
-			_1: {ctor: '[]'}
-		});
-};
-var _user$project$Accio$cells = function (cell) {
-	var _p0 = cell;
-	return _elm_lang$core$Json_Encode$object(
-		{
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: 'userEnteredValue',
-				_1: _elm_lang$core$Json_Encode$object(
-					{
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'stringValue', _1: _p0._1},
-						_1: {ctor: '[]'}
-					})
-			},
-			_1: {ctor: '[]'}
-		});
-};
-var _user$project$Accio$createRow = function (row) {
-	return _elm_lang$core$Json_Encode$object(
-		{
-			ctor: '::',
-			_0: {
-				ctor: '_Tuple2',
-				_0: 'values',
-				_1: _elm_lang$core$Json_Encode$array(
-					_elm_lang$core$Array$fromList(
-						A2(_elm_lang$core$List$map, _user$project$Accio$cells, row)))
-			},
-			_1: {ctor: '[]'}
-		});
-};
-var _user$project$Accio$nestKeys = F2(
-	function (nestedNames, key) {
-		var _p1 = nestedNames;
-		if (_p1 === '') {
-			return key;
-		} else {
-			return A2(
-				_elm_lang$core$Basics_ops['++'],
-				_p1,
-				A2(_elm_lang$core$Basics_ops['++'], '/', key));
-		}
-	});
-var _user$project$Accio$destructureArray = F5(
-	function (nestedName, key, list, acc, counter) {
-		destructureArray:
-		while (true) {
-			var _p2 = list;
-			if (_p2.ctor === '::') {
-				var _p4 = _p2._1;
-				var _p3 = _p2._0;
-				switch (_p3.ctor) {
-					case 'JsonString':
-						var _v4 = nestedName,
-							_v5 = key,
-							_v6 = _p4,
-							_v7 = {
-							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: A2(
-									_elm_lang$core$Basics_ops['++'],
-									A2(_user$project$Accio$nestKeys, nestedName, key),
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										'/',
-										_elm_lang$core$Basics$toString(counter))),
-								_1: _elm_lang$core$Json_Encode$string(_p3._0)
-							},
-							_1: acc
-						},
-							_v8 = counter + 1;
-						nestedName = _v4;
-						key = _v5;
-						list = _v6;
-						acc = _v7;
-						counter = _v8;
-						continue destructureArray;
-					case 'JsonInt':
-						var _v9 = nestedName,
-							_v10 = key,
-							_v11 = _p4,
-							_v12 = {
-							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: A2(
-									_elm_lang$core$Basics_ops['++'],
-									A2(_user$project$Accio$nestKeys, nestedName, key),
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										'/',
-										_elm_lang$core$Basics$toString(counter))),
-								_1: _elm_lang$core$Json_Encode$int(_p3._0)
-							},
-							_1: acc
-						},
-							_v13 = counter + 1;
-						nestedName = _v9;
-						key = _v10;
-						list = _v11;
-						acc = _v12;
-						counter = _v13;
-						continue destructureArray;
-					case 'JsonNull':
-						var _v14 = nestedName,
-							_v15 = key,
-							_v16 = _p4,
-							_v17 = {
-							ctor: '::',
-							_0: {
-								ctor: '_Tuple2',
-								_0: A2(
-									_elm_lang$core$Basics_ops['++'],
-									A2(_user$project$Accio$nestKeys, nestedName, key),
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										'/',
-										_elm_lang$core$Basics$toString(counter))),
-								_1: _elm_lang$core$Json_Encode$null
-							},
-							_1: acc
-						},
-							_v18 = counter + 1;
-						nestedName = _v14;
-						key = _v15;
-						list = _v16;
-						acc = _v17;
-						counter = _v18;
-						continue destructureArray;
-					default:
-						return {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'error', _1: _elm_lang$core$Json_Encode$null},
-							_1: {ctor: '[]'}
-						};
-				}
-			} else {
-				return acc;
-			}
-		}
-	});
 var _user$project$Accio$toKeyValuePair = function (segment) {
-	var _p5 = A2(_elm_lang$core$String$split, '=', segment);
-	if (((_p5.ctor === '::') && (_p5._1.ctor === '::')) && (_p5._1._1.ctor === '[]')) {
+	var _p0 = A2(_elm_lang$core$String$split, '=', segment);
+	if (((_p0.ctor === '::') && (_p0._1.ctor === '::')) && (_p0._1._1.ctor === '[]')) {
 		return A3(
 			_elm_lang$core$Maybe$map2,
 			F2(
 				function (v0, v1) {
 					return {ctor: '_Tuple2', _0: v0, _1: v1};
 				}),
-			_elm_lang$http$Http$decodeUri(_p5._0),
-			_elm_lang$http$Http$decodeUri(_p5._1._0));
+			_elm_lang$http$Http$decodeUri(_p0._0),
+			_elm_lang$http$Http$decodeUri(_p0._1._0));
 	} else {
 		return _elm_lang$core$Maybe$Nothing;
 	}
 };
 var _user$project$Accio$parseToken = function (location) {
-	var _p6 = A2(_evancz$url_parser$UrlParser$parseHash, _evancz$url_parser$UrlParser$string, location);
-	if (_p6.ctor === 'Just') {
+	var _p1 = A2(_evancz$url_parser$UrlParser$parseHash, _evancz$url_parser$UrlParser$string, location);
+	if (_p1.ctor === 'Just') {
 		return A2(
 			_elm_lang$core$Dict$get,
 			'access_token',
@@ -234,7 +48,7 @@ var _user$project$Accio$parseToken = function (location) {
 				A2(
 					_elm_lang$core$List$filterMap,
 					_user$project$Accio$toKeyValuePair,
-					A2(_elm_lang$core$String$split, '&', _p6._0))));
+					A2(_elm_lang$core$String$split, '&', _p1._0))));
 	} else {
 		return _elm_lang$core$Maybe$Nothing;
 	}
@@ -256,328 +70,17 @@ var _user$project$Accio$init = function (location) {
 		_1: _elm_lang$core$Platform_Cmd$none
 	};
 };
-var _user$project$Accio$JsonArray = function (a) {
-	return {ctor: 'JsonArray', _0: a};
-};
-var _user$project$Accio$JsonNull = {ctor: 'JsonNull'};
-var _user$project$Accio$JsonInt = function (a) {
-	return {ctor: 'JsonInt', _0: a};
-};
-var _user$project$Accio$JsonFloat = function (a) {
-	return {ctor: 'JsonFloat', _0: a};
-};
-var _user$project$Accio$JsonObject = function (a) {
-	return {ctor: 'JsonObject', _0: a};
-};
-var _user$project$Accio$destructure = F3(
-	function (acc, nestedName, jsonVal) {
-		destructure:
-		while (true) {
-			var _p7 = jsonVal;
-			if (_p7.ctor === 'JsonObject') {
-				var _p8 = _elm_lang$core$Dict$toList(_p7._0);
-				if (_p8.ctor === '::') {
-					var _p10 = _p8._1;
-					var _p9 = _p8._0;
-					switch (_p9._1.ctor) {
-						case 'JsonString':
-							var _v24 = {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: A2(_user$project$Accio$nestKeys, nestedName, _p9._0),
-									_1: _elm_lang$core$Json_Encode$string(_p9._1._0)
-								},
-								_1: acc
-							},
-								_v25 = nestedName,
-								_v26 = _user$project$Accio$JsonObject(
-								_elm_lang$core$Dict$fromList(_p10));
-							acc = _v24;
-							nestedName = _v25;
-							jsonVal = _v26;
-							continue destructure;
-						case 'JsonInt':
-							var _v27 = {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: A2(_user$project$Accio$nestKeys, nestedName, _p9._0),
-									_1: _elm_lang$core$Json_Encode$int(_p9._1._0)
-								},
-								_1: acc
-							},
-								_v28 = nestedName,
-								_v29 = _user$project$Accio$JsonObject(
-								_elm_lang$core$Dict$fromList(_p10));
-							acc = _v27;
-							nestedName = _v28;
-							jsonVal = _v29;
-							continue destructure;
-						case 'JsonFloat':
-							var _v30 = {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: A2(_user$project$Accio$nestKeys, nestedName, _p9._0),
-									_1: _elm_lang$core$Json_Encode$float(_p9._1._0)
-								},
-								_1: acc
-							},
-								_v31 = nestedName,
-								_v32 = _user$project$Accio$JsonObject(
-								_elm_lang$core$Dict$fromList(_p10));
-							acc = _v30;
-							nestedName = _v31;
-							jsonVal = _v32;
-							continue destructure;
-						case 'JsonNull':
-							var _v33 = {
-								ctor: '::',
-								_0: {
-									ctor: '_Tuple2',
-									_0: A2(_user$project$Accio$nestKeys, nestedName, _p9._0),
-									_1: _elm_lang$core$Json_Encode$null
-								},
-								_1: acc
-							},
-								_v34 = nestedName,
-								_v35 = _user$project$Accio$JsonObject(
-								_elm_lang$core$Dict$fromList(_p10));
-							acc = _v33;
-							nestedName = _v34;
-							jsonVal = _v35;
-							continue destructure;
-						case 'JsonArray':
-							var _v36 = A2(
-								_elm_lang$core$Basics_ops['++'],
-								A5(
-									_user$project$Accio$destructureArray,
-									nestedName,
-									_p9._0,
-									_p9._1._0,
-									{ctor: '[]'},
-									0),
-								acc),
-								_v37 = nestedName,
-								_v38 = _user$project$Accio$JsonObject(
-								_elm_lang$core$Dict$fromList(_p10));
-							acc = _v36;
-							nestedName = _v37;
-							jsonVal = _v38;
-							continue destructure;
-						default:
-							return A2(
-								_elm_lang$core$Basics_ops['++'],
-								A3(
-									_user$project$Accio$destructure,
-									acc,
-									'',
-									_user$project$Accio$JsonObject(
-										_elm_lang$core$Dict$fromList(_p10))),
-								A3(
-									_user$project$Accio$destructure,
-									{ctor: '[]'},
-									A2(_user$project$Accio$nestKeys, nestedName, _p9._0),
-									_user$project$Accio$JsonObject(_p9._1._0)));
-					}
-				} else {
-					var _p11 = _p8;
-					if (((_p11.ctor === '::') && (_p11._0.ctor === '_Tuple2')) && (_p11._1.ctor === '[]')) {
-						switch (_p11._0._1.ctor) {
-							case 'JsonString':
-								return {
-									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: A2(_user$project$Accio$nestKeys, nestedName, _p11._0._0),
-										_1: _elm_lang$core$Json_Encode$string(_p11._0._1._0)
-									},
-									_1: acc
-								};
-							case 'JsonInt':
-								return {
-									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: A2(_user$project$Accio$nestKeys, nestedName, _p11._0._0),
-										_1: _elm_lang$core$Json_Encode$int(_p11._0._1._0)
-									},
-									_1: acc
-								};
-							case 'JsonFloat':
-								return {
-									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: A2(_user$project$Accio$nestKeys, nestedName, _p11._0._0),
-										_1: _elm_lang$core$Json_Encode$float(_p11._0._1._0)
-									},
-									_1: acc
-								};
-							case 'JsonNull':
-								return {
-									ctor: '::',
-									_0: {
-										ctor: '_Tuple2',
-										_0: A2(_user$project$Accio$nestKeys, nestedName, _p11._0._0),
-										_1: _elm_lang$core$Json_Encode$null
-									},
-									_1: acc
-								};
-							case 'JsonArray':
-								return A2(
-									_elm_lang$core$Basics_ops['++'],
-									A5(
-										_user$project$Accio$destructureArray,
-										nestedName,
-										_p11._0._0,
-										_p11._0._1._0,
-										{ctor: '[]'},
-										0),
-									acc);
-							default:
-								var _v40 = acc,
-									_v41 = A2(_user$project$Accio$nestKeys, nestedName, _p11._0._0),
-									_v42 = _user$project$Accio$JsonObject(_p11._0._1._0);
-								acc = _v40;
-								nestedName = _v41;
-								jsonVal = _v42;
-								continue destructure;
-						}
-					} else {
-						return acc;
-					}
-				}
-			} else {
-				return {
-					ctor: '::',
-					_0: {
-						ctor: '_Tuple2',
-						_0: 'y',
-						_1: _elm_lang$core$Json_Encode$string('case')
-					},
-					_1: {ctor: '[]'}
-				};
-			}
-		}
-	});
-var _user$project$Accio$flattenAndEncode = function (json) {
-	var _p12 = json;
-	if (_p12.ctor === 'Ok') {
-		var _p13 = _p12._0;
-		switch (_p13.ctor) {
-			case 'JsonObject':
-				return {
-					ctor: '::',
-					_0: A3(
-						_user$project$Accio$destructure,
-						{ctor: '[]'},
-						'',
-						_user$project$Accio$JsonObject(_p13._0)),
-					_1: {ctor: '[]'}
-				};
-			case 'JsonArray':
-				return A2(
-					_elm_lang$core$List$map,
-					A2(
-						_user$project$Accio$destructure,
-						{ctor: '[]'},
-						''),
-					_p13._0);
-			default:
-				return {
-					ctor: '::',
-					_0: {
-						ctor: '::',
-						_0: {
-							ctor: '_Tuple2',
-							_0: 'error',
-							_1: _elm_lang$core$Json_Encode$string('irregular json')
-						},
-						_1: {ctor: '[]'}
-					},
-					_1: {ctor: '[]'}
-				};
-		}
-	} else {
-		return {
-			ctor: '::',
-			_0: {
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: 'error',
-					_1: _elm_lang$core$Json_Encode$string(_p12._0)
-				},
-				_1: {ctor: '[]'}
-			},
-			_1: {ctor: '[]'}
-		};
-	}
-};
-var _user$project$Accio$JsonString = function (a) {
-	return {ctor: 'JsonString', _0: a};
-};
-var _user$project$Accio$jsonDecoder = _elm_lang$core$Json_Decode$oneOf(
-	{
-		ctor: '::',
-		_0: A2(_elm_lang$core$Json_Decode$map, _user$project$Accio$JsonString, _elm_lang$core$Json_Decode$string),
-		_1: {
-			ctor: '::',
-			_0: A2(_elm_lang$core$Json_Decode$map, _user$project$Accio$JsonInt, _elm_lang$core$Json_Decode$int),
-			_1: {
-				ctor: '::',
-				_0: A2(_elm_lang$core$Json_Decode$map, _user$project$Accio$JsonFloat, _elm_lang$core$Json_Decode$float),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$core$Json_Decode$map,
-						_user$project$Accio$JsonArray,
-						_elm_lang$core$Json_Decode$list(
-							_elm_lang$core$Json_Decode$lazy(
-								function (_p14) {
-									return _user$project$Accio$jsonDecoder;
-								}))),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$core$Json_Decode$map,
-							_user$project$Accio$JsonObject,
-							_elm_lang$core$Json_Decode$dict(
-								_elm_lang$core$Json_Decode$lazy(
-									function (_p15) {
-										return _user$project$Accio$jsonDecoder;
-									}))),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$core$Json_Decode$null(_user$project$Accio$JsonNull),
-							_1: {ctor: '[]'}
-						}
-					}
-				}
-			}
-		}
-	});
-var _user$project$Accio$createSheet = function (response) {
-	return _user$project$Accio$googleSheetsRequestBody(
-		A2(
-			_elm_lang$core$List$map,
-			_user$project$Accio$createRow,
-			_user$project$Accio$flattenAndEncode(
-				A2(_elm_lang$core$Json_Decode$decodeString, _user$project$Accio$jsonDecoder, response))));
-};
 var _user$project$Accio$PostCsv = function (a) {
 	return {ctor: 'PostCsv', _0: a};
 };
 var _user$project$Accio$requestCsv = F2(
 	function (token, model) {
-		var _p16 = token;
-		if (_p16.ctor === 'Just') {
+		var _p2 = token;
+		if (_p2.ctor === 'Just') {
 			return A2(
 				_elm_lang$http$Http$send,
 				_user$project$Accio$PostCsv,
-				A2(_user$project$Accio$putRequest, _p16._0, model));
+				A2(_user$project$Accio$putRequest, _p2._0, model));
 		} else {
 			return _elm_lang$core$Platform_Cmd$none;
 		}
@@ -594,8 +97,8 @@ var _user$project$Accio$getJson = function (url) {
 };
 var _user$project$Accio$update = F2(
 	function (msg, model) {
-		var _p17 = msg;
-		switch (_p17.ctor) {
+		var _p3 = msg;
+		switch (_p3.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Url':
@@ -603,7 +106,7 @@ var _user$project$Accio$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{url: _p17._0}),
+						{url: _p3._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GetData':
@@ -613,13 +116,13 @@ var _user$project$Accio$update = F2(
 					_1: _user$project$Accio$getJson(model.url)
 				};
 			case 'Fetch':
-				if (_p17._0.ctor === 'Ok') {
+				if (_p3._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								keyValues: _user$project$Accio$createSheet(_p17._0._0)
+								keyValues: _user$project$GoogleSheet$createSheet(_p3._0._0)
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
@@ -641,12 +144,12 @@ var _user$project$Accio$update = F2(
 					_1: A2(_user$project$Accio$requestCsv, model.token, model)
 				};
 			default:
-				if (_p17._0.ctor === 'Ok') {
+				if (_p3._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{spreadsheetUrl: _p17._0._0}),
+							{spreadsheetUrl: _p3._0._0}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
@@ -763,7 +266,7 @@ var _user$project$Accio$main = A2(
 		init: _user$project$Accio$init,
 		view: _user$project$Accio$view,
 		update: _user$project$Accio$update,
-		subscriptions: function (_p18) {
+		subscriptions: function (_p4) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
