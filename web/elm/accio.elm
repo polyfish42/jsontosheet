@@ -35,7 +35,6 @@ main =
 type alias Model =
     { url : String
     , errorMessage : String
-    , keyValues : E.Value
     , token : Maybe String
     , spreadsheetUrl : String
     }
@@ -43,7 +42,7 @@ type alias Model =
 
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model "" "" E.null (parseToken location) "", Cmd.none )
+    ( Model "" "" (parseToken location) "", Cmd.none )
 
 
 parseToken : Navigation.Location -> Maybe String
@@ -120,7 +119,7 @@ view model =
             ]
         , li []
             [ text "Step 2: Enter JSON or URL here "
-            , input [ type_ "text", placeholder "url", onInput Url ] []
+            , input [ type_ "text", placeholder "JSON or URL", onInput Url ] []
             , button [ onClick GetData ] [ text "Create Sheet" ]
             ]
         , li []

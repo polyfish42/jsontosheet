@@ -53,18 +53,17 @@ var _user$project$Accio$parseToken = function (location) {
 		return _elm_lang$core$Maybe$Nothing;
 	}
 };
-var _user$project$Accio$Model = F5(
-	function (a, b, c, d, e) {
-		return {url: a, errorMessage: b, keyValues: c, token: d, spreadsheetUrl: e};
+var _user$project$Accio$Model = F4(
+	function (a, b, c, d) {
+		return {url: a, errorMessage: b, token: c, spreadsheetUrl: d};
 	});
 var _user$project$Accio$init = function (location) {
 	return {
 		ctor: '_Tuple2',
-		_0: A5(
+		_0: A4(
 			_user$project$Accio$Model,
 			'',
 			'',
-			_elm_lang$core$Json_Encode$null,
 			_user$project$Accio$parseToken(location),
 			''),
 		_1: _elm_lang$core$Platform_Cmd$none
@@ -209,7 +208,7 @@ var _user$project$Accio$view = function (model) {
 									_0: _elm_lang$html$Html_Attributes$type_('text'),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$placeholder('url'),
+										_0: _elm_lang$html$Html_Attributes$placeholder('JSON or URL'),
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),

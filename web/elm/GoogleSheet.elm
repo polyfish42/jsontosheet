@@ -21,12 +21,15 @@ type JsonVal
     | JsonFloat Float
     | JsonInt Int
     | JsonNull
+    | JsonBool Bool
     | JsonArray (List JsonVal)
-    
+
 createSheet : String -> E.Value
 createSheet response =
     D.decodeString jsonDecoder response
+        |> Debug.log "decoded string"
         |> flattenAndEncode
+        -- |> Debug.log "encoded list"
         |> List.map createRow
         |> googleSheetsRequestBody
 
@@ -39,6 +42,7 @@ jsonDecoder =
         , D.map JsonFloat D.float
         , D.list (D.lazy (\_ -> jsonDecoder)) |> D.map JsonArray
         , D.dict (D.lazy (\_ -> jsonDecoder)) |> D.map JsonObject
+        , D.map JsonBool D.bool
         , D.null JsonNull
         ]
 
@@ -80,6 +84,9 @@ destructure acc nestedName jsonVal =
                         ( key, JsonNull ) ->
                             destructure (( nestKeys nestedName key, E.null ) :: acc) nestedName (JsonObject (Dict.fromList xs))
 
+                        ( key, JsonBool boolian ) ->
+                            destructure (( nestKeys nestedName key, E.bool boolian ) :: acc) nestedName (JsonObject (Dict.fromList xs))
+
                         ( key, JsonArray list ) ->
                             destructure ((destructureArray nestedName key list [] 0) ++ acc) nestedName (JsonObject (Dict.fromList xs))
 
@@ -99,6 +106,9 @@ destructure acc nestedName jsonVal =
 
                         [ ( key, JsonNull ) ] ->
                             ( nestKeys nestedName key, E.null ) :: acc
+
+                        [ ( key, JsonBool boolian) ] ->
+                            ( nestKeys nestedName key, E.bool boolian ) :: acc
 
                         [ ( key, JsonArray list ) ] ->
                             (destructureArray nestedName key list [] 0) ++ acc
