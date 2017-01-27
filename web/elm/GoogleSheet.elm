@@ -15,6 +15,7 @@ import OAuth
 import Platform.Cmd exposing (..)
 import String
 
+
 type JsonVal
     = JsonString String
     | JsonObject (Dict.Dict String JsonVal)
@@ -24,14 +25,14 @@ type JsonVal
     | JsonBool Bool
     | JsonArray (List JsonVal)
 
+
 createSheet : String -> E.Value
 createSheet response =
     D.decodeString jsonDecoder response
-        |> Debug.log "decoded string"
         |> flattenAndEncode
-        -- |> Debug.log "encoded list"
         |> List.map createRow
         |> googleSheetsRequestBody
+        |> Debug.log "practice json"
 
 
 jsonDecoder : Decoder JsonVal
@@ -47,7 +48,7 @@ jsonDecoder =
         ]
 
 
-flattenAndEncode : Result String JsonVal -> List (List ( String, E.Value ))
+flattenAndEncode : Result String JsonVal -> List (List ( String, JsonVal ))
 flattenAndEncode json =
     case json of
         Ok response ->
@@ -59,13 +60,13 @@ flattenAndEncode json =
                     List.map (destructure [] "") list
 
                 _ ->
-                    [ [ ( "error", E.string "irregular json" ) ] ]
+                    [ [ ( "error", JsonString "irregular json" ) ] ]
 
         Err message ->
-            [ [ ( "error", E.string message ) ] ]
+            [ [ ( "error", JsonString message ) ] ]
 
 
-destructure : List ( String, E.Value ) -> String -> JsonVal -> List ( String, E.Value )
+destructure : List ( String, JsonVal ) -> String -> JsonVal -> List ( String, JsonVal )
 destructure acc nestedName jsonVal =
     case jsonVal of
         JsonObject object ->
@@ -73,19 +74,19 @@ destructure acc nestedName jsonVal =
                 x :: xs ->
                     case x of
                         ( key, JsonString val ) ->
-                            destructure (( nestKeys nestedName key, E.string val ) :: acc) nestedName (JsonObject (Dict.fromList xs))
+                            destructure (( nestKeys nestedName key, JsonString val ) :: acc) nestedName (JsonObject (Dict.fromList xs))
 
                         ( key, JsonInt val ) ->
-                            destructure (( nestKeys nestedName key, E.int val ) :: acc) nestedName (JsonObject (Dict.fromList xs))
+                            destructure (( nestKeys nestedName key, JsonInt val ) :: acc) nestedName (JsonObject (Dict.fromList xs))
 
                         ( key, JsonFloat val ) ->
-                            destructure (( nestKeys nestedName key, E.float val ) :: acc) nestedName (JsonObject (Dict.fromList xs))
+                            destructure (( nestKeys nestedName key, JsonFloat val ) :: acc) nestedName (JsonObject (Dict.fromList xs))
 
                         ( key, JsonNull ) ->
-                            destructure (( nestKeys nestedName key, E.null ) :: acc) nestedName (JsonObject (Dict.fromList xs))
+                            destructure (( nestKeys nestedName key, JsonNull ) :: acc) nestedName (JsonObject (Dict.fromList xs))
 
                         ( key, JsonBool boolian ) ->
-                            destructure (( nestKeys nestedName key, E.bool boolian ) :: acc) nestedName (JsonObject (Dict.fromList xs))
+                            destructure (( nestKeys nestedName key, JsonBool boolian ) :: acc) nestedName (JsonObject (Dict.fromList xs))
 
                         ( key, JsonArray list ) ->
                             destructure ((destructureArray nestedName key list [] 0) ++ acc) nestedName (JsonObject (Dict.fromList xs))
@@ -96,19 +97,19 @@ destructure acc nestedName jsonVal =
                 x ->
                     case x of
                         [ ( key, JsonString val ) ] ->
-                            ( nestKeys nestedName key, E.string val ) :: acc
+                            ( nestKeys nestedName key, JsonString val ) :: acc
 
                         [ ( key, JsonInt val ) ] ->
-                            ( nestKeys nestedName key, E.int val ) :: acc
+                            ( nestKeys nestedName key, JsonInt val ) :: acc
 
                         [ ( key, JsonFloat val ) ] ->
-                            ( nestKeys nestedName key, E.float val ) :: acc
+                            ( nestKeys nestedName key, JsonFloat val ) :: acc
 
                         [ ( key, JsonNull ) ] ->
-                            ( nestKeys nestedName key, E.null ) :: acc
+                            ( nestKeys nestedName key, JsonNull ) :: acc
 
-                        [ ( key, JsonBool boolian) ] ->
-                            ( nestKeys nestedName key, E.bool boolian ) :: acc
+                        [ ( key, JsonBool boolian ) ] ->
+                            ( nestKeys nestedName key, JsonBool boolian ) :: acc
 
                         [ ( key, JsonArray list ) ] ->
                             (destructureArray nestedName key list [] 0) ++ acc
@@ -120,7 +121,7 @@ destructure acc nestedName jsonVal =
                             acc
 
         _ ->
-            [ ( "y", E.string "case" ) ]
+            [ ( "y", JsonString "case" ) ]
 
 
 nestKeys : String -> String -> String
@@ -133,28 +134,28 @@ nestKeys nestedNames key =
             str ++ "/" ++ key
 
 
-destructureArray : String -> String -> List JsonVal -> List ( String, E.Value ) -> Int -> List ( String, E.Value )
+destructureArray : String -> String -> List JsonVal -> List ( String, JsonVal ) -> Int -> List ( String, JsonVal )
 destructureArray nestedName key list acc counter =
     case list of
         x :: xs ->
             case x of
                 JsonString str ->
-                    destructureArray nestedName key xs (( (nestKeys nestedName key) ++ "/" ++ (toString counter), E.string str ) :: acc) (counter + 1)
+                    destructureArray nestedName key xs (( (nestKeys nestedName key) ++ "/" ++ (toString counter), JsonString str ) :: acc) (counter + 1)
 
                 JsonInt int ->
-                    destructureArray nestedName key xs (( (nestKeys nestedName key) ++ "/" ++ (toString counter), E.int int ) :: acc) (counter + 1)
+                    destructureArray nestedName key xs (( (nestKeys nestedName key) ++ "/" ++ (toString counter), JsonInt int ) :: acc) (counter + 1)
 
                 JsonNull ->
-                    destructureArray nestedName key xs (( (nestKeys nestedName key) ++ "/" ++ (toString counter), E.null ) :: acc) (counter + 1)
+                    destructureArray nestedName key xs (( (nestKeys nestedName key) ++ "/" ++ (toString counter), JsonNull ) :: acc) (counter + 1)
 
                 _ ->
-                    [ ( "error", E.null ) ]
+                    [ ( "error", JsonNull ) ]
 
         [] ->
             acc
 
 
-createRow : List ( String, E.Value ) -> E.Value
+createRow : List ( String, JsonVal ) -> E.Value
 createRow row =
     E.object
         [ ( "values"
@@ -166,37 +167,54 @@ createRow row =
         ]
 
 
+cells : ( String, JsonVal ) -> E.Value
 cells cell =
     case cell of
-        ( key, str ) ->
+        ( key, JsonString str ) ->
+            googleStringCell str
+
+        ( key, JsonInt int ) ->
+            googleNumberCell (toString int)
+
+        ( key, JsonFloat float ) ->
+            googleNumberCell (toString float)
+
+        ( key, JsonBool boolian ) ->
+            googleStringCell (toString boolian)
+
+        ( key, JsonNull ) ->
+            googleStringCell "null"
+
+        _ ->
             E.object
                 [ ( "userEnteredValue"
                   , E.object
-                        [ ( "stringValue", str )
+                        [ ( "stringValue", E.string "There was an error parsing this cell" )
                         ]
                   )
                 ]
 
 
+googleStringCell : String -> E.Value
+googleStringCell str =
+    E.object
+        [ ( "userEnteredValue"
+          , E.object
+                [ ( "stringValue", E.string str )
+                ]
+          )
+        ]
 
---
--- (key, E.int int) ->
---   E.object
---       [ ( "userEnteredValue"
---         , E.object
---               [ ( "numberValue", E.int int )
---               ]
---         )
---       ]
---
--- (key, E.float float) ->
---   E.object
---       [ ( "userEnteredValue"
---         , E.object
---               [ ( "numberValue", E.float float )
---               ]
---         )
---       ]
+
+googleNumberCell : String -> E.Value
+googleNumberCell num =
+    E.object
+        [ ( "userEnteredValue"
+          , E.object
+                [ ( "numberValue", E.string num )
+                ]
+          )
+        ]
 
 
 googleSheetsRequestBody : List E.Value -> E.Value
@@ -219,6 +237,14 @@ googleSheetsRequestBody rows =
                                         ]
                                     ]
                                 )
+                          )
+                        , ( "properties"
+                          , E.object
+                                [ ( "gridProperties"
+                                  , E.object
+                                        [ ( "columnCount", E.int 200 ) ]
+                                  )
+                                ]
                           )
                         ]
                     ]
