@@ -69,6 +69,8 @@ toKeyValuePair segment =
         _ ->
             Nothing
 
+
+
 -- UPDATE
 
 
@@ -106,17 +108,25 @@ update msg model =
 
 
 
-
 -- VIEW
 
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ a [ href <| OAuth.requestToken ] [ text "Authorize Google" ]
-        , a [ href model.spreadsheetUrl ] [ text "Click here to see your spreadsheet" ]
-        , input [ type_ "text", placeholder "url", onInput Url ] []
-        , button [ onClick GetData ] [ text "Create Sheet" ]
+    ul [ style [ ( "list-style", "none" ) ] ]
+        [ li []
+            [ text "Step 1: "
+            , a [ href <| OAuth.requestToken ] [ text "Authorize Google" ]
+            ]
+        , li []
+            [ text "Step 2: Enter JSON or URL here "
+            , input [ type_ "text", placeholder "url", onInput Url ] []
+            , button [ onClick GetData ] [ text "Create Sheet" ]
+            ]
+        , li []
+            [ text "Step 3: "
+            , a [ href model.spreadsheetUrl ] [ text "Click here to see your spreadsheet" ]
+            ]
         ]
 
 
