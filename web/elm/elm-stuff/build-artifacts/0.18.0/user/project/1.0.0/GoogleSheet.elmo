@@ -169,15 +169,38 @@ var _user$project$GoogleSheet$createRow = function (row) {
 			_1: {ctor: '[]'}
 		});
 };
+var _user$project$GoogleSheet$firstTuple = function (row) {
+	var _p1 = row;
+	return _user$project$GoogleSheet$googleStringCell(
+		_elm_lang$core$Basics$toString(_p1._0));
+};
+var _user$project$GoogleSheet$createHeaders = function (row) {
+	return {
+		ctor: '::',
+		_0: _elm_lang$core$Json_Encode$object(
+			{
+				ctor: '::',
+				_0: {
+					ctor: '_Tuple2',
+					_0: 'values',
+					_1: _elm_lang$core$Json_Encode$array(
+						_elm_lang$core$Array$fromList(
+							A2(_elm_lang$core$List$map, _user$project$GoogleSheet$firstTuple, row)))
+				},
+				_1: {ctor: '[]'}
+			}),
+		_1: {ctor: '[]'}
+	};
+};
 var _user$project$GoogleSheet$nestKeys = F2(
 	function (nestedNames, key) {
-		var _p1 = nestedNames;
-		if (_p1 === '') {
+		var _p2 = nestedNames;
+		if (_p2 === '') {
 			return key;
 		} else {
 			return A2(
 				_elm_lang$core$Basics_ops['++'],
-				_p1,
+				_p2,
 				A2(_elm_lang$core$Basics_ops['++'], '/', key));
 		}
 	});
@@ -188,6 +211,21 @@ var _user$project$GoogleSheet$JsonBool = function (a) {
 	return {ctor: 'JsonBool', _0: a};
 };
 var _user$project$GoogleSheet$JsonNull = {ctor: 'JsonNull'};
+var _user$project$GoogleSheet$headersAndRows = function (rows) {
+	return _elm_lang$core$List$reverse(
+		A2(
+			_elm_lang$core$List$append,
+			A2(_elm_lang$core$List$map, _user$project$GoogleSheet$createRow, rows),
+			_user$project$GoogleSheet$createHeaders(
+				A2(
+					_elm_lang$core$Maybe$withDefault,
+					{
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'didn\'t work', _1: _user$project$GoogleSheet$JsonNull},
+						_1: {ctor: '[]'}
+					},
+					_elm_lang$core$List$head(rows)))));
+};
 var _user$project$GoogleSheet$JsonInt = function (a) {
 	return {ctor: 'JsonInt', _0: a};
 };
@@ -217,7 +255,7 @@ var _user$project$GoogleSheet$jsonDecoder = _elm_lang$core$Json_Decode$oneOf(
 						_user$project$GoogleSheet$JsonArray,
 						_elm_lang$core$Json_Decode$list(
 							_elm_lang$core$Json_Decode$lazy(
-								function (_p2) {
+								function (_p3) {
 									return _user$project$GoogleSheet$jsonDecoder;
 								}))),
 					_1: {
@@ -227,7 +265,7 @@ var _user$project$GoogleSheet$jsonDecoder = _elm_lang$core$Json_Decode$oneOf(
 							_user$project$GoogleSheet$JsonObject,
 							_elm_lang$core$Json_Decode$dict(
 								_elm_lang$core$Json_Decode$lazy(
-									function (_p3) {
+									function (_p4) {
 										return _user$project$GoogleSheet$jsonDecoder;
 									}))),
 						_1: {
@@ -248,16 +286,16 @@ var _user$project$GoogleSheet$destructureArray = F5(
 	function (nestedName, key, list, acc, counter) {
 		destructureArray:
 		while (true) {
-			var _p4 = list;
-			if (_p4.ctor === '::') {
-				var _p6 = _p4._1;
-				var _p5 = _p4._0;
-				switch (_p5.ctor) {
+			var _p5 = list;
+			if (_p5.ctor === '::') {
+				var _p7 = _p5._1;
+				var _p6 = _p5._0;
+				switch (_p6.ctor) {
 					case 'JsonString':
-						var _v4 = nestedName,
-							_v5 = key,
-							_v6 = _p6,
-							_v7 = {
+						var _v5 = nestedName,
+							_v6 = key,
+							_v7 = _p7,
+							_v8 = {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
@@ -268,22 +306,22 @@ var _user$project$GoogleSheet$destructureArray = F5(
 										_elm_lang$core$Basics_ops['++'],
 										'/',
 										_elm_lang$core$Basics$toString(counter))),
-								_1: _user$project$GoogleSheet$JsonString(_p5._0)
+								_1: _user$project$GoogleSheet$JsonString(_p6._0)
 							},
 							_1: acc
 						},
-							_v8 = counter + 1;
-						nestedName = _v4;
-						key = _v5;
-						list = _v6;
-						acc = _v7;
-						counter = _v8;
+							_v9 = counter + 1;
+						nestedName = _v5;
+						key = _v6;
+						list = _v7;
+						acc = _v8;
+						counter = _v9;
 						continue destructureArray;
 					case 'JsonInt':
-						var _v9 = nestedName,
-							_v10 = key,
-							_v11 = _p6,
-							_v12 = {
+						var _v10 = nestedName,
+							_v11 = key,
+							_v12 = _p7,
+							_v13 = {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
@@ -294,22 +332,22 @@ var _user$project$GoogleSheet$destructureArray = F5(
 										_elm_lang$core$Basics_ops['++'],
 										'/',
 										_elm_lang$core$Basics$toString(counter))),
-								_1: _user$project$GoogleSheet$JsonInt(_p5._0)
+								_1: _user$project$GoogleSheet$JsonInt(_p6._0)
 							},
 							_1: acc
 						},
-							_v13 = counter + 1;
-						nestedName = _v9;
-						key = _v10;
-						list = _v11;
-						acc = _v12;
-						counter = _v13;
+							_v14 = counter + 1;
+						nestedName = _v10;
+						key = _v11;
+						list = _v12;
+						acc = _v13;
+						counter = _v14;
 						continue destructureArray;
 					case 'JsonNull':
-						var _v14 = nestedName,
-							_v15 = key,
-							_v16 = _p6,
-							_v17 = {
+						var _v15 = nestedName,
+							_v16 = key,
+							_v17 = _p7,
+							_v18 = {
 							ctor: '::',
 							_0: {
 								ctor: '_Tuple2',
@@ -324,12 +362,12 @@ var _user$project$GoogleSheet$destructureArray = F5(
 							},
 							_1: acc
 						},
-							_v18 = counter + 1;
-						nestedName = _v14;
-						key = _v15;
-						list = _v16;
-						acc = _v17;
-						counter = _v18;
+							_v19 = counter + 1;
+						nestedName = _v15;
+						key = _v16;
+						list = _v17;
+						acc = _v18;
+						counter = _v19;
 						continue destructureArray;
 					default:
 						return {
@@ -347,115 +385,115 @@ var _user$project$GoogleSheet$destructure = F3(
 	function (acc, nestedName, jsonVal) {
 		destructure:
 		while (true) {
-			var _p7 = jsonVal;
-			if (_p7.ctor === 'JsonObject') {
-				var _p8 = _elm_lang$core$Dict$toList(_p7._0);
-				if (_p8.ctor === '::') {
-					var _p10 = _p8._1;
-					var _p9 = _p8._0;
-					switch (_p9._1.ctor) {
+			var _p8 = jsonVal;
+			if (_p8.ctor === 'JsonObject') {
+				var _p9 = _elm_lang$core$Dict$toList(_p8._0);
+				if (_p9.ctor === '::') {
+					var _p11 = _p9._1;
+					var _p10 = _p9._0;
+					switch (_p10._1.ctor) {
 						case 'JsonString':
-							var _v22 = {
+							var _v23 = {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p9._0),
-									_1: _user$project$GoogleSheet$JsonString(_p9._1._0)
+									_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p10._0),
+									_1: _user$project$GoogleSheet$JsonString(_p10._1._0)
 								},
 								_1: acc
 							},
-								_v23 = nestedName,
-								_v24 = _user$project$GoogleSheet$JsonObject(
-								_elm_lang$core$Dict$fromList(_p10));
-							acc = _v22;
-							nestedName = _v23;
-							jsonVal = _v24;
+								_v24 = nestedName,
+								_v25 = _user$project$GoogleSheet$JsonObject(
+								_elm_lang$core$Dict$fromList(_p11));
+							acc = _v23;
+							nestedName = _v24;
+							jsonVal = _v25;
 							continue destructure;
 						case 'JsonInt':
-							var _v25 = {
+							var _v26 = {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p9._0),
-									_1: _user$project$GoogleSheet$JsonInt(_p9._1._0)
+									_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p10._0),
+									_1: _user$project$GoogleSheet$JsonInt(_p10._1._0)
 								},
 								_1: acc
 							},
-								_v26 = nestedName,
-								_v27 = _user$project$GoogleSheet$JsonObject(
-								_elm_lang$core$Dict$fromList(_p10));
-							acc = _v25;
-							nestedName = _v26;
-							jsonVal = _v27;
+								_v27 = nestedName,
+								_v28 = _user$project$GoogleSheet$JsonObject(
+								_elm_lang$core$Dict$fromList(_p11));
+							acc = _v26;
+							nestedName = _v27;
+							jsonVal = _v28;
 							continue destructure;
 						case 'JsonFloat':
-							var _v28 = {
+							var _v29 = {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p9._0),
-									_1: _user$project$GoogleSheet$JsonFloat(_p9._1._0)
+									_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p10._0),
+									_1: _user$project$GoogleSheet$JsonFloat(_p10._1._0)
 								},
 								_1: acc
 							},
-								_v29 = nestedName,
-								_v30 = _user$project$GoogleSheet$JsonObject(
-								_elm_lang$core$Dict$fromList(_p10));
-							acc = _v28;
-							nestedName = _v29;
-							jsonVal = _v30;
+								_v30 = nestedName,
+								_v31 = _user$project$GoogleSheet$JsonObject(
+								_elm_lang$core$Dict$fromList(_p11));
+							acc = _v29;
+							nestedName = _v30;
+							jsonVal = _v31;
 							continue destructure;
 						case 'JsonNull':
-							var _v31 = {
+							var _v32 = {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p9._0),
+									_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p10._0),
 									_1: _user$project$GoogleSheet$JsonNull
 								},
 								_1: acc
 							},
-								_v32 = nestedName,
-								_v33 = _user$project$GoogleSheet$JsonObject(
-								_elm_lang$core$Dict$fromList(_p10));
-							acc = _v31;
-							nestedName = _v32;
-							jsonVal = _v33;
+								_v33 = nestedName,
+								_v34 = _user$project$GoogleSheet$JsonObject(
+								_elm_lang$core$Dict$fromList(_p11));
+							acc = _v32;
+							nestedName = _v33;
+							jsonVal = _v34;
 							continue destructure;
 						case 'JsonBool':
-							var _v34 = {
+							var _v35 = {
 								ctor: '::',
 								_0: {
 									ctor: '_Tuple2',
-									_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p9._0),
-									_1: _user$project$GoogleSheet$JsonBool(_p9._1._0)
+									_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p10._0),
+									_1: _user$project$GoogleSheet$JsonBool(_p10._1._0)
 								},
 								_1: acc
 							},
-								_v35 = nestedName,
-								_v36 = _user$project$GoogleSheet$JsonObject(
-								_elm_lang$core$Dict$fromList(_p10));
-							acc = _v34;
-							nestedName = _v35;
-							jsonVal = _v36;
+								_v36 = nestedName,
+								_v37 = _user$project$GoogleSheet$JsonObject(
+								_elm_lang$core$Dict$fromList(_p11));
+							acc = _v35;
+							nestedName = _v36;
+							jsonVal = _v37;
 							continue destructure;
 						case 'JsonArray':
-							var _v37 = A2(
+							var _v38 = A2(
 								_elm_lang$core$Basics_ops['++'],
 								A5(
 									_user$project$GoogleSheet$destructureArray,
 									nestedName,
-									_p9._0,
-									_p9._1._0,
+									_p10._0,
+									_p10._1._0,
 									{ctor: '[]'},
 									0),
 								acc),
-								_v38 = nestedName,
-								_v39 = _user$project$GoogleSheet$JsonObject(
-								_elm_lang$core$Dict$fromList(_p10));
-							acc = _v37;
-							nestedName = _v38;
-							jsonVal = _v39;
+								_v39 = nestedName,
+								_v40 = _user$project$GoogleSheet$JsonObject(
+								_elm_lang$core$Dict$fromList(_p11));
+							acc = _v38;
+							nestedName = _v39;
+							jsonVal = _v40;
 							continue destructure;
 						default:
 							return A2(
@@ -465,24 +503,24 @@ var _user$project$GoogleSheet$destructure = F3(
 									acc,
 									'',
 									_user$project$GoogleSheet$JsonObject(
-										_elm_lang$core$Dict$fromList(_p10))),
+										_elm_lang$core$Dict$fromList(_p11))),
 								A3(
 									_user$project$GoogleSheet$destructure,
 									{ctor: '[]'},
-									A2(_user$project$GoogleSheet$nestKeys, nestedName, _p9._0),
-									_user$project$GoogleSheet$JsonObject(_p9._1._0)));
+									A2(_user$project$GoogleSheet$nestKeys, nestedName, _p10._0),
+									_user$project$GoogleSheet$JsonObject(_p10._1._0)));
 					}
 				} else {
-					var _p11 = _p8;
-					if (((_p11.ctor === '::') && (_p11._0.ctor === '_Tuple2')) && (_p11._1.ctor === '[]')) {
-						switch (_p11._0._1.ctor) {
+					var _p12 = _p9;
+					if (((_p12.ctor === '::') && (_p12._0.ctor === '_Tuple2')) && (_p12._1.ctor === '[]')) {
+						switch (_p12._0._1.ctor) {
 							case 'JsonString':
 								return {
 									ctor: '::',
 									_0: {
 										ctor: '_Tuple2',
-										_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p11._0._0),
-										_1: _user$project$GoogleSheet$JsonString(_p11._0._1._0)
+										_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p12._0._0),
+										_1: _user$project$GoogleSheet$JsonString(_p12._0._1._0)
 									},
 									_1: acc
 								};
@@ -491,8 +529,8 @@ var _user$project$GoogleSheet$destructure = F3(
 									ctor: '::',
 									_0: {
 										ctor: '_Tuple2',
-										_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p11._0._0),
-										_1: _user$project$GoogleSheet$JsonInt(_p11._0._1._0)
+										_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p12._0._0),
+										_1: _user$project$GoogleSheet$JsonInt(_p12._0._1._0)
 									},
 									_1: acc
 								};
@@ -501,8 +539,8 @@ var _user$project$GoogleSheet$destructure = F3(
 									ctor: '::',
 									_0: {
 										ctor: '_Tuple2',
-										_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p11._0._0),
-										_1: _user$project$GoogleSheet$JsonFloat(_p11._0._1._0)
+										_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p12._0._0),
+										_1: _user$project$GoogleSheet$JsonFloat(_p12._0._1._0)
 									},
 									_1: acc
 								};
@@ -511,7 +549,7 @@ var _user$project$GoogleSheet$destructure = F3(
 									ctor: '::',
 									_0: {
 										ctor: '_Tuple2',
-										_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p11._0._0),
+										_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p12._0._0),
 										_1: _user$project$GoogleSheet$JsonNull
 									},
 									_1: acc
@@ -521,8 +559,8 @@ var _user$project$GoogleSheet$destructure = F3(
 									ctor: '::',
 									_0: {
 										ctor: '_Tuple2',
-										_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p11._0._0),
-										_1: _user$project$GoogleSheet$JsonBool(_p11._0._1._0)
+										_0: A2(_user$project$GoogleSheet$nestKeys, nestedName, _p12._0._0),
+										_1: _user$project$GoogleSheet$JsonBool(_p12._0._1._0)
 									},
 									_1: acc
 								};
@@ -532,18 +570,18 @@ var _user$project$GoogleSheet$destructure = F3(
 									A5(
 										_user$project$GoogleSheet$destructureArray,
 										nestedName,
-										_p11._0._0,
-										_p11._0._1._0,
+										_p12._0._0,
+										_p12._0._1._0,
 										{ctor: '[]'},
 										0),
 									acc);
 							default:
-								var _v41 = acc,
-									_v42 = A2(_user$project$GoogleSheet$nestKeys, nestedName, _p11._0._0),
-									_v43 = _user$project$GoogleSheet$JsonObject(_p11._0._1._0);
-								acc = _v41;
-								nestedName = _v42;
-								jsonVal = _v43;
+								var _v42 = acc,
+									_v43 = A2(_user$project$GoogleSheet$nestKeys, nestedName, _p12._0._0),
+									_v44 = _user$project$GoogleSheet$JsonObject(_p12._0._1._0);
+								acc = _v42;
+								nestedName = _v43;
+								jsonVal = _v44;
 								continue destructure;
 						}
 					} else {
@@ -564,10 +602,10 @@ var _user$project$GoogleSheet$destructure = F3(
 		}
 	});
 var _user$project$GoogleSheet$flattenAndEncode = function (json) {
-	var _p12 = json;
-	if (_p12.ctor === 'Ok') {
-		var _p13 = _p12._0;
-		switch (_p13.ctor) {
+	var _p13 = json;
+	if (_p13.ctor === 'Ok') {
+		var _p14 = _p13._0;
+		switch (_p14.ctor) {
 			case 'JsonObject':
 				return {
 					ctor: '::',
@@ -575,7 +613,7 @@ var _user$project$GoogleSheet$flattenAndEncode = function (json) {
 						_user$project$GoogleSheet$destructure,
 						{ctor: '[]'},
 						'',
-						_user$project$GoogleSheet$JsonObject(_p13._0)),
+						_user$project$GoogleSheet$JsonObject(_p14._0)),
 					_1: {ctor: '[]'}
 				};
 			case 'JsonArray':
@@ -585,7 +623,7 @@ var _user$project$GoogleSheet$flattenAndEncode = function (json) {
 						_user$project$GoogleSheet$destructure,
 						{ctor: '[]'},
 						''),
-					_p13._0);
+					_p14._0);
 			default:
 				return {
 					ctor: '::',
@@ -609,7 +647,7 @@ var _user$project$GoogleSheet$flattenAndEncode = function (json) {
 				_0: {
 					ctor: '_Tuple2',
 					_0: 'error',
-					_1: _user$project$GoogleSheet$JsonString(_p12._0)
+					_1: _user$project$GoogleSheet$JsonString(_p13._0)
 				},
 				_1: {ctor: '[]'}
 			},
@@ -618,13 +656,8 @@ var _user$project$GoogleSheet$flattenAndEncode = function (json) {
 	}
 };
 var _user$project$GoogleSheet$createSheet = function (response) {
-	return A2(
-		_elm_lang$core$Debug$log,
-		'practice json',
-		_user$project$GoogleSheet$googleSheetsRequestBody(
-			A2(
-				_elm_lang$core$List$map,
-				_user$project$GoogleSheet$createRow,
-				_user$project$GoogleSheet$flattenAndEncode(
-					A2(_elm_lang$core$Json_Decode$decodeString, _user$project$GoogleSheet$jsonDecoder, response)))));
+	return _user$project$GoogleSheet$googleSheetsRequestBody(
+		_user$project$GoogleSheet$headersAndRows(
+			_user$project$GoogleSheet$flattenAndEncode(
+				A2(_elm_lang$core$Json_Decode$decodeString, _user$project$GoogleSheet$jsonDecoder, response))));
 };

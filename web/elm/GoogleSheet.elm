@@ -30,9 +30,8 @@ createSheet : String -> E.Value
 createSheet response =
     D.decodeString jsonDecoder response
         |> flattenAndEncode
-        |> List.map createRow
+        |> headersAndRows
         |> googleSheetsRequestBody
-        |> Debug.log "practice json"
 
 
 jsonDecoder : Decoder JsonVal
@@ -153,6 +152,34 @@ destructureArray nestedName key list acc counter =
 
         [] ->
             acc
+
+
+headersAndRows : List (List ( String, JsonVal )) -> List E.Value
+headersAndRows rows =
+    Maybe.withDefault [ ( "didn't work", JsonNull ) ] (List.head rows)
+        |> createHeaders
+        |> List.append (List.map createRow rows)
+        |> List.reverse
+
+
+createHeaders : List ( String, JsonVal ) -> List E.Value
+createHeaders row =
+    [ E.object
+        [ ( "values"
+          , E.array
+                (Array.fromList
+                    (List.map firstTuple row)
+                )
+          )
+        ]
+    ]
+
+
+firstTuple : ( String, JsonVal ) -> E.Value
+firstTuple row =
+    case row of
+        ( header, value ) ->
+            googleStringCell (toString header)
 
 
 createRow : List ( String, JsonVal ) -> E.Value
