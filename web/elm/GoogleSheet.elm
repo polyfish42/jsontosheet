@@ -156,7 +156,7 @@ destructureArray nestedName key list acc counter =
 
 headersAndRows : List (List ( String, JsonVal )) -> List E.Value
 headersAndRows rows =
-    Maybe.withDefault [ ( "didn't work", JsonNull ) ] (List.head rows)
+    Maybe.withDefault [ ( "There was an error with the headers in this app", JsonNull ) ] (List.head rows)
         |> createHeaders
         |> List.append (List.map createRow rows)
         |> List.reverse
@@ -179,7 +179,7 @@ firstTuple : ( String, JsonVal ) -> E.Value
 firstTuple row =
     case row of
         ( header, value ) ->
-            googleStringCell (toString header)
+            googleStringCell header
 
 
 createRow : List ( String, JsonVal ) -> E.Value
@@ -271,6 +271,7 @@ googleSheetsRequestBody rows =
                                   , E.object
                                         [ ( "columnCount", E.int 200 ) ]
                                   )
+                                , ("title", E.string "From Accio")
                                 ]
                           )
                         ]

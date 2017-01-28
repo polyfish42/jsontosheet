@@ -10154,7 +10154,15 @@ var _user$project$GoogleSheet$googleSheetsRequestBody = function (rows) {
 																_1: {ctor: '[]'}
 															})
 													},
-													_1: {ctor: '[]'}
+													_1: {
+														ctor: '::',
+														_0: {
+															ctor: '_Tuple2',
+															_0: 'title',
+															_1: _elm_lang$core$Json_Encode$string('From Accio')
+														},
+														_1: {ctor: '[]'}
+													}
 												})
 										},
 										_1: {ctor: '[]'}
@@ -10270,8 +10278,7 @@ var _user$project$GoogleSheet$createRow = function (row) {
 };
 var _user$project$GoogleSheet$firstTuple = function (row) {
 	var _p1 = row;
-	return _user$project$GoogleSheet$googleStringCell(
-		_elm_lang$core$Basics$toString(_p1._0));
+	return _user$project$GoogleSheet$googleStringCell(_p1._0);
 };
 var _user$project$GoogleSheet$createHeaders = function (row) {
 	return {
@@ -10320,7 +10327,7 @@ var _user$project$GoogleSheet$headersAndRows = function (rows) {
 					_elm_lang$core$Maybe$withDefault,
 					{
 						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'didn\'t work', _1: _user$project$GoogleSheet$JsonNull},
+						_0: {ctor: '_Tuple2', _0: 'There was an error with the headers in this app', _1: _user$project$GoogleSheet$JsonNull},
 						_1: {ctor: '[]'}
 					},
 					_elm_lang$core$List$head(rows)))));
@@ -10804,7 +10811,7 @@ var _user$project$Accio$init = function (location) {
 			'',
 			_user$project$OAuth$parseToken(location),
 			''),
-		_1: _elm_lang$core$Platform_Cmd$none
+		_1: _elm_lang$navigation$Navigation$modifyUrl('#')
 	};
 };
 var _user$project$Accio$validateInput = function (str) {

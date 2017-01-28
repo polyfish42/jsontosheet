@@ -45,7 +45,7 @@ type Input
 
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model (ApiUrl "") "" (OAuth.parseToken location) "", Cmd.none )
+    ( Model (ApiUrl "") "" (OAuth.parseToken location) "", Navigation.modifyUrl "#" )
 
 
 

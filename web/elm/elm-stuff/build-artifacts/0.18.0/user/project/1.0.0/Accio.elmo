@@ -41,7 +41,7 @@ var _user$project$Accio$init = function (location) {
 			'',
 			_user$project$OAuth$parseToken(location),
 			''),
-		_1: _elm_lang$core$Platform_Cmd$none
+		_1: _elm_lang$navigation$Navigation$modifyUrl('#')
 	};
 };
 var _user$project$Accio$validateInput = function (str) {
