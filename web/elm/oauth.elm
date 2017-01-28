@@ -1,6 +1,35 @@
 module OAuth exposing (..)
 
+import Dict exposing (..)
 import Http exposing (..)
+import Navigation
+import UrlParser exposing (parseHash)
+
+
+
+parseToken : Navigation.Location -> Maybe String
+parseToken location =
+    case (parseHash (UrlParser.string) location) of
+        Just str ->
+            str
+                |> String.split "&"
+                |> List.filterMap toKeyValuePair
+                |> Dict.fromList
+                |> Dict.get "access_token"
+
+        Nothing ->
+            Nothing
+
+
+toKeyValuePair : String -> Maybe ( String, String )
+toKeyValuePair segment =
+    case String.split "=" segment of
+        [ key, value ] ->
+            Maybe.map2 (,) (Http.decodeUri key) (Http.decodeUri value)
+
+        _ ->
+            Nothing
+
 
 requestToken : String
 requestToken =

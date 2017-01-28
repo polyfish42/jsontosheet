@@ -15,8 +15,6 @@ import Navigation
 import OAuth
 import Platform.Cmd exposing (..)
 import String
-import UrlParser exposing (parseHash)
-
 
 main =
     Navigation.program
@@ -42,31 +40,7 @@ type alias Model =
 
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model "" "" (parseToken location) "", Cmd.none )
-
-
-parseToken : Navigation.Location -> Maybe String
-parseToken location =
-    case (parseHash (UrlParser.string) location) of
-        Just str ->
-            str
-                |> String.split "&"
-                |> List.filterMap toKeyValuePair
-                |> Dict.fromList
-                |> Dict.get "access_token"
-
-        Nothing ->
-            Nothing
-
-
-toKeyValuePair : String -> Maybe ( String, String )
-toKeyValuePair segment =
-    case String.split "=" segment of
-        [ key, value ] ->
-            Maybe.map2 (,) (Http.decodeUri key) (Http.decodeUri value)
-
-        _ ->
-            Nothing
+    ( Model "" "" (OAuth.parseToken location) "", Cmd.none )
 
 
 

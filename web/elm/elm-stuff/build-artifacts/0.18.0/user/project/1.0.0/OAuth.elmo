@@ -51,3 +51,33 @@ var _user$project$OAuth$formUrl = A2(
 		}
 	});
 var _user$project$OAuth$requestToken = _user$project$OAuth$formUrl;
+var _user$project$OAuth$toKeyValuePair = function (segment) {
+	var _p3 = A2(_elm_lang$core$String$split, '=', segment);
+	if (((_p3.ctor === '::') && (_p3._1.ctor === '::')) && (_p3._1._1.ctor === '[]')) {
+		return A3(
+			_elm_lang$core$Maybe$map2,
+			F2(
+				function (v0, v1) {
+					return {ctor: '_Tuple2', _0: v0, _1: v1};
+				}),
+			_elm_lang$http$Http$decodeUri(_p3._0),
+			_elm_lang$http$Http$decodeUri(_p3._1._0));
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
+var _user$project$OAuth$parseToken = function (location) {
+	var _p4 = A2(_evancz$url_parser$UrlParser$parseHash, _evancz$url_parser$UrlParser$string, location);
+	if (_p4.ctor === 'Just') {
+		return A2(
+			_elm_lang$core$Dict$get,
+			'access_token',
+			_elm_lang$core$Dict$fromList(
+				A2(
+					_elm_lang$core$List$filterMap,
+					_user$project$OAuth$toKeyValuePair,
+					A2(_elm_lang$core$String$split, '&', _p4._0))));
+	} else {
+		return _elm_lang$core$Maybe$Nothing;
+	}
+};
