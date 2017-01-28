@@ -11,8 +11,7 @@ var _user$project$Accio$putRequest = F3(
 				method: 'POST',
 				headers: {
 					ctor: '::',
-					_0: _user$project$Accio$getHeaders(
-						A2(_elm_lang$core$Debug$log, 'token', token)),
+					_0: _user$project$Accio$getHeaders(token),
 					_1: {ctor: '[]'}
 				},
 				url: 'https://sheets.googleapis.com/v4/spreadsheets',
@@ -27,17 +26,29 @@ var _user$project$Accio$Model = F4(
 	function (a, b, c, d) {
 		return {url: a, errorMessage: b, token: c, spreadsheetUrl: d};
 	});
+var _user$project$Accio$Json = function (a) {
+	return {ctor: 'Json', _0: a};
+};
+var _user$project$Accio$ApiUrl = function (a) {
+	return {ctor: 'ApiUrl', _0: a};
+};
 var _user$project$Accio$init = function (location) {
 	return {
 		ctor: '_Tuple2',
 		_0: A4(
 			_user$project$Accio$Model,
-			'',
+			_user$project$Accio$ApiUrl(''),
 			'',
 			_user$project$OAuth$parseToken(location),
 			''),
 		_1: _elm_lang$core$Platform_Cmd$none
 	};
+};
+var _user$project$Accio$validateInput = function (str) {
+	return A2(
+		_elm_lang$core$Regex$contains,
+		_elm_lang$core$Regex$regex('{'),
+		str) ? _user$project$Accio$Json(str) : _user$project$Accio$ApiUrl(str);
 };
 var _user$project$Accio$PostCsv = function (a) {
 	return {ctor: 'PostCsv', _0: a};
@@ -63,10 +74,23 @@ var _user$project$Accio$getJson = function (url) {
 		_user$project$Accio$Fetch,
 		_elm_lang$http$Http$getString(url));
 };
+var _user$project$Accio$getData = F2(
+	function (input, model) {
+		var _p1 = input;
+		if (_p1.ctor === 'Json') {
+			return A3(
+				_user$project$Accio$requestCsv,
+				model.token,
+				model,
+				_user$project$GoogleSheet$createSheet(_p1._0));
+		} else {
+			return _user$project$Accio$getJson(_p1._0);
+		}
+	});
 var _user$project$Accio$update = F2(
 	function (msg, model) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
+		var _p2 = msg;
+		switch (_p2.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Url':
@@ -74,17 +98,19 @@ var _user$project$Accio$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{url: _p1._0}),
+						{
+							url: _user$project$Accio$validateInput(_p2._0)
+						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GetData':
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: _user$project$Accio$getJson(model.url)
+					_1: A2(_user$project$Accio$getData, model.url, model)
 				};
 			case 'Fetch':
-				if (_p1._0.ctor === 'Ok') {
+				if (_p2._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: model,
@@ -92,7 +118,7 @@ var _user$project$Accio$update = F2(
 							_user$project$Accio$requestCsv,
 							model.token,
 							model,
-							_user$project$GoogleSheet$createSheet(_p1._0._0))
+							_user$project$GoogleSheet$createSheet(_p2._0._0))
 					};
 				} else {
 					return {
@@ -106,12 +132,12 @@ var _user$project$Accio$update = F2(
 					};
 				}
 			default:
-				if (_p1._0.ctor === 'Ok') {
+				if (_p2._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{spreadsheetUrl: _p1._0._0}),
+							{spreadsheetUrl: _p2._0._0}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
@@ -243,7 +269,7 @@ var _user$project$Accio$main = A2(
 		init: _user$project$Accio$init,
 		view: _user$project$Accio$view,
 		update: _user$project$Accio$update,
-		subscriptions: function (_p2) {
+		subscriptions: function (_p3) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();

@@ -14,7 +14,9 @@ import Maybe exposing (..)
 import Navigation
 import OAuth
 import Platform.Cmd exposing (..)
+import Regex exposing (..)
 import String
+
 
 main =
     Navigation.program
@@ -31,16 +33,19 @@ main =
 
 
 type alias Model =
-    { url : String
+    { url : Input
     , errorMessage : String
     , token : Maybe String
     , spreadsheetUrl : String
     }
 
+type Input
+    = ApiUrl String
+    | Json String
 
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model "" "" (OAuth.parseToken location) "", Cmd.none )
+    ( Model (ApiUrl "") "" (OAuth.parseToken location) "", Cmd.none )
 
 
 
@@ -62,10 +67,10 @@ update msg model =
             ( model, Cmd.none )
 
         Url url ->
-            ( { model | url = url }, Cmd.none )
+            ( { model | url = validateInput url }, Cmd.none )
 
         GetData ->
-            ( model, getJson model.url )
+            ( model, getData model.url model )
 
         Fetch (Ok response) ->
             ( model, requestCsv model.token model (GoogleSheet.createSheet response) )
@@ -79,6 +84,20 @@ update msg model =
         PostCsv (Err _) ->
             ( model, Cmd.none )
 
+validateInput : String -> Input
+validateInput str =
+  if contains (regex "{") str then
+    Json str
+  else
+    ApiUrl str
+
+getData : Input -> Model -> Cmd Msg
+getData input model =
+  case input of
+    Json str ->
+      requestCsv model.token model (GoogleSheet.createSheet str)
+    ApiUrl str ->
+      getJson str
 
 
 -- VIEW
@@ -127,7 +146,7 @@ putRequest : String -> Model -> E.Value -> Http.Request String
 putRequest token model requestBody =
     Http.request
         { method = "POST"
-        , headers = [ getHeaders (Debug.log "token" token) ]
+        , headers = [ getHeaders token ]
         , url = "https://sheets.googleapis.com/v4/spreadsheets"
         , body = Http.jsonBody requestBody
         , expect = expectJson (D.field "spreadsheetUrl" D.string)

@@ -6142,6 +6142,126 @@ var _elm_lang$core$Json_Decode$bool = _elm_lang$core$Native_Json.decodePrimitive
 var _elm_lang$core$Json_Decode$string = _elm_lang$core$Native_Json.decodePrimitive('string');
 var _elm_lang$core$Json_Decode$Decoder = {ctor: 'Decoder'};
 
+//import Maybe, Native.List //
+
+var _elm_lang$core$Native_Regex = function() {
+
+function escape(str)
+{
+	return str.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+function caseInsensitive(re)
+{
+	return new RegExp(re.source, 'gi');
+}
+function regex(raw)
+{
+	return new RegExp(raw, 'g');
+}
+
+function contains(re, string)
+{
+	return string.match(re) !== null;
+}
+
+function find(n, re, str)
+{
+	n = n.ctor === 'All' ? Infinity : n._0;
+	var out = [];
+	var number = 0;
+	var string = str;
+	var lastIndex = re.lastIndex;
+	var prevLastIndex = -1;
+	var result;
+	while (number++ < n && (result = re.exec(string)))
+	{
+		if (prevLastIndex === re.lastIndex) break;
+		var i = result.length - 1;
+		var subs = new Array(i);
+		while (i > 0)
+		{
+			var submatch = result[i];
+			subs[--i] = submatch === undefined
+				? _elm_lang$core$Maybe$Nothing
+				: _elm_lang$core$Maybe$Just(submatch);
+		}
+		out.push({
+			match: result[0],
+			submatches: _elm_lang$core$Native_List.fromArray(subs),
+			index: result.index,
+			number: number
+		});
+		prevLastIndex = re.lastIndex;
+	}
+	re.lastIndex = lastIndex;
+	return _elm_lang$core$Native_List.fromArray(out);
+}
+
+function replace(n, re, replacer, string)
+{
+	n = n.ctor === 'All' ? Infinity : n._0;
+	var count = 0;
+	function jsReplacer(match)
+	{
+		if (count++ >= n)
+		{
+			return match;
+		}
+		var i = arguments.length - 3;
+		var submatches = new Array(i);
+		while (i > 0)
+		{
+			var submatch = arguments[i];
+			submatches[--i] = submatch === undefined
+				? _elm_lang$core$Maybe$Nothing
+				: _elm_lang$core$Maybe$Just(submatch);
+		}
+		return replacer({
+			match: match,
+			submatches: _elm_lang$core$Native_List.fromArray(submatches),
+			index: arguments[arguments.length - 2],
+			number: count
+		});
+	}
+	return string.replace(re, jsReplacer);
+}
+
+function split(n, re, str)
+{
+	n = n.ctor === 'All' ? Infinity : n._0;
+	if (n === Infinity)
+	{
+		return _elm_lang$core$Native_List.fromArray(str.split(re));
+	}
+	var string = str;
+	var result;
+	var out = [];
+	var start = re.lastIndex;
+	var restoreLastIndex = re.lastIndex;
+	while (n--)
+	{
+		if (!(result = re.exec(string))) break;
+		out.push(string.slice(start, result.index));
+		start = re.lastIndex;
+	}
+	out.push(string.slice(start));
+	re.lastIndex = restoreLastIndex;
+	return _elm_lang$core$Native_List.fromArray(out);
+}
+
+return {
+	regex: regex,
+	caseInsensitive: caseInsensitive,
+	escape: escape,
+
+	contains: F2(contains),
+	find: F3(find),
+	replace: F4(replace),
+	split: F3(split)
+};
+
+}();
+
 var _elm_lang$core$Process$kill = _elm_lang$core$Native_Scheduler.kill;
 var _elm_lang$core$Process$sleep = _elm_lang$core$Native_Scheduler.sleep;
 var _elm_lang$core$Process$spawn = _elm_lang$core$Native_Scheduler.spawn;
@@ -6172,6 +6292,23 @@ var _elm_lang$core$Tuple$first = function (_p6) {
 	var _p7 = _p6;
 	return _p7._0;
 };
+
+var _elm_lang$core$Regex$split = _elm_lang$core$Native_Regex.split;
+var _elm_lang$core$Regex$replace = _elm_lang$core$Native_Regex.replace;
+var _elm_lang$core$Regex$find = _elm_lang$core$Native_Regex.find;
+var _elm_lang$core$Regex$contains = _elm_lang$core$Native_Regex.contains;
+var _elm_lang$core$Regex$caseInsensitive = _elm_lang$core$Native_Regex.caseInsensitive;
+var _elm_lang$core$Regex$regex = _elm_lang$core$Native_Regex.regex;
+var _elm_lang$core$Regex$escape = _elm_lang$core$Native_Regex.escape;
+var _elm_lang$core$Regex$Match = F4(
+	function (a, b, c, d) {
+		return {match: a, submatches: b, index: c, number: d};
+	});
+var _elm_lang$core$Regex$Regex = {ctor: 'Regex'};
+var _elm_lang$core$Regex$AtMost = function (a) {
+	return {ctor: 'AtMost', _0: a};
+};
+var _elm_lang$core$Regex$All = {ctor: 'All'};
 
 var _elm_lang$dom$Native_Dom = function() {
 
@@ -10637,8 +10774,7 @@ var _user$project$Accio$putRequest = F3(
 				method: 'POST',
 				headers: {
 					ctor: '::',
-					_0: _user$project$Accio$getHeaders(
-						A2(_elm_lang$core$Debug$log, 'token', token)),
+					_0: _user$project$Accio$getHeaders(token),
 					_1: {ctor: '[]'}
 				},
 				url: 'https://sheets.googleapis.com/v4/spreadsheets',
@@ -10653,17 +10789,29 @@ var _user$project$Accio$Model = F4(
 	function (a, b, c, d) {
 		return {url: a, errorMessage: b, token: c, spreadsheetUrl: d};
 	});
+var _user$project$Accio$Json = function (a) {
+	return {ctor: 'Json', _0: a};
+};
+var _user$project$Accio$ApiUrl = function (a) {
+	return {ctor: 'ApiUrl', _0: a};
+};
 var _user$project$Accio$init = function (location) {
 	return {
 		ctor: '_Tuple2',
 		_0: A4(
 			_user$project$Accio$Model,
-			'',
+			_user$project$Accio$ApiUrl(''),
 			'',
 			_user$project$OAuth$parseToken(location),
 			''),
 		_1: _elm_lang$core$Platform_Cmd$none
 	};
+};
+var _user$project$Accio$validateInput = function (str) {
+	return A2(
+		_elm_lang$core$Regex$contains,
+		_elm_lang$core$Regex$regex('{'),
+		str) ? _user$project$Accio$Json(str) : _user$project$Accio$ApiUrl(str);
 };
 var _user$project$Accio$PostCsv = function (a) {
 	return {ctor: 'PostCsv', _0: a};
@@ -10689,10 +10837,23 @@ var _user$project$Accio$getJson = function (url) {
 		_user$project$Accio$Fetch,
 		_elm_lang$http$Http$getString(url));
 };
+var _user$project$Accio$getData = F2(
+	function (input, model) {
+		var _p1 = input;
+		if (_p1.ctor === 'Json') {
+			return A3(
+				_user$project$Accio$requestCsv,
+				model.token,
+				model,
+				_user$project$GoogleSheet$createSheet(_p1._0));
+		} else {
+			return _user$project$Accio$getJson(_p1._0);
+		}
+	});
 var _user$project$Accio$update = F2(
 	function (msg, model) {
-		var _p1 = msg;
-		switch (_p1.ctor) {
+		var _p2 = msg;
+		switch (_p2.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Url':
@@ -10700,17 +10861,19 @@ var _user$project$Accio$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{url: _p1._0}),
+						{
+							url: _user$project$Accio$validateInput(_p2._0)
+						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'GetData':
 				return {
 					ctor: '_Tuple2',
 					_0: model,
-					_1: _user$project$Accio$getJson(model.url)
+					_1: A2(_user$project$Accio$getData, model.url, model)
 				};
 			case 'Fetch':
-				if (_p1._0.ctor === 'Ok') {
+				if (_p2._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: model,
@@ -10718,7 +10881,7 @@ var _user$project$Accio$update = F2(
 							_user$project$Accio$requestCsv,
 							model.token,
 							model,
-							_user$project$GoogleSheet$createSheet(_p1._0._0))
+							_user$project$GoogleSheet$createSheet(_p2._0._0))
 					};
 				} else {
 					return {
@@ -10732,12 +10895,12 @@ var _user$project$Accio$update = F2(
 					};
 				}
 			default:
-				if (_p1._0.ctor === 'Ok') {
+				if (_p2._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{spreadsheetUrl: _p1._0._0}),
+							{spreadsheetUrl: _p2._0._0}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
@@ -10869,7 +11032,7 @@ var _user$project$Accio$main = A2(
 		init: _user$project$Accio$init,
 		view: _user$project$Accio$view,
 		update: _user$project$Accio$update,
-		subscriptions: function (_p2) {
+		subscriptions: function (_p3) {
 			return _elm_lang$core$Platform_Sub$none;
 		}
 	})();
