@@ -151,13 +151,13 @@ var _user$project$Accio$Url = function (a) {
 };
 var _user$project$Accio$view = function (model) {
 	return A2(
-		_elm_lang$html$Html$ul,
+		_elm_lang$html$Html$body,
 		{
 			ctor: '::',
 			_0: _elm_lang$html$Html_Attributes$style(
 				{
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'list-style', _1: 'none'},
+					_0: {ctor: '_Tuple2', _0: 'backgroundColor', _1: 'red'},
 					_1: {ctor: '[]'}
 				}),
 			_1: {ctor: '[]'}
@@ -165,98 +165,157 @@ var _user$project$Accio$view = function (model) {
 		{
 			ctor: '::',
 			_0: A2(
-				_elm_lang$html$Html$li,
-				{ctor: '[]'},
+				_elm_lang$html$Html$h1,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('Step 1: '),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$a,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$href(_user$project$OAuth$requestToken),
-								_1: {ctor: '[]'}
-							},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text('Authorize Google'),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'margin-bottom', _1: '300px'},
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Convert Json Into A Spreadsheet'),
+					_1: {ctor: '[]'}
 				}),
 			_1: {
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$li,
-					{ctor: '[]'},
+					_elm_lang$html$Html$div,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text('Step 2: Enter JSON or URL here '),
+						_0: _elm_lang$html$Html_Attributes$style(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'width', _1: '33%'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'float', _1: 'left'},
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Step 1: '),
 						_1: {
 							ctor: '::',
 							_0: A2(
-								_elm_lang$html$Html$input,
+								_elm_lang$html$Html$a,
 								{
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$type_('text'),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$placeholder('JSON or URL'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
-											_1: {ctor: '[]'}
-										}
-									}
+									_0: _elm_lang$html$Html_Attributes$href(_user$project$OAuth$requestToken),
+									_1: {ctor: '[]'}
 								},
-								{ctor: '[]'}),
-							_1: {
-								ctor: '::',
-								_0: A2(
-									_elm_lang$html$Html$button,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Create Sheet'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text('Click here to Authorize Google'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
 						}
 					}),
 				_1: {
 					ctor: '::',
 					_0: A2(
-						_elm_lang$html$Html$li,
-						{ctor: '[]'},
+						_elm_lang$html$Html$div,
 						{
 							ctor: '::',
-							_0: _elm_lang$html$Html$text('Step 3: '),
+							_0: _elm_lang$html$Html_Attributes$style(
+								{
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'width', _1: '33%'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'float', _1: 'left'},
+										_1: {ctor: '[]'}
+									}
+								}),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Step 2: Enter JSON or URL here '),
 							_1: {
 								ctor: '::',
 								_0: A2(
-									_elm_lang$html$Html$a,
+									_elm_lang$html$Html$input,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$href(model.spreadsheetUrl),
-										_1: {ctor: '[]'}
+										_0: _elm_lang$html$Html_Attributes$type_('text'),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$placeholder('JSON or URL'),
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
+												_1: {ctor: '[]'}
+											}
+										}
 									},
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html$text('Click here to see your spreadsheet'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
+									{ctor: '[]'}),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$button,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Create Sheet'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
 							}
 						}),
-					_1: {ctor: '[]'}
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$style(
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'width', _1: '33%'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'float', _1: 'left'},
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text('Step 3: '),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$a,
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$href(model.spreadsheetUrl),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text('Click here to see your spreadsheet'),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					}
 				}
 			}
 		});

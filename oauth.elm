@@ -41,7 +41,7 @@ formUrl =
         "https://accounts.google.com/o/oauth2/v2/auth"
         [ ( "response_type", "token" )
         , ( "client_id", "591745061791-69jpb1uina8sp60eq8c0125dm5nb5hhd.apps.googleusercontent.com" )
-        , ( "redirect_uri", "http://localhost:4000" )
+        , ( "redirect_uri", "http://localhost:8000/accio.elm" )
         , ( "scope", "https://www.googleapis.com/auth/spreadsheets" )
         , ( "prompt", "consent" )
         ]

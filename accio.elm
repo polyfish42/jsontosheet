@@ -39,9 +39,11 @@ type alias Model =
     , spreadsheetUrl : String
     }
 
+
 type Input
     = ApiUrl String
     | Json String
+
 
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
@@ -84,20 +86,24 @@ update msg model =
         PostCsv (Err _) ->
             ( model, Cmd.none )
 
+
 validateInput : String -> Input
 validateInput str =
-  if contains (regex "{") str then
-    Json str
-  else
-    ApiUrl str
+    if contains (regex "{") str then
+        Json str
+    else
+        ApiUrl str
+
 
 getData : Input -> Model -> Cmd Msg
 getData input model =
-  case input of
-    Json str ->
-      requestCsv model.token model (GoogleSheet.createSheet str)
-    ApiUrl str ->
-      getJson str
+    case input of
+        Json str ->
+            requestCsv model.token model (GoogleSheet.createSheet str)
+
+        ApiUrl str ->
+            getJson str
+
 
 
 -- VIEW
@@ -105,17 +111,18 @@ getData input model =
 
 view : Model -> Html Msg
 view model =
-    ul [ style [ ( "list-style", "none" ) ] ]
-        [ li []
+    body [ style [ ( "backgroundColor", "red" ) ] ]
+        [ h1 [ style [ ( "margin-bottom", "300px" ) ] ] [ text "Convert Json Into A Spreadsheet" ]
+        , div [ style [ ( "width", "33%" ), ( "float", "left" ) ] ]
             [ text "Step 1: "
-            , a [ href <| OAuth.requestToken ] [ text "Authorize Google" ]
+            , a [ href <| OAuth.requestToken ] [ text "Click here to Authorize Google" ]
             ]
-        , li []
+        , div [ style [ ( "width", "33%" ), ( "float", "left" ) ] ]
             [ text "Step 2: Enter JSON or URL here "
             , input [ type_ "text", placeholder "JSON or URL", onInput Url ] []
             , button [ onClick GetData ] [ text "Create Sheet" ]
             ]
-        , li []
+        , div [ style [ ( "width", "33%" ), ( "float", "left" ) ] ]
             [ text "Step 3: "
             , a [ href model.spreadsheetUrl ] [ text "Click here to see your spreadsheet" ]
             ]
