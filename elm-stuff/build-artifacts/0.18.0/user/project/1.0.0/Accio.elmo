@@ -250,6 +250,7 @@ var _user$project$Accio$update = F2(
 var _user$project$Accio$GetData = {ctor: 'GetData'};
 var _user$project$Accio$CloseDialog = {ctor: 'CloseDialog'};
 var _user$project$Accio$OpenDialog = {ctor: 'OpenDialog'};
+var _user$project$Accio$Authorize = {ctor: 'Authorize'};
 var _user$project$Accio$authorizeOrConvert = function (model) {
 	var _p7 = model.token;
 	if (_p7.ctor === 'Just') {
@@ -284,37 +285,75 @@ var _user$project$Accio$authorizeOrConvert = function (model) {
 			});
 	} else {
 		return A2(
-			_elm_lang$html$Html$button,
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('btn btn-primary'),
+				_0: A2(
+					_elm_lang$html$Html$button,
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('btn btn-default'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$OpenDialog),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$style(
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '10px'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'float', _1: 'right'},
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Convert'),
+						_1: {ctor: '[]'}
+					}),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$OpenDialog),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$style(
-							{
+					_0: A2(
+						_elm_lang$html$Html$button,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('btn btn-primary'),
+							_1: {
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '10px'},
+								_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$Authorize),
 								_1: {
 									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'float', _1: 'right'},
+									_0: _elm_lang$html$Html_Attributes$style(
+										{
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'margin', _1: '10px 10px 0 0 '},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'float', _1: 'right'},
+												_1: {ctor: '[]'}
+											}
+										}),
 									_1: {ctor: '[]'}
 								}
-							}),
-						_1: {ctor: '[]'}
-					}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html$text('Connect to Google'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
 				}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('Authorize and Convert'),
-				_1: {ctor: '[]'}
 			});
 	}
 };
-var _user$project$Accio$Authorize = {ctor: 'Authorize'};
 var _user$project$Accio$dialogConfig = function (model) {
 	return {
 		closeMessage: _elm_lang$core$Maybe$Just(_user$project$Accio$CloseDialog),
@@ -325,7 +364,7 @@ var _user$project$Accio$dialogConfig = function (model) {
 				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('Authorize Google'),
+					_0: _elm_lang$html$Html$text('Connect to Google'),
 					_1: {ctor: '[]'}
 				})),
 		body: _elm_lang$core$Maybe$Just(
@@ -334,7 +373,7 @@ var _user$project$Accio$dialogConfig = function (model) {
 				{ctor: '[]'},
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html$text('Please authorize Google in order to create a Google Sheet'),
+					_0: _elm_lang$html$Html$text('Before converting to a Google Sheet, you must first connect your Google Account'),
 					_1: {ctor: '[]'}
 				})),
 		footer: _elm_lang$core$Maybe$Just(
@@ -342,7 +381,7 @@ var _user$project$Accio$dialogConfig = function (model) {
 				_elm_lang$html$Html$button,
 				{
 					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$class('btn btn-success'),
+					_0: _elm_lang$html$Html_Attributes$class('btn btn-primary'),
 					_1: {
 						ctor: '::',
 						_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$Authorize),

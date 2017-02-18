@@ -1,4 +1,4 @@
-module Accio exposing (..)
+port module Accio exposing (..)
 
 import Array
 import Dialog
@@ -206,7 +206,9 @@ authorizeOrConvert model =
             button [ class "btn btn-primary", onClick GetData, style [ ( "margin-top", "10px" ), ( "float", "right" ) ] ] [ text "Convert" ]
 
         Nothing ->
-            button [ class "btn btn-primary", onClick OpenDialog, style [ ( "margin-top", "10px" ), ( "float", "right" ) ] ] [ text "Authorize and Convert" ]
+            div [] [ button [ class "btn btn-default", onClick OpenDialog, style [ ( "margin-top", "10px" ), ( "float", "right" ) ] ] [ text "Convert" ]
+                   , button [ class "btn btn-primary", onClick Authorize, style [ ( "margin", "10px 10px 0 0 " ), ( "float", "right" ) ] ] [ text "Connect to Google" ]
+            ]
 
 
 packageState : Maybe Input -> String
@@ -226,9 +228,9 @@ dialogConfig : Model -> Dialog.Config Msg
 dialogConfig model =
     { closeMessage = Just CloseDialog
     , containerClass = Nothing
-    , header = Just (h3 [] [ text "Authorize Google" ])
-    , body = Just (p [] [ text "Please authorize Google in order to create a Google Sheet" ])
-    , footer = Just (button [ class "btn btn-success", onClick Authorize ] [ text "Authorize" ])
+    , header = Just (h3 [] [ text "Connect to Google" ])
+    , body = Just (p [] [ text "Before converting to a Google Sheet, you must first connect your Google Account" ])
+    , footer = Just (button [ class "btn btn-primary", onClick Authorize ] [ text "Authorize" ])
     }
 
 
