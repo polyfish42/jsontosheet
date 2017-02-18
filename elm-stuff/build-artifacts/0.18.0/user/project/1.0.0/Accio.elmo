@@ -26,12 +26,12 @@ var _user$project$Accio$packageState = function (url) {
 	var _p0 = url;
 	if (_p0.ctor === 'Just') {
 		if (_p0._0.ctor === 'Json') {
-			return _p0._0._0;
+			return _elm_lang$http$Http$encodeUri(_p0._0._0);
 		} else {
 			return _elm_lang$http$Http$encodeUri(_p0._0._0);
 		}
 	} else {
-		return '#';
+		return '';
 	}
 };
 var _user$project$Accio$showUrl = function (model) {
@@ -46,9 +46,22 @@ var _user$project$Accio$showUrl = function (model) {
 		return _elm_lang$html$Html$text('');
 	}
 };
-var _user$project$Accio$Model = F4(
-	function (a, b, c, d) {
-		return {url: a, errorMessage: b, token: c, spreadsheetUrl: d};
+var _user$project$Accio$bootstrap = A3(
+	_elm_lang$html$Html$node,
+	'link',
+	{
+		ctor: '::',
+		_0: _elm_lang$html$Html_Attributes$href('https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css'),
+		_1: {
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$rel('stylesheet'),
+			_1: {ctor: '[]'}
+		}
+	},
+	{ctor: '[]'});
+var _user$project$Accio$Model = F5(
+	function (a, b, c, d, e) {
+		return {url: a, errorMessage: b, token: c, spreadsheetUrl: d, showDialog: e};
 	});
 var _user$project$Accio$Json = function (a) {
 	return {ctor: 'Json', _0: a};
@@ -64,7 +77,11 @@ var _user$project$Accio$validateState = function (state) {
 			_elm_lang$core$Regex$contains,
 			_elm_lang$core$Regex$regex('{'),
 			_p3) ? _elm_lang$core$Maybe$Just(
-			_user$project$Accio$Json(_p3)) : _elm_lang$core$Maybe$Just(
+			_user$project$Accio$Json(
+				A2(
+					_elm_lang$core$Maybe$withDefault,
+					'error',
+					_elm_lang$http$Http$decodeUri(_p3)))) : _elm_lang$core$Maybe$Just(
 			_user$project$Accio$ApiUrl(
 				A2(
 					_elm_lang$core$Maybe$withDefault,
@@ -77,14 +94,14 @@ var _user$project$Accio$validateState = function (state) {
 var _user$project$Accio$init = function (location) {
 	return {
 		ctor: '_Tuple2',
-		_0: A4(
+		_0: A5(
 			_user$project$Accio$Model,
 			_user$project$Accio$validateState(
 				_user$project$OAuth$parseState(location)),
 			'',
-			_user$project$OAuth$parseToken(
-				A2(_elm_lang$core$Debug$log, 'location', location)),
-			''),
+			_user$project$OAuth$parseToken(location),
+			'',
+			false),
 		_1: _elm_lang$navigation$Navigation$modifyUrl('#')
 	};
 };
@@ -156,6 +173,30 @@ var _user$project$Accio$update = F2(
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'OpenDialog':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{showDialog: true}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'CloseDialog':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{showDialog: false}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
+			case 'Authorize':
+				return {
+					ctor: '_Tuple2',
+					_0: model,
+					_1: _elm_lang$navigation$Navigation$load(
+						_user$project$OAuth$requestToken(
+							_user$project$Accio$packageState(model.url)))
+				};
 			case 'GetData':
 				return {
 					ctor: '_Tuple2',
@@ -207,6 +248,8 @@ var _user$project$Accio$update = F2(
 		}
 	});
 var _user$project$Accio$GetData = {ctor: 'GetData'};
+var _user$project$Accio$CloseDialog = {ctor: 'CloseDialog'};
+var _user$project$Accio$OpenDialog = {ctor: 'OpenDialog'};
 var _user$project$Accio$authorizeOrConvert = function (model) {
 	var _p7 = model.token;
 	if (_p7.ctor === 'Just') {
@@ -214,8 +257,25 @@ var _user$project$Accio$authorizeOrConvert = function (model) {
 			_elm_lang$html$Html$button,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
-				_1: {ctor: '[]'}
+				_0: _elm_lang$html$Html_Attributes$class('btn btn-primary'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$style(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '10px'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'float', _1: 'right'},
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}
 			},
 			{
 				ctor: '::',
@@ -224,23 +284,77 @@ var _user$project$Accio$authorizeOrConvert = function (model) {
 			});
 	} else {
 		return A2(
-			_elm_lang$html$Html$a,
+			_elm_lang$html$Html$button,
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$href(
-					_user$project$OAuth$requestToken(
-						A2(
-							_elm_lang$core$Debug$log,
-							'url',
-							_user$project$Accio$packageState(model.url)))),
-				_1: {ctor: '[]'}
+				_0: _elm_lang$html$Html_Attributes$class('btn btn-primary'),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$OpenDialog),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$style(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '10px'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'float', _1: 'right'},
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					}
+				}
 			},
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html$text('Authorize Google'),
+				_0: _elm_lang$html$Html$text('Authorize and Convert'),
 				_1: {ctor: '[]'}
 			});
 	}
+};
+var _user$project$Accio$Authorize = {ctor: 'Authorize'};
+var _user$project$Accio$dialogConfig = function (model) {
+	return {
+		closeMessage: _elm_lang$core$Maybe$Just(_user$project$Accio$CloseDialog),
+		containerClass: _elm_lang$core$Maybe$Nothing,
+		header: _elm_lang$core$Maybe$Just(
+			A2(
+				_elm_lang$html$Html$h3,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Authorize Google'),
+					_1: {ctor: '[]'}
+				})),
+		body: _elm_lang$core$Maybe$Just(
+			A2(
+				_elm_lang$html$Html$p,
+				{ctor: '[]'},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Please authorize Google in order to create a Google Sheet'),
+					_1: {ctor: '[]'}
+				})),
+		footer: _elm_lang$core$Maybe$Just(
+			A2(
+				_elm_lang$html$Html$button,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class('btn btn-success'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$Authorize),
+						_1: {ctor: '[]'}
+					}
+				},
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html$text('Authorize'),
+					_1: {ctor: '[]'}
+				}))
+	};
 };
 var _user$project$Accio$Url = function (a) {
 	return {ctor: 'Url', _0: a};
@@ -255,7 +369,11 @@ var _user$project$Accio$inputOrLink = function (model) {
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$p,
-					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$class('lead'),
+						_1: {ctor: '[]'}
+					},
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text('Enter your JSON or URL here:'),
@@ -270,18 +388,13 @@ var _user$project$Accio$inputOrLink = function (model) {
 							_0: _elm_lang$html$Html_Attributes$placeholder('JSON or URL'),
 							_1: {
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$rows(10),
+								_0: _elm_lang$html$Html_Attributes$class('form-control'),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$cols(70),
+									_0: _elm_lang$html$Html_Attributes$rows(10),
 									_1: {
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$style(
-											{
-												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'display', _1: 'block'},
-												_1: {ctor: '[]'}
-											}),
+										_0: _elm_lang$html$Html_Attributes$cols(70),
 										_1: {
 											ctor: '::',
 											_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
@@ -327,59 +440,59 @@ var _user$project$Accio$inputOrLink = function (model) {
 };
 var _user$project$Accio$view = function (model) {
 	return A2(
-		_elm_lang$html$Html$div,
+		_elm_lang$html$Html$body,
 		{
 			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$style(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'width', _1: '800px'},
-					_1: {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'margin', _1: '0 auto'},
-						_1: {ctor: '[]'}
-					}
-				}),
+			_0: _elm_lang$html$Html_Attributes$class('container-fluid'),
 			_1: {ctor: '[]'}
 		},
 		{
 			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$body,
-				{ctor: '[]'},
-				{
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$header,
-						{ctor: '[]'},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$h1,
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$style(
-										{
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'margin-bottom', _1: '100px'},
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text('Turn Json into a Google Sheet. Each object will become a row.'),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
+			_0: _user$project$Accio$bootstrap,
+			_1: {
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$div,
+					{
 						ctor: '::',
-						_0: _user$project$Accio$inputOrLink(model),
+						_0: _elm_lang$html$Html_Attributes$class('row'),
 						_1: {ctor: '[]'}
-					}
-				}),
-			_1: {ctor: '[]'}
+					},
+					{
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$class('col-md-6'),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$h1,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text('Turn Json into a Google Sheet.'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {
+									ctor: '::',
+									_0: _user$project$Accio$inputOrLink(model),
+									_1: {
+										ctor: '::',
+										_0: _krisajenkins$elm_dialog$Dialog$view(
+											model.showDialog ? _elm_lang$core$Maybe$Just(
+												_user$project$Accio$dialogConfig(model)) : _elm_lang$core$Maybe$Nothing),
+										_1: {ctor: '[]'}
+									}
+								}
+							}),
+						_1: {ctor: '[]'}
+					}),
+				_1: {ctor: '[]'}
+			}
 		});
 };
 var _user$project$Accio$NoOp = {ctor: 'NoOp'};

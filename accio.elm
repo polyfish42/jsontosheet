@@ -1,6 +1,7 @@
 module Accio exposing (..)
 
 import Array
+import Dialog
 import Debug
 import Dict
 import GoogleSheet
@@ -38,6 +39,7 @@ type alias Model =
     , errorMessage : String
     , token : Maybe String
     , spreadsheetUrl : String
+    , showDialog : Bool
     }
 
 
@@ -48,19 +50,21 @@ type Input
 
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model (OAuth.parseState location |> validateState) "" (OAuth.parseToken (Debug.log "location" location)) "", Navigation.modifyUrl "#" )
+    ( Model (OAuth.parseState location |> validateState) "" (OAuth.parseToken location) "" False, Navigation.modifyUrl "#" )
+
 
 validateState : Maybe String -> Maybe Input
 validateState state =
-  case state of
-    Just str ->
-          if contains (regex "{") str then
-              Just (Json str)
-          else
-              Just (ApiUrl (withDefault "error" (decodeUri str)))
+    case state of
+        Just str ->
+            if contains (regex "{") str then
+                Just (Json (withDefault "error" (decodeUri str)))
+            else
+                Just (ApiUrl (withDefault "error" (decodeUri str)))
 
-    Nothing ->
-      Nothing
+        Nothing ->
+            Nothing
+
 
 
 -- UPDATE
@@ -69,6 +73,9 @@ validateState state =
 type Msg
     = NoOp
     | Url String
+    | Authorize
+    | OpenDialog
+    | CloseDialog
     | GetData
     | Fetch (Result Http.Error String)
     | PostCsv (Result Http.Error String)
@@ -83,6 +90,15 @@ update msg model =
 
         Url url ->
             ( { model | url = validateInput url }, Cmd.none )
+
+        OpenDialog ->
+            ( { model | showDialog = True }, Cmd.none )
+
+        CloseDialog ->
+            ( { model | showDialog = False }, Cmd.none )
+
+        Authorize ->
+            ( model, Navigation.load <| OAuth.requestToken <| packageState model.url )
 
         GetData ->
             ( model, getData model.url model )
@@ -130,57 +146,90 @@ getData input model =
 
 view : Model -> Html Msg
 view model =
-    div [ style [ ( "width", "800px" ), ( "margin", "0 auto" ) ] ]
-        [ body
-            []
-            [ Html.header []
-                [ h1 [ style [ ( "margin-bottom", "100px" ) ] ] [ text "Turn Json into a Google Sheet. Each object will become a row." ] ]
-            , inputOrLink model
+    body
+        [ class "container-fluid" ]
+        [ bootstrap
+        , div [ class "row" ]
+            [ div [ class "col-md-6" ]
+                [ h1 [] [ text "Turn Json into a Google Sheet." ]
+                , inputOrLink model
+                , Dialog.view
+                    (if model.showDialog then
+                        Just (dialogConfig model)
+                     else
+                        Nothing
+                    )
+                ]
             ]
         ]
 
-inputOrLink model =
-  case model.spreadsheetUrl of
-    "" ->
-      div []
-        [ p [] [ text "Enter your JSON or URL here:" ]
-        , textarea [ placeholder "JSON or URL", rows 10, cols 70, style [ ( "display", "block" ) ], onInput Url ] [showUrl model]
-        , authorizeOrConvert model
+
+bootstrap : Html Msg
+bootstrap =
+    node "link"
+        [ href "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
+        , rel "stylesheet"
         ]
-    url ->
-       div [ ]
-          [  a [ href url ] [ text "Click here to see your spreadsheet" ]
-          ]
+        []
+
+
+inputOrLink model =
+    case model.spreadsheetUrl of
+        "" ->
+            div []
+                [ p [ class "lead" ] [ text "Enter your JSON or URL here:" ]
+                , textarea [ placeholder "JSON or URL", class "form-control", rows 10, cols 70, onInput Url ] [ showUrl model ]
+                , authorizeOrConvert model
+                ]
+
+        url ->
+            div []
+                [ a [ href url ] [ text "Click here to see your spreadsheet" ]
+                ]
+
 
 showUrl model =
-  case model.url of
-    Just (Json str) ->
-        text str
+    case model.url of
+        Just (Json str) ->
+            text str
 
-    Just (ApiUrl str) ->
-        text str
+        Just (ApiUrl str) ->
+            text str
 
-    Nothing ->
-        text ""
+        Nothing ->
+            text ""
+
 
 authorizeOrConvert model =
-  case model.token of
-    Just token ->
-      button [onClick GetData] [ text "Convert"]
-    Nothing ->
-      a [ href <| OAuth.requestToken <| Debug.log "url" <| packageState model.url ] [ text "Authorize Google" ]
+    case model.token of
+        Just token ->
+            button [ class "btn btn-primary", onClick GetData, style [ ( "margin-top", "10px" ), ( "float", "right" ) ] ] [ text "Convert" ]
+
+        Nothing ->
+            button [ class "btn btn-primary", onClick OpenDialog, style [ ( "margin-top", "10px" ), ( "float", "right" ) ] ] [ text "Authorize and Convert" ]
+
 
 packageState : Maybe Input -> String
 packageState url =
     case url of
         Just (Json str) ->
-            str
+            encodeUri str
 
         Just (ApiUrl str) ->
             encodeUri str
 
         Nothing ->
-          "#"
+            ""
+
+
+dialogConfig : Model -> Dialog.Config Msg
+dialogConfig model =
+    { closeMessage = Just CloseDialog
+    , containerClass = Nothing
+    , header = Just (h3 [] [ text "Authorize Google" ])
+    , body = Just (p [] [ text "Please authorize Google in order to create a Google Sheet" ])
+    , footer = Just (button [ class "btn btn-success", onClick Authorize ] [ text "Authorize" ])
+    }
 
 
 
