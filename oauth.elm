@@ -19,6 +19,19 @@ parseToken location =
         Nothing ->
             Nothing
 
+parseState : Navigation.Location -> Maybe String
+parseState location =
+    case (parseHash (UrlParser.string) location) of
+        Just str ->
+            Debug.log "there is a string" str
+                |> String.split "&"
+                |> List.filterMap toKeyValuePair
+                |> Dict.fromList
+                |> Dict.get "state"
+
+        Nothing ->
+            Nothing
+
 
 toKeyValuePair : String -> Maybe ( String, String )
 toKeyValuePair segment =
@@ -30,13 +43,13 @@ toKeyValuePair segment =
             Nothing
 
 
-requestToken : String
-requestToken =
-    formUrl
+requestToken : String -> String
+requestToken state =
+    formUrl state
 
 
-formUrl : String
-formUrl =
+formUrl : String -> String
+formUrl state =
     url
         "https://accounts.google.com/o/oauth2/v2/auth"
         [ ( "response_type", "token" )
@@ -44,6 +57,7 @@ formUrl =
         , ( "redirect_uri", "http://localhost:8000/accio.elm" )
         , ( "scope", "https://www.googleapis.com/auth/spreadsheets" )
         , ( "prompt", "consent" )
+        , ( "state", state )
         ]
 
 

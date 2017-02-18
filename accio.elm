@@ -16,6 +16,7 @@ import OAuth
 import Platform.Cmd exposing (..)
 import Regex exposing (..)
 import String
+import UrlParser exposing (parseHash)
 
 
 main =
@@ -33,7 +34,7 @@ main =
 
 
 type alias Model =
-    { url : Input
+    { url : Maybe Input
     , errorMessage : String
     , token : Maybe String
     , spreadsheetUrl : String
@@ -47,8 +48,19 @@ type Input
 
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model (ApiUrl "") "" (OAuth.parseToken location) "", Navigation.modifyUrl "#" )
+    ( Model (OAuth.parseState location |> validateState) "" (OAuth.parseToken (Debug.log "location" location)) "", Navigation.modifyUrl "#" )
 
+validateState : Maybe String -> Maybe Input
+validateState state =
+  case state of
+    Just str ->
+          if contains (regex "{") str then
+              Just (Json str)
+          else
+              Just (ApiUrl (withDefault "error" (decodeUri str)))
+
+    Nothing ->
+      Nothing
 
 
 -- UPDATE
@@ -60,6 +72,7 @@ type Msg
     | GetData
     | Fetch (Result Http.Error String)
     | PostCsv (Result Http.Error String)
+    | Error String
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -86,23 +99,29 @@ update msg model =
         PostCsv (Err _) ->
             ( model, Cmd.none )
 
+        Error msg ->
+            ( { model | errorMessage = msg }, Cmd.none )
 
-validateInput : String -> Input
+
+validateInput : String -> Maybe Input
 validateInput str =
     if contains (regex "{") str then
-        Json str
+        Just (Json str)
     else
-        ApiUrl str
+        Just (ApiUrl str)
 
 
-getData : Input -> Model -> Cmd Msg
+getData : Maybe Input -> Model -> Cmd Msg
 getData input model =
     case input of
-        Json str ->
+        Just (Json str) ->
             requestCsv model.token model (GoogleSheet.createSheet str)
 
-        ApiUrl str ->
+        Just (ApiUrl str) ->
             getJson str
+
+        Nothing ->
+            Cmd.none
 
 
 
@@ -111,22 +130,57 @@ getData input model =
 
 view : Model -> Html Msg
 view model =
-    body [ style [ ( "backgroundColor", "red" ) ] ]
-        [ h1 [ style [ ( "margin-bottom", "300px" ) ] ] [ text "Convert Json Into A Spreadsheet" ]
-        , div [ style [ ( "width", "33%" ), ( "float", "left" ) ] ]
-            [ text "Step 1: "
-            , a [ href <| OAuth.requestToken ] [ text "Click here to Authorize Google" ]
-            ]
-        , div [ style [ ( "width", "33%" ), ( "float", "left" ) ] ]
-            [ text "Step 2: Enter JSON or URL here "
-            , input [ type_ "text", placeholder "JSON or URL", onInput Url ] []
-            , button [ onClick GetData ] [ text "Create Sheet" ]
-            ]
-        , div [ style [ ( "width", "33%" ), ( "float", "left" ) ] ]
-            [ text "Step 3: "
-            , a [ href model.spreadsheetUrl ] [ text "Click here to see your spreadsheet" ]
+    div [ style [ ( "width", "800px" ), ( "margin", "0 auto" ) ] ]
+        [ body
+            []
+            [ Html.header []
+                [ h1 [ style [ ( "margin-bottom", "100px" ) ] ] [ text "Turn Json into a Google Sheet. Each object will become a row." ] ]
+            , inputOrLink model
             ]
         ]
+
+inputOrLink model =
+  case model.spreadsheetUrl of
+    "" ->
+      div []
+        [ p [] [ text "Enter your JSON or URL here:" ]
+        , textarea [ placeholder "JSON or URL", rows 10, cols 70, style [ ( "display", "block" ) ], onInput Url ] [showUrl model]
+        , authorizeOrConvert model
+        ]
+    url ->
+       div [ ]
+          [  a [ href url ] [ text "Click here to see your spreadsheet" ]
+          ]
+
+showUrl model =
+  case model.url of
+    Just (Json str) ->
+        text str
+
+    Just (ApiUrl str) ->
+        text str
+
+    Nothing ->
+        text ""
+
+authorizeOrConvert model =
+  case model.token of
+    Just token ->
+      button [onClick GetData] [ text "Convert"]
+    Nothing ->
+      a [ href <| OAuth.requestToken <| Debug.log "url" <| packageState model.url ] [ text "Authorize Google" ]
+
+packageState : Maybe Input -> String
+packageState url =
+    case url of
+        Just (Json str) ->
+            str
+
+        Just (ApiUrl str) ->
+            encodeUri str
+
+        Nothing ->
+          "#"
 
 
 
