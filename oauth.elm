@@ -19,11 +19,17 @@ parseToken location =
         Nothing ->
             Nothing
 
+
+validateUrl : String -> String
+validateUrl token =
+  url "https://www.googleapis.com/oauth2/v3/tokeninfo"
+        [("access_token", token)]
+
 parseState : Navigation.Location -> Maybe String
 parseState location =
     case (parseHash (UrlParser.string) location) of
         Just str ->
-            Debug.log "there is a string" str
+            str
                 |> String.split "&"
                 |> List.filterMap toKeyValuePair
                 |> Dict.fromList
@@ -54,7 +60,7 @@ formUrl state =
         "https://accounts.google.com/o/oauth2/v2/auth"
         [ ( "response_type", "token" )
         , ( "client_id", "591745061791-69jpb1uina8sp60eq8c0125dm5nb5hhd.apps.googleusercontent.com" )
-        , ( "redirect_uri", "http://localhost:8000/accio.elm" )
+        , ( "redirect_uri", "http://localhost:8000/main.html" )
         , ( "scope", "https://www.googleapis.com/auth/spreadsheets" )
         , ( "prompt", "consent" )
         , ( "state", state )

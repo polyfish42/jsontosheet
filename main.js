@@ -10610,7 +10610,7 @@ var _user$project$OAuth$formUrl = function (state) {
 				_0: {ctor: '_Tuple2', _0: 'client_id', _1: '591745061791-69jpb1uina8sp60eq8c0125dm5nb5hhd.apps.googleusercontent.com'},
 				_1: {
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'redirect_uri', _1: 'http://localhost:8000/accio.elm'},
+					_0: {ctor: '_Tuple2', _0: 'redirect_uri', _1: 'http://localhost:8000/main.html'},
 					_1: {
 						ctor: '::',
 						_0: {ctor: '_Tuple2', _0: 'scope', _1: 'https://www.googleapis.com/auth/spreadsheets'},
@@ -10656,13 +10656,20 @@ var _user$project$OAuth$parseState = function (location) {
 				A2(
 					_elm_lang$core$List$filterMap,
 					_user$project$OAuth$toKeyValuePair,
-					A2(
-						_elm_lang$core$String$split,
-						'&',
-						A2(_elm_lang$core$Debug$log, 'there is a string', _p4._0)))));
+					A2(_elm_lang$core$String$split, '&', _p4._0))));
 	} else {
 		return _elm_lang$core$Maybe$Nothing;
 	}
+};
+var _user$project$OAuth$validateUrl = function (token) {
+	return A2(
+		_user$project$OAuth$url,
+		'https://www.googleapis.com/oauth2/v3/tokeninfo',
+		{
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'access_token', _1: token},
+			_1: {ctor: '[]'}
+		});
 };
 var _user$project$OAuth$parseToken = function (location) {
 	var _p5 = A2(_evancz$url_parser$UrlParser$parseHash, _evancz$url_parser$UrlParser$string, location);
@@ -11412,6 +11419,26 @@ var _user$project$Accio$bootstrap = A3(
 		}
 	},
 	{ctor: '[]'});
+var _user$project$Accio$setAndGetToken = _elm_lang$core$Native_Platform.outgoingPort(
+	'setAndGetToken',
+	function (v) {
+		return v;
+	});
+var _user$project$Accio$getToken = _elm_lang$core$Native_Platform.outgoingPort(
+	'getToken',
+	function (v) {
+		return v;
+	});
+var _user$project$Accio$saveToken = function (location) {
+	var _p2 = _user$project$OAuth$parseToken(location);
+	if (_p2.ctor === 'Just') {
+		return _user$project$Accio$setAndGetToken(_p2._0);
+	} else {
+		return _user$project$Accio$getToken('get token');
+	}
+};
+var _user$project$Accio$getTokenResponse = _elm_lang$core$Native_Platform.incomingPort('getTokenResponse', _elm_lang$core$Json_Decode$string);
+var _user$project$Accio$setAndGetTokenResponse = _elm_lang$core$Native_Platform.incomingPort('setAndGetTokenResponse', _elm_lang$core$Json_Decode$string);
 var _user$project$Accio$Model = F5(
 	function (a, b, c, d, e) {
 		return {url: a, errorMessage: b, token: c, spreadsheetUrl: d, showDialog: e};
@@ -11423,23 +11450,23 @@ var _user$project$Accio$ApiUrl = function (a) {
 	return {ctor: 'ApiUrl', _0: a};
 };
 var _user$project$Accio$validateState = function (state) {
-	var _p2 = state;
-	if (_p2.ctor === 'Just') {
-		var _p3 = _p2._0;
+	var _p3 = state;
+	if (_p3.ctor === 'Just') {
+		var _p4 = _p3._0;
 		return A2(
 			_elm_lang$core$Regex$contains,
 			_elm_lang$core$Regex$regex('{'),
-			_p3) ? _elm_lang$core$Maybe$Just(
+			_p4) ? _elm_lang$core$Maybe$Just(
 			_user$project$Accio$Json(
 				A2(
 					_elm_lang$core$Maybe$withDefault,
 					'error',
-					_elm_lang$http$Http$decodeUri(_p3)))) : _elm_lang$core$Maybe$Just(
+					_elm_lang$http$Http$decodeUri(_p4)))) : _elm_lang$core$Maybe$Just(
 			_user$project$Accio$ApiUrl(
 				A2(
 					_elm_lang$core$Maybe$withDefault,
 					'error',
-					_elm_lang$http$Http$decodeUri(_p3))));
+					_elm_lang$http$Http$decodeUri(_p4))));
 	} else {
 		return _elm_lang$core$Maybe$Nothing;
 	}
@@ -11452,10 +11479,19 @@ var _user$project$Accio$init = function (location) {
 			_user$project$Accio$validateState(
 				_user$project$OAuth$parseState(location)),
 			'',
-			_user$project$OAuth$parseToken(location),
+			_elm_lang$core$Maybe$Nothing,
 			'',
 			false),
-		_1: _elm_lang$navigation$Navigation$modifyUrl('#')
+		_1: _elm_lang$core$Platform_Cmd$batch(
+			{
+				ctor: '::',
+				_0: _elm_lang$navigation$Navigation$modifyUrl('#'),
+				_1: {
+					ctor: '::',
+					_0: _user$project$Accio$saveToken(location),
+					_1: {ctor: '[]'}
+				}
+			})
 	};
 };
 var _user$project$Accio$validateInput = function (str) {
@@ -11466,6 +11502,21 @@ var _user$project$Accio$validateInput = function (str) {
 		_user$project$Accio$Json(str)) : _elm_lang$core$Maybe$Just(
 		_user$project$Accio$ApiUrl(str));
 };
+var _user$project$Accio$TokenValue = function (a) {
+	return {ctor: 'TokenValue', _0: a};
+};
+var _user$project$Accio$subscriptions = function (model) {
+	return _elm_lang$core$Platform_Sub$batch(
+		{
+			ctor: '::',
+			_0: _user$project$Accio$setAndGetTokenResponse(_user$project$Accio$TokenValue),
+			_1: {
+				ctor: '::',
+				_0: _user$project$Accio$getTokenResponse(_user$project$Accio$TokenValue),
+				_1: {ctor: '[]'}
+			}
+		});
+};
 var _user$project$Accio$Error = function (a) {
 	return {ctor: 'Error', _0: a};
 };
@@ -11474,12 +11525,12 @@ var _user$project$Accio$PostCsv = function (a) {
 };
 var _user$project$Accio$requestCsv = F3(
 	function (token, model, requestBody) {
-		var _p4 = token;
-		if (_p4.ctor === 'Just') {
+		var _p5 = token;
+		if (_p5.ctor === 'Just') {
 			return A2(
 				_elm_lang$http$Http$send,
 				_user$project$Accio$PostCsv,
-				A3(_user$project$Accio$putRequest, _p4._0, model, requestBody));
+				A3(_user$project$Accio$putRequest, _p5._0, model, requestBody));
 		} else {
 			return _elm_lang$core$Platform_Cmd$none;
 		}
@@ -11495,16 +11546,16 @@ var _user$project$Accio$getJson = function (url) {
 };
 var _user$project$Accio$getData = F2(
 	function (input, model) {
-		var _p5 = input;
-		if (_p5.ctor === 'Just') {
-			if (_p5._0.ctor === 'Json') {
+		var _p6 = input;
+		if (_p6.ctor === 'Just') {
+			if (_p6._0.ctor === 'Json') {
 				return A3(
 					_user$project$Accio$requestCsv,
 					model.token,
 					model,
-					_user$project$GoogleSheet$createSheet(_p5._0._0));
+					_user$project$GoogleSheet$createSheet(_p6._0._0));
 			} else {
-				return _user$project$Accio$getJson(_p5._0._0);
+				return _user$project$Accio$getJson(_p6._0._0);
 			}
 		} else {
 			return _elm_lang$core$Platform_Cmd$none;
@@ -11512,8 +11563,8 @@ var _user$project$Accio$getData = F2(
 	});
 var _user$project$Accio$update = F2(
 	function (msg, model) {
-		var _p6 = msg;
-		switch (_p6.ctor) {
+		var _p7 = msg;
+		switch (_p7.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Url':
@@ -11522,7 +11573,7 @@ var _user$project$Accio$update = F2(
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							url: _user$project$Accio$validateInput(_p6._0)
+							url: _user$project$Accio$validateInput(_p7._0)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -11557,7 +11608,7 @@ var _user$project$Accio$update = F2(
 					_1: A2(_user$project$Accio$getData, model.url, model)
 				};
 			case 'Fetch':
-				if (_p6._0.ctor === 'Ok') {
+				if (_p7._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: model,
@@ -11565,7 +11616,7 @@ var _user$project$Accio$update = F2(
 							_user$project$Accio$requestCsv,
 							model.token,
 							model,
-							_user$project$GoogleSheet$createSheet(_p6._0._0))
+							_user$project$GoogleSheet$createSheet(_p7._0._0))
 					};
 				} else {
 					return {
@@ -11579,23 +11630,33 @@ var _user$project$Accio$update = F2(
 					};
 				}
 			case 'PostCsv':
-				if (_p6._0.ctor === 'Ok') {
+				if (_p7._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{spreadsheetUrl: _p6._0._0}),
+							{spreadsheetUrl: _p7._0._0}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 				}
+			case 'Error':
+				return {
+					ctor: '_Tuple2',
+					_0: _elm_lang$core$Native_Utils.update(
+						model,
+						{errorMessage: _p7._0}),
+					_1: _elm_lang$core$Platform_Cmd$none
+				};
 			default:
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{errorMessage: _p6._0}),
+						{
+							token: _elm_lang$core$Maybe$Just(_p7._0)
+						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 		}
@@ -11605,8 +11666,8 @@ var _user$project$Accio$CloseDialog = {ctor: 'CloseDialog'};
 var _user$project$Accio$OpenDialog = {ctor: 'OpenDialog'};
 var _user$project$Accio$Authorize = {ctor: 'Authorize'};
 var _user$project$Accio$authorizeOrConvert = function (model) {
-	var _p7 = model.token;
-	if (_p7.ctor === 'Just') {
+	var _p8 = model.token;
+	if (_p8.ctor === 'Just') {
 		return A2(
 			_elm_lang$html$Html$button,
 			{
@@ -11752,8 +11813,8 @@ var _user$project$Accio$Url = function (a) {
 	return {ctor: 'Url', _0: a};
 };
 var _user$project$Accio$inputOrLink = function (model) {
-	var _p8 = model.spreadsheetUrl;
-	if (_p8 === '') {
+	var _p9 = model.spreadsheetUrl;
+	if (_p9 === '') {
 		return A2(
 			_elm_lang$html$Html$div,
 			{ctor: '[]'},
@@ -11803,7 +11864,7 @@ var _user$project$Accio$inputOrLink = function (model) {
 					_elm_lang$html$Html$a,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$href(_p8),
+						_0: _elm_lang$html$Html_Attributes$href(_p9),
 						_1: {ctor: '[]'}
 					},
 					{
@@ -11851,18 +11912,30 @@ var _user$project$Accio$view = function (model) {
 									{ctor: '[]'},
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html$text('Turn Json into a Google Sheet.'),
+										_0: _elm_lang$html$Html$text('Turn JSON into a Google Sheet'),
 										_1: {ctor: '[]'}
 									}),
 								_1: {
 									ctor: '::',
-									_0: _user$project$Accio$inputOrLink(model),
+									_0: A2(
+										_elm_lang$html$Html$h4,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(
+												A2(_elm_lang$core$Maybe$withDefault, '', model.token)),
+											_1: {ctor: '[]'}
+										}),
 									_1: {
 										ctor: '::',
-										_0: _krisajenkins$elm_dialog$Dialog$view(
-											model.showDialog ? _elm_lang$core$Maybe$Just(
-												_user$project$Accio$dialogConfig(model)) : _elm_lang$core$Maybe$Nothing),
-										_1: {ctor: '[]'}
+										_0: _user$project$Accio$inputOrLink(model),
+										_1: {
+											ctor: '::',
+											_0: _krisajenkins$elm_dialog$Dialog$view(
+												model.showDialog ? _elm_lang$core$Maybe$Just(
+													_user$project$Accio$dialogConfig(model)) : _elm_lang$core$Maybe$Nothing),
+											_1: {ctor: '[]'}
+										}
 									}
 								}
 							}),
@@ -11876,14 +11949,7 @@ var _user$project$Accio$NoOp = {ctor: 'NoOp'};
 var _user$project$Accio$main = A2(
 	_elm_lang$navigation$Navigation$program,
 	_elm_lang$core$Basics$always(_user$project$Accio$NoOp),
-	{
-		init: _user$project$Accio$init,
-		view: _user$project$Accio$view,
-		update: _user$project$Accio$update,
-		subscriptions: function (_p9) {
-			return _elm_lang$core$Platform_Sub$none;
-		}
-	})();
+	{init: _user$project$Accio$init, view: _user$project$Accio$view, update: _user$project$Accio$update, subscriptions: _user$project$Accio$subscriptions})();
 
 var Elm = {};
 Elm['Accio'] = Elm['Accio'] || {};

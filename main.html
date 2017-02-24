@@ -1,25 +1,36 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8">
     <title></title>
-  </head>
-  <body>
-    <script src="main.js"></script>
+</head>
+
+<body>
     <div id="main"></div>
-      <script>
-          var node = document.getElementById('main');
-          var app = Elm.Accio.embed(node);
+    <script src="main.js"></script>
+    <script>
+        var node = document.getElementById('main');
+        var app = Elm.Accio.embed(node);
 
-          app.ports.setToken.subscribe(function(token){
-            sessionStorage.setItem('token', token);
-            app.ports.setTokenResponse.send(True);
-          });
+        app.ports.setAndGetToken.subscribe(function(token) {
+            var tokenObject = {
+                token: token,
+                timestamp: new Date().getTime()
+            };
+            localStorage.setItem('token', JSON.stringify(tokenObject));
+            app.ports.setAndGetTokenResponse.send(tokenObject.token);
+        });
 
-          app.ports.getToken.subscribe(function(){
-            var token = sessionStorage.getItem('token');
-            app.ports.getTokenResponse.send(token);
-          })
-      </script>
-  </body>
+        app.ports.getToken.subscribe(function(blank) {
+            var tokenObject = JSON.parse(localStorage.getItem('token'));
+            if (tokenObject == null) {
+                return
+            } else {
+                app.ports.getTokenResponse.send(tokenObject.token);
+            }
+        });
+    </script>
+</body>
+
 </html>

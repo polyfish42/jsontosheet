@@ -26,7 +26,7 @@ main =
         { init = init
         , view = view
         , update = update
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         }
 
 
@@ -50,7 +50,7 @@ type Input
 
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model Nothing "" Nothing "" False, Cmd.batch [(Navigation.modifyUrl "#"),(OAuth.parseState location |> validateState |> setAndGetToken)] )
+    ( Model (OAuth.parseState location |> validateState) "" Nothing "" False, Cmd.batch [ (Navigation.modifyUrl "#"), (saveToken location) ] )
 
 
 validateState : Maybe String -> Maybe Input
@@ -64,6 +64,16 @@ validateState state =
 
         Nothing ->
             Nothing
+
+
+saveToken : Navigation.Location -> Cmd Msg
+saveToken location =
+    case OAuth.parseToken location of
+        Just str ->
+            setAndGetToken str
+
+        Nothing ->
+            getToken "get token"
 
 
 
@@ -82,9 +92,12 @@ type Msg
     | Error String
     | TokenValue String
 
+
 port setAndGetToken : String -> Cmd msg
 
+
 port getToken : String -> Cmd msg
+
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -123,7 +136,7 @@ update msg model =
             ( { model | errorMessage = msg }, Cmd.none )
 
         TokenValue str ->
-          ({ model | token = Just str}, Cmd.none)
+            ( { model | token = Just str }, Cmd.none )
 
 
 validateInput : String -> Maybe Input
@@ -146,16 +159,24 @@ getData input model =
         Nothing ->
             Cmd.none
 
+
+
 -- SUBSCRIPTIONS
-port setAndGetTokenResponse : (String -> msg) -> Sub msg
+
 
 port getTokenResponse : (String -> msg) -> Sub msg
 
+
+port setAndGetTokenResponse : (String -> msg) -> Sub msg
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.batch [ ( setAndGetTokenResponse TokenValue )
-            , ( getTokenResponse TokenValue )
-            ]
+    Sub.batch
+        [ (setAndGetTokenResponse TokenValue)
+        , (getTokenResponse TokenValue)
+        ]
+
 
 
 -- VIEW
@@ -168,7 +189,8 @@ view model =
         [ bootstrap
         , div [ class "row" ]
             [ div [ class "col-md-6" ]
-                [ h1 [] [ text "Turn Json into a Google Sheet." ]
+                [ h1 [] [ text "Turn JSON into a Google Sheet" ]
+                , h4 [] [ text (withDefault "" model.token)]
                 , inputOrLink model
                 , Dialog.view
                     (if model.showDialog then
@@ -222,9 +244,10 @@ authorizeOrConvert model =
             button [ class "btn btn-primary", onClick GetData, style [ ( "margin-top", "10px" ), ( "float", "right" ) ] ] [ text "Convert" ]
 
         Nothing ->
-            div [] [ button [ class "btn btn-default", onClick OpenDialog, style [ ( "margin-top", "10px" ), ( "float", "right" ) ] ] [ text "Convert" ]
-                   , button [ class "btn btn-primary", onClick Authorize, style [ ( "margin", "10px 10px 0 0 " ), ( "float", "right" ) ] ] [ text "Connect to Google" ]
-            ]
+            div []
+                [ button [ class "btn btn-default", onClick OpenDialog, style [ ( "margin-top", "10px" ), ( "float", "right" ) ] ] [ text "Convert" ]
+                , button [ class "btn btn-primary", onClick Authorize, style [ ( "margin", "10px 10px 0 0 " ), ( "float", "right" ) ] ] [ text "Connect to Google" ]
+                ]
 
 
 packageState : Maybe Input -> String
