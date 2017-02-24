@@ -90,7 +90,8 @@ type Msg
     | Fetch (Result Http.Error String)
     | PostCsv (Result Http.Error String)
     | Error String
-    | TokenValue String
+    | TokenValue (Maybe String)
+    | ValidateToken (Result Http.Error String)
 
 
 port setAndGetToken : String -> Cmd msg
@@ -135,8 +136,14 @@ update msg model =
         Error msg ->
             ( { model | errorMessage = msg }, Cmd.none )
 
-        TokenValue str ->
-            ( { model | token = Just str }, Cmd.none )
+        TokenValue token ->
+            ( { model | token = token }, validateToken token )
+
+        ValidateToken (Ok response) ->
+            ( { model | token = setExpiration response model.token }, Cmd.none )
+
+        ValidateToken (Err _) ->
+            ( model, Cmd.none )
 
 
 validateInput : String -> Maybe Input
@@ -145,6 +152,37 @@ validateInput str =
         Just (Json str)
     else
         Just (ApiUrl str)
+
+
+validateToken : Maybe String -> Cmd Msg
+validateToken token =
+    case token of
+        Just token ->
+            Http.send ValidateToken <|
+                Http.getString (validateTokenUrl token)
+
+        Nothing ->
+            Cmd.none
+
+
+validateTokenUrl : String -> String
+validateTokenUrl token =
+    OAuth.url
+        "https://www.googleapis.com/oauth2/v3/tokeninfo"
+        [ ( "access_token", token ) ]
+
+
+setExpiration : String -> Maybe String -> Maybe String
+setExpiration response token =
+    case Debug.log "decoded string" (D.decodeString (D.maybe (D.field "expires_in" D.string)) response) of
+        Ok (Just expiration) ->
+            token
+
+        Ok Nothing ->
+            Nothing
+
+        Err _ ->
+            Nothing
 
 
 getData : Maybe Input -> Model -> Cmd Msg
@@ -164,10 +202,10 @@ getData input model =
 -- SUBSCRIPTIONS
 
 
-port getTokenResponse : (String -> msg) -> Sub msg
+port getTokenResponse : (Maybe String -> msg) -> Sub msg
 
 
-port setAndGetTokenResponse : (String -> msg) -> Sub msg
+port setAndGetTokenResponse : (Maybe String -> msg) -> Sub msg
 
 
 subscriptions : Model -> Sub Msg
@@ -190,7 +228,8 @@ view model =
         , div [ class "row" ]
             [ div [ class "col-md-6" ]
                 [ h1 [] [ text "Turn JSON into a Google Sheet" ]
-                , h4 [] [ text (withDefault "" model.token)]
+                , h4 [] [ text (withDefault "" model.token) ]
+                , h4 [] [ text model.errorMessage ]
                 , inputOrLink model
                 , Dialog.view
                     (if model.showDialog then
