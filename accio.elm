@@ -50,7 +50,7 @@ type Input
 
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model (OAuth.parseState location |> validateState) "" (OAuth.parseToken location) "" False, Navigation.modifyUrl "#" )
+    ( Model Nothing "" Nothing "" False, Cmd.batch [(Navigation.modifyUrl "#"),(OAuth.parseState location |> validateState |> setAndGetToken)] )
 
 
 validateState : Maybe String -> Maybe Input
@@ -80,7 +80,11 @@ type Msg
     | Fetch (Result Http.Error String)
     | PostCsv (Result Http.Error String)
     | Error String
+    | TokenValue String
 
+port setAndGetToken : String -> Cmd msg
+
+port getToken : String -> Cmd msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
@@ -118,6 +122,9 @@ update msg model =
         Error msg ->
             ( { model | errorMessage = msg }, Cmd.none )
 
+        TokenValue str ->
+          ({ model | token = Just str}, Cmd.none)
+
 
 validateInput : String -> Maybe Input
 validateInput str =
@@ -139,6 +146,16 @@ getData input model =
         Nothing ->
             Cmd.none
 
+-- SUBSCRIPTIONS
+port setAndGetTokenResponse : (String -> msg) -> Sub msg
+
+port getTokenResponse : (String -> msg) -> Sub msg
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+  Sub.batch [ ( setAndGetTokenResponse TokenValue )
+            , ( getTokenResponse TokenValue )
+            ]
 
 
 -- VIEW
@@ -177,8 +194,7 @@ inputOrLink model =
     case model.spreadsheetUrl of
         "" ->
             div []
-                [ p [ class "lead" ] [ text "Enter your JSON or URL here:" ]
-                , textarea [ placeholder "JSON or URL", class "form-control", rows 10, cols 70, onInput Url ] [ showUrl model ]
+                [ textarea [ placeholder "Enter your JSON or URL here.", class "form-control", rows 10, cols 70, onInput Url ] [ showUrl model ]
                 , authorizeOrConvert model
                 ]
 

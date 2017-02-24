@@ -5,12 +5,21 @@
     <title></title>
   </head>
   <body>
+    <script src="main.js"></script>
     <div id="main"></div>
       <script>
           var node = document.getElementById('main');
-          var app = Elm.Main.embed(node);
-          // Note: if your Elm module is named "MyThing.Root" you
-          // would call "Elm.MyThing.Root.embed(node)" instead.
+          var app = Elm.Accio.embed(node);
+
+          app.ports.setToken.subscribe(function(token){
+            sessionStorage.setItem('token', token);
+            app.ports.setTokenResponse.send(True);
+          });
+
+          app.ports.getToken.subscribe(function(){
+            var token = sessionStorage.getItem('token');
+            app.ports.getTokenResponse.send(token);
+          })
       </script>
   </body>
 </html>

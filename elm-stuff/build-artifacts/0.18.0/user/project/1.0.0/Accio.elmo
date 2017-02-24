@@ -407,52 +407,37 @@ var _user$project$Accio$inputOrLink = function (model) {
 			{
 				ctor: '::',
 				_0: A2(
-					_elm_lang$html$Html$p,
+					_elm_lang$html$Html$textarea,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$class('lead'),
-						_1: {ctor: '[]'}
+						_0: _elm_lang$html$Html_Attributes$placeholder('Enter your JSON or URL here.'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('form-control'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$rows(10),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$cols(70),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
+										_1: {ctor: '[]'}
+									}
+								}
+							}
+						}
 					},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text('Enter your JSON or URL here:'),
+						_0: _user$project$Accio$showUrl(model),
 						_1: {ctor: '[]'}
 					}),
 				_1: {
 					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$textarea,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$placeholder('JSON or URL'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$class('form-control'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$rows(10),
-									_1: {
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$cols(70),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							}
-						},
-						{
-							ctor: '::',
-							_0: _user$project$Accio$showUrl(model),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: _user$project$Accio$authorizeOrConvert(model),
-						_1: {ctor: '[]'}
-					}
+					_0: _user$project$Accio$authorizeOrConvert(model),
+					_1: {ctor: '[]'}
 				}
 			});
 	} else {
