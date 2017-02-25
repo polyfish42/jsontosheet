@@ -59,25 +59,16 @@ var _user$project$Accio$bootstrap = A3(
 		}
 	},
 	{ctor: '[]'});
-var _user$project$Accio$setExpiration = F2(
-	function (response, token) {
-		var _p2 = A2(
-			_elm_lang$core$Debug$log,
-			'decoded string',
+var _user$project$Accio$delay = F2(
+	function (time, msg) {
+		return A2(
+			_elm_lang$core$Task$perform,
+			_elm_lang$core$Basics$identity,
 			A2(
-				_elm_lang$core$Json_Decode$decodeString,
-				_elm_lang$core$Json_Decode$maybe(
-					A2(_elm_lang$core$Json_Decode$field, 'expires_in', _elm_lang$core$Json_Decode$string)),
-				response));
-		if (_p2.ctor === 'Ok') {
-			if (_p2._0.ctor === 'Just') {
-				return token;
-			} else {
-				return _elm_lang$core$Maybe$Nothing;
-			}
-		} else {
-			return _elm_lang$core$Maybe$Nothing;
-		}
+				_elm_lang$core$Task$andThen,
+				_elm_lang$core$Basics$always(
+					_elm_lang$core$Task$succeed(msg)),
+				_elm_lang$core$Process$sleep(time)));
 	});
 var _user$project$Accio$validateTokenUrl = function (token) {
 	return A2(
@@ -92,19 +83,20 @@ var _user$project$Accio$validateTokenUrl = function (token) {
 var _user$project$Accio$setAndGetToken = _elm_lang$core$Native_Platform.outgoingPort(
 	'setAndGetToken',
 	function (v) {
-		return v;
+		return (v.ctor === 'Nothing') ? null : v._0;
 	});
 var _user$project$Accio$getToken = _elm_lang$core$Native_Platform.outgoingPort(
 	'getToken',
 	function (v) {
-		return v;
+		return (v.ctor === 'Nothing') ? null : v._0;
 	});
 var _user$project$Accio$saveToken = function (location) {
-	var _p3 = _user$project$OAuth$parseToken(location);
-	if (_p3.ctor === 'Just') {
-		return _user$project$Accio$setAndGetToken(_p3._0);
+	var _p2 = _user$project$OAuth$parseToken(location);
+	if (_p2.ctor === 'Just') {
+		return _user$project$Accio$setAndGetToken(
+			_elm_lang$core$Maybe$Just(_p2._0));
 	} else {
-		return _user$project$Accio$getToken('get token');
+		return _user$project$Accio$getToken(_elm_lang$core$Maybe$Nothing);
 	}
 };
 var _user$project$Accio$getTokenResponse = _elm_lang$core$Native_Platform.incomingPort(
@@ -142,23 +134,23 @@ var _user$project$Accio$ApiUrl = function (a) {
 	return {ctor: 'ApiUrl', _0: a};
 };
 var _user$project$Accio$validateState = function (state) {
-	var _p4 = state;
-	if (_p4.ctor === 'Just') {
-		var _p5 = _p4._0;
+	var _p3 = state;
+	if (_p3.ctor === 'Just') {
+		var _p4 = _p3._0;
 		return A2(
 			_elm_lang$core$Regex$contains,
 			_elm_lang$core$Regex$regex('{'),
-			_p5) ? _elm_lang$core$Maybe$Just(
+			_p4) ? _elm_lang$core$Maybe$Just(
 			_user$project$Accio$Json(
 				A2(
 					_elm_lang$core$Maybe$withDefault,
 					'error',
-					_elm_lang$http$Http$decodeUri(_p5)))) : _elm_lang$core$Maybe$Just(
+					_elm_lang$http$Http$decodeUri(_p4)))) : _elm_lang$core$Maybe$Just(
 			_user$project$Accio$ApiUrl(
 				A2(
 					_elm_lang$core$Maybe$withDefault,
 					'error',
-					_elm_lang$http$Http$decodeUri(_p5))));
+					_elm_lang$http$Http$decodeUri(_p4))));
 	} else {
 		return _elm_lang$core$Maybe$Nothing;
 	}
@@ -198,13 +190,13 @@ var _user$project$Accio$ValidateToken = function (a) {
 	return {ctor: 'ValidateToken', _0: a};
 };
 var _user$project$Accio$validateToken = function (token) {
-	var _p6 = token;
-	if (_p6.ctor === 'Just') {
+	var _p5 = token;
+	if (_p5.ctor === 'Just') {
 		return A2(
 			_elm_lang$http$Http$send,
 			_user$project$Accio$ValidateToken,
 			_elm_lang$http$Http$getString(
-				_user$project$Accio$validateTokenUrl(_p6._0)));
+				_user$project$Accio$validateTokenUrl(_p5._0)));
 	} else {
 		return _elm_lang$core$Platform_Cmd$none;
 	}
@@ -212,6 +204,34 @@ var _user$project$Accio$validateToken = function (token) {
 var _user$project$Accio$TokenValue = function (a) {
 	return {ctor: 'TokenValue', _0: a};
 };
+var _user$project$Accio$setExpiration = F2(
+	function (response, token) {
+		var _p6 = A2(
+			_elm_lang$core$Debug$log,
+			'decoded string',
+			A2(
+				_elm_lang$core$Json_Decode$decodeString,
+				_elm_lang$core$Json_Decode$maybe(
+					A2(_elm_lang$core$Json_Decode$field, 'expires_in', _elm_lang$core$Json_Decode$string)),
+				response));
+		if (_p6.ctor === 'Ok') {
+			if (_p6._0.ctor === 'Just') {
+				return A2(
+					_user$project$Accio$delay,
+					_elm_lang$core$Time$second * A2(
+						_elm_lang$core$Result$withDefault,
+						0,
+						_elm_lang$core$String$toFloat(_p6._0._0)),
+					_user$project$Accio$TokenValue(_elm_lang$core$Maybe$Nothing));
+			} else {
+				return _user$project$Accio$setAndGetToken(
+					_elm_lang$core$Maybe$Just(''));
+			}
+		} else {
+			return _user$project$Accio$setAndGetToken(
+				_elm_lang$core$Maybe$Just(''));
+		}
+	});
 var _user$project$Accio$subscriptions = function (model) {
 	return _elm_lang$core$Platform_Sub$batch(
 		{
@@ -369,12 +389,8 @@ var _user$project$Accio$update = F2(
 				if (_p9._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
-						_0: _elm_lang$core$Native_Utils.update(
-							model,
-							{
-								token: A2(_user$project$Accio$setExpiration, _p9._0._0, model.token)
-							}),
-						_1: _elm_lang$core$Platform_Cmd$none
+						_0: model,
+						_1: A2(_user$project$Accio$setExpiration, _p9._0._0, model.token)
 					};
 				} else {
 					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
@@ -638,7 +654,7 @@ var _user$project$Accio$view = function (model) {
 								_1: {
 									ctor: '::',
 									_0: A2(
-										_elm_lang$html$Html$h4,
+										_elm_lang$html$Html$h2,
 										{ctor: '[]'},
 										{
 											ctor: '::',

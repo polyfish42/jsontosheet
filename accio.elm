@@ -15,8 +15,11 @@ import Maybe exposing (..)
 import Navigation
 import OAuth
 import Platform.Cmd exposing (..)
+import Process exposing (..)
 import Regex exposing (..)
 import String
+import Task exposing (..)
+import Time exposing (..)
 import UrlParser exposing (parseHash)
 
 
@@ -70,10 +73,10 @@ saveToken : Navigation.Location -> Cmd Msg
 saveToken location =
     case OAuth.parseToken location of
         Just str ->
-            setAndGetToken str
+            setAndGetToken (Just str)
 
         Nothing ->
-            getToken "get token"
+            getToken Nothing
 
 
 
@@ -94,10 +97,10 @@ type Msg
     | ValidateToken (Result Http.Error String)
 
 
-port setAndGetToken : String -> Cmd msg
+port setAndGetToken : Maybe String -> Cmd msg
 
 
-port getToken : String -> Cmd msg
+port getToken : Maybe String -> Cmd msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -140,7 +143,7 @@ update msg model =
             ( { model | token = token }, validateToken token )
 
         ValidateToken (Ok response) ->
-            ( { model | token = setExpiration response model.token }, Cmd.none )
+            ( model, setExpiration response model.token )
 
         ValidateToken (Err _) ->
             ( model, Cmd.none )
@@ -172,18 +175,25 @@ validateTokenUrl token =
         [ ( "access_token", token ) ]
 
 
-setExpiration : String -> Maybe String -> Maybe String
+setExpiration : String -> Maybe String -> Cmd Msg
 setExpiration response token =
     case Debug.log "decoded string" (D.decodeString (D.maybe (D.field "expires_in" D.string)) response) of
         Ok (Just expiration) ->
-            token
+          delay (Time.second * (Result.withDefault 0 (String.toFloat expiration))) <| TokenValue Nothing
+
 
         Ok Nothing ->
-            Nothing
+            setAndGetToken (Just "")
 
         Err _ ->
-            Nothing
+            setAndGetToken (Just "")
 
+
+delay : Time -> msg -> Cmd msg
+delay time msg =
+  Process.sleep time
+  |> Task.andThen (always <| Task.succeed msg)
+  |> Task.perform identity
 
 getData : Maybe Input -> Model -> Cmd Msg
 getData input model =
@@ -228,7 +238,7 @@ view model =
         , div [ class "row" ]
             [ div [ class "col-md-6" ]
                 [ h1 [] [ text "Turn JSON into a Google Sheet" ]
-                , h4 [] [ text (withDefault "" model.token) ]
+                , h2 [] [text (withDefault "" model.token)]
                 , h4 [] [ text model.errorMessage ]
                 , inputOrLink model
                 , Dialog.view
