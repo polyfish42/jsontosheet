@@ -11579,9 +11579,12 @@ var _user$project$Accio$setExpiration = F2(
 				return A2(
 					_user$project$Accio$delay,
 					_elm_lang$core$Time$second * A2(
-						_elm_lang$core$Result$withDefault,
-						0,
-						_elm_lang$core$String$toFloat(_p6._0._0)),
+						_elm_lang$core$Debug$log,
+						'token expires in (seconds)',
+						A2(
+							_elm_lang$core$Result$withDefault,
+							0,
+							_elm_lang$core$String$toFloat(_p6._0._0))),
 					_user$project$Accio$TokenValue(_elm_lang$core$Maybe$Nothing));
 			} else {
 				return _user$project$Accio$setAndGetToken(
@@ -11753,7 +11756,11 @@ var _user$project$Accio$update = F2(
 						_1: A2(_user$project$Accio$setExpiration, _p9._0._0, model.token)
 					};
 				} else {
-					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+					return {
+						ctor: '_Tuple2',
+						_0: model,
+						_1: _user$project$Accio$setAndGetToken(_elm_lang$core$Maybe$Nothing)
+					};
 				}
 		}
 	});
@@ -11765,32 +11772,39 @@ var _user$project$Accio$authorizeOrConvert = function (model) {
 	var _p11 = model.token;
 	if (_p11.ctor === 'Just') {
 		return A2(
-			_elm_lang$html$Html$button,
+			_elm_lang$html$Html$div,
+			{ctor: '[]'},
 			{
 				ctor: '::',
-				_0: _elm_lang$html$Html_Attributes$class('btn btn-primary'),
-				_1: {
-					ctor: '::',
-					_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
-					_1: {
+				_0: A2(
+					_elm_lang$html$Html$button,
+					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$style(
-							{
+						_0: _elm_lang$html$Html_Attributes$class('btn btn-primary'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$html$Html_Events$onClick(_user$project$Accio$GetData),
+							_1: {
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '10px'},
-								_1: {
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'float', _1: 'right'},
-									_1: {ctor: '[]'}
-								}
-							}),
+								_0: _elm_lang$html$Html_Attributes$style(
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '10px'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'float', _1: 'right'},
+											_1: {ctor: '[]'}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html$text('Convert'),
 						_1: {ctor: '[]'}
-					}
-				}
-			},
-			{
-				ctor: '::',
-				_0: _elm_lang$html$Html$text('Convert'),
+					}),
 				_1: {ctor: '[]'}
 			});
 	} else {
@@ -12014,32 +12028,74 @@ var _user$project$Accio$view = function (model) {
 								_1: {
 									ctor: '::',
 									_0: A2(
-										_elm_lang$html$Html$h2,
+										_elm_lang$html$Html$h4,
 										{ctor: '[]'},
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html$text(
-												A2(_elm_lang$core$Maybe$withDefault, '', model.token)),
+											_0: _elm_lang$html$Html$text(model.errorMessage),
 											_1: {ctor: '[]'}
 										}),
 									_1: {
 										ctor: '::',
-										_0: A2(
-											_elm_lang$html$Html$h4,
-											{ctor: '[]'},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text(model.errorMessage),
-												_1: {ctor: '[]'}
-											}),
+										_0: _user$project$Accio$inputOrLink(model),
 										_1: {
 											ctor: '::',
-											_0: _user$project$Accio$inputOrLink(model),
+											_0: _krisajenkins$elm_dialog$Dialog$view(
+												model.showDialog ? _elm_lang$core$Maybe$Just(
+													_user$project$Accio$dialogConfig(model)) : _elm_lang$core$Maybe$Nothing),
 											_1: {
 												ctor: '::',
-												_0: _krisajenkins$elm_dialog$Dialog$view(
-													model.showDialog ? _elm_lang$core$Maybe$Just(
-														_user$project$Accio$dialogConfig(model)) : _elm_lang$core$Maybe$Nothing),
+												_0: A2(
+													_elm_lang$html$Html$footer,
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$style(
+															{
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '80px'},
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													},
+													{
+														ctor: '::',
+														_0: _elm_lang$html$Html$text('For feedback, please '),
+														_1: {
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$a,
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$href('https://github.com/polyfish42/accio/issues'),
+																	_1: {ctor: '[]'}
+																},
+																{
+																	ctor: '::',
+																	_0: _elm_lang$html$Html$text('open an issue on Github. '),
+																	_1: {ctor: '[]'}
+																}),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Created by '),
+																_1: {
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$html$Html$a,
+																		{
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Attributes$href('https://twitter.com/polyfish42'),
+																			_1: {ctor: '[]'}
+																		},
+																		{
+																			ctor: '::',
+																			_0: _elm_lang$html$Html$text(' @polyfish42'),
+																			_1: {ctor: '[]'}
+																		}),
+																	_1: {ctor: '[]'}
+																}
+															}
+														}
+													}),
 												_1: {ctor: '[]'}
 											}
 										}

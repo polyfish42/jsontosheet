@@ -146,7 +146,7 @@ update msg model =
             ( model, setExpiration response model.token )
 
         ValidateToken (Err _) ->
-            ( model, Cmd.none )
+            ( model, setAndGetToken Nothing )
 
 
 validateInput : String -> Maybe Input
@@ -179,8 +179,7 @@ setExpiration : String -> Maybe String -> Cmd Msg
 setExpiration response token =
     case Debug.log "decoded string" (D.decodeString (D.maybe (D.field "expires_in" D.string)) response) of
         Ok (Just expiration) ->
-          delay (Time.second * (Result.withDefault 0 (String.toFloat expiration))) <| TokenValue Nothing
-
+            delay (Time.second * Debug.log "token expires in (seconds)" (Result.withDefault 0 (String.toFloat expiration))) <| TokenValue Nothing
 
         Ok Nothing ->
             setAndGetToken (Just "")
@@ -191,9 +190,10 @@ setExpiration response token =
 
 delay : Time -> msg -> Cmd msg
 delay time msg =
-  Process.sleep time
-  |> Task.andThen (always <| Task.succeed msg)
-  |> Task.perform identity
+    Process.sleep time
+        |> Task.andThen (always <| Task.succeed msg)
+        |> Task.perform identity
+
 
 getData : Maybe Input -> Model -> Cmd Msg
 getData input model =
@@ -238,7 +238,6 @@ view model =
         , div [ class "row" ]
             [ div [ class "col-md-6" ]
                 [ h1 [] [ text "Turn JSON into a Google Sheet" ]
-                , h2 [] [text (withDefault "" model.token)]
                 , h4 [] [ text model.errorMessage ]
                 , inputOrLink model
                 , Dialog.view
@@ -247,6 +246,7 @@ view model =
                      else
                         Nothing
                     )
+                , footer [ style [ ( "margin-top", "80px" ) ] ] [ text "For feedback, please ", a [ href "https://github.com/polyfish42/accio/issues" ] [ text "open an issue on Github. " ], text "Created by ", a [ href "https://twitter.com/polyfish42" ] [ text " @polyfish42" ] ]
                 ]
             ]
         ]
@@ -290,7 +290,12 @@ showUrl model =
 authorizeOrConvert model =
     case model.token of
         Just token ->
-            button [ class "btn btn-primary", onClick GetData, style [ ( "margin-top", "10px" ), ( "float", "right" ) ] ] [ text "Convert" ]
+            div []
+                [ button [ class "btn btn-primary", onClick GetData, style [ ( "margin-top", "10px" ), ( "float", "right" ) ] ] [ text "Convert" ]
+                -- , svg
+                --     [ width "120", height "120", viewBox "0 0 120 120" ]
+                --     [ rect [ x "10", y "10", width "100", height "100", rx "15", ry "15" ] [] ]
+                ]
 
         Nothing ->
             div []
