@@ -59,11 +59,15 @@ init location =
 validateState : Maybe String -> Maybe Input
 validateState state =
     case state of
-        Just str ->
-            if contains (regex "{") str then
-                Just (Json (withDefault "error" (decodeUri str)))
-            else
-                Just (ApiUrl (withDefault "error" (decodeUri str)))
+        Just string ->
+            case decodeUri string of
+                Just str ->
+                  if contains (regex "{") str then
+                      Just (Json str)
+                  else
+                      Just (ApiUrl str)
+                Nothing ->
+                  Nothing
 
         Nothing ->
             Nothing
@@ -127,8 +131,8 @@ update msg model =
         Fetch (Ok response) ->
             ( model, requestCsv model.token model (GoogleSheet.createSheet response) )
 
-        Fetch (Err _) ->
-            ( { model | errorMessage = toString Err }, Cmd.none )
+        Fetch (Err message) ->
+            ( { model | errorMessage = toString message }, Cmd.none )
 
         PostCsv (Ok response) ->
             ( { model | spreadsheetUrl = response }, Cmd.none )
@@ -140,7 +144,7 @@ update msg model =
             ( { model | errorMessage = msg }, Cmd.none )
 
         TokenValue token ->
-            ( { model | token = token }, validateToken token )
+            ( { model | token = (Debug.log "token is entered into the model" token) }, validateToken token )
 
         ValidateToken (Ok response) ->
             ( model, setExpiration response model.token )
@@ -238,6 +242,7 @@ view model =
         , div [ class "row" ]
             [ div [ class "col-md-6" ]
                 [ h1 [] [ text "Turn JSON into a Google Sheet" ]
+                , h3 [] [ text <| withDefault "No token" model.token ]
                 , h4 [] [ text model.errorMessage ]
                 , inputOrLink model
                 , Dialog.view
@@ -276,7 +281,7 @@ inputOrLink model =
 
 
 showUrl model =
-    case model.url of
+    case (Debug.log "input" model.url) of
         Just (Json str) ->
             text str
 
@@ -292,9 +297,6 @@ authorizeOrConvert model =
         Just token ->
             div []
                 [ button [ class "btn btn-primary", onClick GetData, style [ ( "margin-top", "10px" ), ( "float", "right" ) ] ] [ text "Convert" ]
-                -- , svg
-                --     [ width "120", height "120", viewBox "0 0 120 120" ]
-                --     [ rect [ x "10", y "10", width "100", height "100", rx "15", ry "15" ] [] ]
                 ]
 
         Nothing ->

@@ -35,7 +35,7 @@ var _user$project$Accio$packageState = function (url) {
 	}
 };
 var _user$project$Accio$showUrl = function (model) {
-	var _p1 = model.url;
+	var _p1 = A2(_elm_lang$core$Debug$log, 'input', model.url);
 	if (_p1.ctor === 'Just') {
 		if (_p1._0.ctor === 'Json') {
 			return _elm_lang$html$Html$text(_p1._0._0);
@@ -136,21 +136,18 @@ var _user$project$Accio$ApiUrl = function (a) {
 var _user$project$Accio$validateState = function (state) {
 	var _p3 = state;
 	if (_p3.ctor === 'Just') {
-		var _p4 = _p3._0;
-		return A2(
-			_elm_lang$core$Regex$contains,
-			_elm_lang$core$Regex$regex('{'),
-			_p4) ? _elm_lang$core$Maybe$Just(
-			_user$project$Accio$Json(
-				A2(
-					_elm_lang$core$Maybe$withDefault,
-					'error',
-					_elm_lang$http$Http$decodeUri(_p4)))) : _elm_lang$core$Maybe$Just(
-			_user$project$Accio$ApiUrl(
-				A2(
-					_elm_lang$core$Maybe$withDefault,
-					'error',
-					_elm_lang$http$Http$decodeUri(_p4))));
+		var _p4 = _elm_lang$http$Http$decodeUri(_p3._0);
+		if (_p4.ctor === 'Just') {
+			var _p5 = _p4._0;
+			return A2(
+				_elm_lang$core$Regex$contains,
+				_elm_lang$core$Regex$regex('{'),
+				_p5) ? _elm_lang$core$Maybe$Just(
+				_user$project$Accio$Json(_p5)) : _elm_lang$core$Maybe$Just(
+				_user$project$Accio$ApiUrl(_p5));
+		} else {
+			return _elm_lang$core$Maybe$Nothing;
+		}
 	} else {
 		return _elm_lang$core$Maybe$Nothing;
 	}
@@ -190,13 +187,13 @@ var _user$project$Accio$ValidateToken = function (a) {
 	return {ctor: 'ValidateToken', _0: a};
 };
 var _user$project$Accio$validateToken = function (token) {
-	var _p5 = token;
-	if (_p5.ctor === 'Just') {
+	var _p6 = token;
+	if (_p6.ctor === 'Just') {
 		return A2(
 			_elm_lang$http$Http$send,
 			_user$project$Accio$ValidateToken,
 			_elm_lang$http$Http$getString(
-				_user$project$Accio$validateTokenUrl(_p5._0)));
+				_user$project$Accio$validateTokenUrl(_p6._0)));
 	} else {
 		return _elm_lang$core$Platform_Cmd$none;
 	}
@@ -206,7 +203,7 @@ var _user$project$Accio$TokenValue = function (a) {
 };
 var _user$project$Accio$setExpiration = F2(
 	function (response, token) {
-		var _p6 = A2(
+		var _p7 = A2(
 			_elm_lang$core$Debug$log,
 			'decoded string',
 			A2(
@@ -214,8 +211,8 @@ var _user$project$Accio$setExpiration = F2(
 				_elm_lang$core$Json_Decode$maybe(
 					A2(_elm_lang$core$Json_Decode$field, 'expires_in', _elm_lang$core$Json_Decode$string)),
 				response));
-		if (_p6.ctor === 'Ok') {
-			if (_p6._0.ctor === 'Just') {
+		if (_p7.ctor === 'Ok') {
+			if (_p7._0.ctor === 'Just') {
 				return A2(
 					_user$project$Accio$delay,
 					_elm_lang$core$Time$second * A2(
@@ -224,7 +221,7 @@ var _user$project$Accio$setExpiration = F2(
 						A2(
 							_elm_lang$core$Result$withDefault,
 							0,
-							_elm_lang$core$String$toFloat(_p6._0._0))),
+							_elm_lang$core$String$toFloat(_p7._0._0))),
 					_user$project$Accio$TokenValue(_elm_lang$core$Maybe$Nothing));
 			} else {
 				return _user$project$Accio$setAndGetToken(
@@ -255,12 +252,12 @@ var _user$project$Accio$PostCsv = function (a) {
 };
 var _user$project$Accio$requestCsv = F3(
 	function (token, model, requestBody) {
-		var _p7 = token;
-		if (_p7.ctor === 'Just') {
+		var _p8 = token;
+		if (_p8.ctor === 'Just') {
 			return A2(
 				_elm_lang$http$Http$send,
 				_user$project$Accio$PostCsv,
-				A3(_user$project$Accio$putRequest, _p7._0, model, requestBody));
+				A3(_user$project$Accio$putRequest, _p8._0, model, requestBody));
 		} else {
 			return _elm_lang$core$Platform_Cmd$none;
 		}
@@ -276,16 +273,16 @@ var _user$project$Accio$getJson = function (url) {
 };
 var _user$project$Accio$getData = F2(
 	function (input, model) {
-		var _p8 = input;
-		if (_p8.ctor === 'Just') {
-			if (_p8._0.ctor === 'Json') {
+		var _p9 = input;
+		if (_p9.ctor === 'Just') {
+			if (_p9._0.ctor === 'Json') {
 				return A3(
 					_user$project$Accio$requestCsv,
 					model.token,
 					model,
-					_user$project$GoogleSheet$createSheet(_p8._0._0));
+					_user$project$GoogleSheet$createSheet(_p9._0._0));
 			} else {
-				return _user$project$Accio$getJson(_p8._0._0);
+				return _user$project$Accio$getJson(_p9._0._0);
 			}
 		} else {
 			return _elm_lang$core$Platform_Cmd$none;
@@ -293,8 +290,8 @@ var _user$project$Accio$getData = F2(
 	});
 var _user$project$Accio$update = F2(
 	function (msg, model) {
-		var _p9 = msg;
-		switch (_p9.ctor) {
+		var _p10 = msg;
+		switch (_p10.ctor) {
 			case 'NoOp':
 				return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			case 'Url':
@@ -303,7 +300,7 @@ var _user$project$Accio$update = F2(
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							url: _user$project$Accio$validateInput(_p9._0)
+							url: _user$project$Accio$validateInput(_p10._0)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -338,7 +335,7 @@ var _user$project$Accio$update = F2(
 					_1: A2(_user$project$Accio$getData, model.url, model)
 				};
 			case 'Fetch':
-				if (_p9._0.ctor === 'Ok') {
+				if (_p10._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: model,
@@ -346,7 +343,7 @@ var _user$project$Accio$update = F2(
 							_user$project$Accio$requestCsv,
 							model.token,
 							model,
-							_user$project$GoogleSheet$createSheet(_p9._0._0))
+							_user$project$GoogleSheet$createSheet(_p10._0._0))
 					};
 				} else {
 					return {
@@ -354,18 +351,18 @@ var _user$project$Accio$update = F2(
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
 							{
-								errorMessage: _elm_lang$core$Basics$toString(_elm_lang$core$Result$Err)
+								errorMessage: _elm_lang$core$Basics$toString(_p10._0._0)
 							}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
 			case 'PostCsv':
-				if (_p9._0.ctor === 'Ok') {
+				if (_p10._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: _elm_lang$core$Native_Utils.update(
 							model,
-							{spreadsheetUrl: _p9._0._0}),
+							{spreadsheetUrl: _p10._0._0}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
@@ -376,24 +373,26 @@ var _user$project$Accio$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{errorMessage: _p9._0}),
+						{errorMessage: _p10._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'TokenValue':
-				var _p10 = _p9._0;
+				var _p11 = _p10._0;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{token: _p10}),
-					_1: _user$project$Accio$validateToken(_p10)
+						{
+							token: A2(_elm_lang$core$Debug$log, 'token is entered into the model', _p11)
+						}),
+					_1: _user$project$Accio$validateToken(_p11)
 				};
 			default:
-				if (_p9._0.ctor === 'Ok') {
+				if (_p10._0.ctor === 'Ok') {
 					return {
 						ctor: '_Tuple2',
 						_0: model,
-						_1: A2(_user$project$Accio$setExpiration, _p9._0._0, model.token)
+						_1: A2(_user$project$Accio$setExpiration, _p10._0._0, model.token)
 					};
 				} else {
 					return {
@@ -409,8 +408,8 @@ var _user$project$Accio$CloseDialog = {ctor: 'CloseDialog'};
 var _user$project$Accio$OpenDialog = {ctor: 'OpenDialog'};
 var _user$project$Accio$Authorize = {ctor: 'Authorize'};
 var _user$project$Accio$authorizeOrConvert = function (model) {
-	var _p11 = model.token;
-	if (_p11.ctor === 'Just') {
+	var _p12 = model.token;
+	if (_p12.ctor === 'Just') {
 		return A2(
 			_elm_lang$html$Html$div,
 			{ctor: '[]'},
@@ -563,8 +562,8 @@ var _user$project$Accio$Url = function (a) {
 	return {ctor: 'Url', _0: a};
 };
 var _user$project$Accio$inputOrLink = function (model) {
-	var _p12 = model.spreadsheetUrl;
-	if (_p12 === '') {
+	var _p13 = model.spreadsheetUrl;
+	if (_p13 === '') {
 		return A2(
 			_elm_lang$html$Html$div,
 			{ctor: '[]'},
@@ -614,7 +613,7 @@ var _user$project$Accio$inputOrLink = function (model) {
 					_elm_lang$html$Html$a,
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$href(_p12),
+						_0: _elm_lang$html$Html_Attributes$href(_p13),
 						_1: {ctor: '[]'}
 					},
 					{
@@ -668,75 +667,87 @@ var _user$project$Accio$view = function (model) {
 								_1: {
 									ctor: '::',
 									_0: A2(
-										_elm_lang$html$Html$h4,
+										_elm_lang$html$Html$h3,
 										{ctor: '[]'},
 										{
 											ctor: '::',
-											_0: _elm_lang$html$Html$text(model.errorMessage),
+											_0: _elm_lang$html$Html$text(
+												A2(_elm_lang$core$Maybe$withDefault, 'No token', model.token)),
 											_1: {ctor: '[]'}
 										}),
 									_1: {
 										ctor: '::',
-										_0: _user$project$Accio$inputOrLink(model),
+										_0: A2(
+											_elm_lang$html$Html$h4,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: _elm_lang$html$Html$text(model.errorMessage),
+												_1: {ctor: '[]'}
+											}),
 										_1: {
 											ctor: '::',
-											_0: _krisajenkins$elm_dialog$Dialog$view(
-												model.showDialog ? _elm_lang$core$Maybe$Just(
-													_user$project$Accio$dialogConfig(model)) : _elm_lang$core$Maybe$Nothing),
+											_0: _user$project$Accio$inputOrLink(model),
 											_1: {
 												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$footer,
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html_Attributes$style(
-															{
-																ctor: '::',
-																_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '80px'},
-																_1: {ctor: '[]'}
-															}),
-														_1: {ctor: '[]'}
-													},
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('For feedback, please '),
-														_1: {
+												_0: _krisajenkins$elm_dialog$Dialog$view(
+													model.showDialog ? _elm_lang$core$Maybe$Just(
+														_user$project$Accio$dialogConfig(model)) : _elm_lang$core$Maybe$Nothing),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$footer,
+														{
 															ctor: '::',
-															_0: A2(
-																_elm_lang$html$Html$a,
+															_0: _elm_lang$html$Html_Attributes$style(
 																{
 																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$href('https://github.com/polyfish42/accio/issues'),
-																	_1: {ctor: '[]'}
-																},
-																{
-																	ctor: '::',
-																	_0: _elm_lang$html$Html$text('open an issue on Github. '),
+																	_0: {ctor: '_Tuple2', _0: 'margin-top', _1: '80px'},
 																	_1: {ctor: '[]'}
 																}),
+															_1: {ctor: '[]'}
+														},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('For feedback, please '),
 															_1: {
 																ctor: '::',
-																_0: _elm_lang$html$Html$text('Created by '),
+																_0: A2(
+																	_elm_lang$html$Html$a,
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Attributes$href('https://github.com/polyfish42/accio/issues'),
+																		_1: {ctor: '[]'}
+																	},
+																	{
+																		ctor: '::',
+																		_0: _elm_lang$html$Html$text('open an issue on Github. '),
+																		_1: {ctor: '[]'}
+																	}),
 																_1: {
 																	ctor: '::',
-																	_0: A2(
-																		_elm_lang$html$Html$a,
-																		{
-																			ctor: '::',
-																			_0: _elm_lang$html$Html_Attributes$href('https://twitter.com/polyfish42'),
-																			_1: {ctor: '[]'}
-																		},
-																		{
-																			ctor: '::',
-																			_0: _elm_lang$html$Html$text(' @polyfish42'),
-																			_1: {ctor: '[]'}
-																		}),
-																	_1: {ctor: '[]'}
+																	_0: _elm_lang$html$Html$text('Created by '),
+																	_1: {
+																		ctor: '::',
+																		_0: A2(
+																			_elm_lang$html$Html$a,
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html_Attributes$href('https://twitter.com/polyfish42'),
+																				_1: {ctor: '[]'}
+																			},
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html$text(' @polyfish42'),
+																				_1: {ctor: '[]'}
+																			}),
+																		_1: {ctor: '[]'}
+																	}
 																}
 															}
-														}
-													}),
-												_1: {ctor: '[]'}
+														}),
+													_1: {ctor: '[]'}
+												}
 											}
 										}
 									}
