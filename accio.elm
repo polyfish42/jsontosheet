@@ -270,8 +270,8 @@ inputOrLink model =
     case model.spreadsheetUrl of
         "" ->
             div []
-                [ textarea [ placeholder "Enter your JSON or URL here.", class "form-control", rows 10, cols 70, onInput Url ] [ showUrl model ]
-                , authorizeOrConvert model
+                [ textarea [ placeholder "Enter your JSON or URL here.", class "form-control", rows 10, cols 60, onInput Url ] [ showUrl model ]
+                , authorizeOrConvert model.token
                 ]
 
         url ->
@@ -292,9 +292,9 @@ showUrl model =
             text ""
 
 
-authorizeOrConvert model =
-    case model.token of
-        Just token ->
+authorizeOrConvert token =
+    case token of
+        Just str ->
             div []
                 [ button [ class "btn btn-primary", onClick GetData, style [ ( "margin-top", "10px" ), ( "float", "right" ) ] ] [ text "Convert" ]
                 ]

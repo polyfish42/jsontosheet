@@ -11767,8 +11767,8 @@ var _user$project$Accio$GetData = {ctor: 'GetData'};
 var _user$project$Accio$CloseDialog = {ctor: 'CloseDialog'};
 var _user$project$Accio$OpenDialog = {ctor: 'OpenDialog'};
 var _user$project$Accio$Authorize = {ctor: 'Authorize'};
-var _user$project$Accio$authorizeOrConvert = function (model) {
-	var _p12 = model.token;
+var _user$project$Accio$authorizeOrConvert = function (token) {
+	var _p12 = token;
 	if (_p12.ctor === 'Just') {
 		return A2(
 			_elm_lang$html$Html$div,
@@ -11942,7 +11942,7 @@ var _user$project$Accio$inputOrLink = function (model) {
 								_0: _elm_lang$html$Html_Attributes$rows(10),
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$cols(70),
+									_0: _elm_lang$html$Html_Attributes$cols(60),
 									_1: {
 										ctor: '::',
 										_0: _elm_lang$html$Html_Events$onInput(_user$project$Accio$Url),
@@ -11959,7 +11959,7 @@ var _user$project$Accio$inputOrLink = function (model) {
 					}),
 				_1: {
 					ctor: '::',
-					_0: _user$project$Accio$authorizeOrConvert(model),
+					_0: _user$project$Accio$authorizeOrConvert(model.token),
 					_1: {ctor: '[]'}
 				}
 			});
