@@ -1,5 +1,6 @@
 port module Accio exposing (..)
 
+import Animation exposing (px)
 import Array
 import Dialog
 import Debug
@@ -43,6 +44,7 @@ type alias Model =
     , token : Maybe String
     , spreadsheetUrl : String
     , showDialog : Bool
+    , style : Animation.State
     }
 
 
@@ -53,7 +55,7 @@ type Input
 
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model (OAuth.parseState location |> validateState) "" Nothing "" False, Cmd.batch [ (Navigation.modifyUrl "#"), (saveToken location) ] )
+    ( Model (OAuth.parseState location |> validateState) "" Nothing "" False ( Animation.style [Animation.opacity 1.0]), Cmd.batch [ (Navigation.modifyUrl "#"), (saveToken location) ] )
 
 
 validateState : Maybe String -> Maybe Input
@@ -90,6 +92,7 @@ saveToken location =
 type Msg
     = NoOp
     | Url String
+    | Animate Animation.Msg
     | Authorize
     | OpenDialog
     | CloseDialog
@@ -113,6 +116,11 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
+        Animate animMsg ->
+          ({ model
+              | style = Animation.update animMsg model.style
+          }, Cmd.none)
+
         Url url ->
             ( { model | url = validateInput url }, Cmd.none )
 
@@ -126,7 +134,20 @@ update msg model =
             ( model, Navigation.load <| OAuth.requestToken <| packageState model.url )
 
         GetData ->
-            ( model, getData model.url model )
+            ( { model
+                | style =
+                    Animation.interrupt
+                        [ Animation.loop
+                          [ Animation.to
+                              [ Animation.opacity 0
+                              ]
+                          , Animation.to
+                              [ Animation.opacity 1
+                              ]
+                          ]
+                        ]
+                        model.style
+              }, getData model.url model )
 
         Fetch (Ok response) ->
             ( model, requestCsv model.token model (GoogleSheet.createSheet response) )
@@ -151,6 +172,7 @@ update msg model =
 
         ValidateToken (Err _) ->
             ( model, setAndGetToken Nothing )
+
 
 
 validateInput : String -> Maybe Input
@@ -186,10 +208,10 @@ setExpiration response token =
             delay (Time.second * Debug.log "token expires in (seconds)" (Result.withDefault 0 (String.toFloat expiration))) <| TokenValue Nothing
 
         Ok Nothing ->
-            setAndGetToken (Just "")
+            setAndGetToken (Nothing)
 
         Err _ ->
-            setAndGetToken (Just "")
+            setAndGetToken (Nothing)
 
 
 delay : Time -> msg -> Cmd msg
@@ -227,6 +249,7 @@ subscriptions model =
     Sub.batch
         [ (setAndGetTokenResponse TokenValue)
         , (getTokenResponse TokenValue)
+        , (Animation.subscription Animate [ model.style ])
         ]
 
 
@@ -242,7 +265,6 @@ view model =
         , div [ class "row" ]
             [ div [ class "col-md-6" ]
                 [ h1 [] [ text "Turn JSON into a Google Sheet" ]
-                , h3 [] [ text <| withDefault "No token" model.token ]
                 , h4 [] [ text model.errorMessage ]
                 , inputOrLink model
                 , Dialog.view
@@ -271,7 +293,7 @@ inputOrLink model =
         "" ->
             div []
                 [ textarea [ placeholder "Enter your JSON or URL here.", class "form-control", rows 10, cols 60, onInput Url ] [ showUrl model ]
-                , authorizeOrConvert model.token
+                , authorizeOrConvert model
                 ]
 
         url ->
@@ -292,12 +314,19 @@ showUrl model =
             text ""
 
 
-authorizeOrConvert token =
-    case token of
+authorizeOrConvert model =
+    case Debug.log "view model" model.token of
         Just str ->
             div []
-                [ button [ class "btn btn-primary", onClick GetData, style [ ( "margin-top", "10px" ), ( "float", "right" ) ] ] [ text "Convert" ]
+                [ button (Animation.render model.style ++ [ onClick GetData
+                                                              , style
+                                                                  [ ( "margin-top", "10px" ), ( "float", "right" )
+                                                                  ]
+                                                              , class "btn btn-primary"
+                                                                     ])
+                                                               [ text "Convert" ]
                 ]
+
 
         Nothing ->
             div []
