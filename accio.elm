@@ -39,7 +39,7 @@ main =
 
 
 type alias Model =
-    { url : Maybe Input
+    { input : Maybe Input
     , errorMessage : String
     , token : Maybe String
     , spreadsheetUrl : String
@@ -55,29 +55,30 @@ type Input
 
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model (OAuth.parseState location |> validateState) "" Nothing "" False ( Animation.style [Animation.opacity 1.0]), Cmd.batch [ (Navigation.modifyUrl "#"), (saveToken location) ] )
+    ( Model (OAuth.parseState location |> decodeState) "" Nothing "" False (Animation.style [ Animation.opacity 1.0 ]), Cmd.batch [ (Navigation.modifyUrl "#"), (OAuth.parseToken location |> saveToken) ] )
 
 
-validateState : Maybe String -> Maybe Input
-validateState state =
+decodeState : Maybe String -> Maybe Input
+decodeState state =
     case state of
         Just string ->
             case decodeUri string of
                 Just str ->
-                  if contains (regex "{") str then
-                      Just (Json str)
-                  else
-                      Just (ApiUrl str)
+                    if contains (regex "{") str then
+                        Just (Json str)
+                    else
+                        Just (ApiUrl str)
+
                 Nothing ->
-                  Nothing
+                    Nothing
 
         Nothing ->
             Nothing
 
 
-saveToken : Navigation.Location -> Cmd Msg
+saveToken : Maybe String -> Cmd Msg
 saveToken location =
-    case OAuth.parseToken location of
+    case location of
         Just str ->
             setAndGetToken (Just str)
 
@@ -91,14 +92,14 @@ saveToken location =
 
 type Msg
     = NoOp
-    | Url String
+    | Input String
     | Animate Animation.Msg
     | Authorize
     | OpenDialog
     | CloseDialog
-    | GetData
-    | Fetch (Result Http.Error String)
-    | PostCsv (Result Http.Error String)
+    | Convert
+    | FetchJson (Result Http.Error String)
+    | CreateSheet (Result Http.Error String)
     | Error String
     | TokenValue (Maybe String)
     | ValidateToken (Result Http.Error String)
@@ -117,12 +118,14 @@ update msg model =
             ( model, Cmd.none )
 
         Animate animMsg ->
-          ({ model
-              | style = Animation.update animMsg model.style
-          }, Cmd.none)
+            ( { model
+                | style = Animation.update animMsg model.style
+              }
+            , Cmd.none
+            )
 
-        Url url ->
-            ( { model | url = validateInput url }, Cmd.none )
+        Input str ->
+            ( { model | input = encodeInput str }, Cmd.none )
 
         OpenDialog ->
             ( { model | showDialog = True }, Cmd.none )
@@ -131,52 +134,53 @@ update msg model =
             ( { model | showDialog = False }, Cmd.none )
 
         Authorize ->
-            ( model, Navigation.load <| OAuth.requestToken <| packageState model.url )
+            ( model, Navigation.load <| OAuth.requestToken <| packageState model.input )
 
-        GetData ->
+        Convert ->
             ( { model
                 | style =
                     Animation.interrupt
                         [ Animation.loop
-                          [ Animation.to
-                              [ Animation.opacity 0
-                              ]
-                          , Animation.to
-                              [ Animation.opacity 1
-                              ]
-                          ]
+                            [ Animation.to
+                                [ Animation.opacity 0
+                                ]
+                            , Animation.to
+                                [ Animation.opacity 1
+                                ]
+                            ]
                         ]
                         model.style
-              }, getData model.url model )
+              }
+            , convert model.input model
+            )
 
-        Fetch (Ok response) ->
+        FetchJson (Ok response) ->
             ( model, requestCsv model.token model (GoogleSheet.createSheet response) )
 
-        Fetch (Err message) ->
+        FetchJson (Err message) ->
             ( { model | errorMessage = toString message }, Cmd.none )
 
-        PostCsv (Ok response) ->
+        CreateSheet (Ok response) ->
             ( { model | spreadsheetUrl = response }, Cmd.none )
 
-        PostCsv (Err _) ->
+        CreateSheet (Err _) ->
             ( model, Cmd.none )
 
         Error msg ->
             ( { model | errorMessage = msg }, Cmd.none )
 
         TokenValue token ->
-            ( { model | token = (Debug.log "token is entered into the model" token) }, validateToken token )
+            ( { model | token = token }, validateToken token )
 
         ValidateToken (Ok response) ->
-            ( model, setExpiration response model.token )
+            ( model, setExpiration response )
 
         ValidateToken (Err _) ->
             ( model, setAndGetToken Nothing )
 
 
-
-validateInput : String -> Maybe Input
-validateInput str =
+encodeInput : String -> Maybe Input
+encodeInput str =
     if contains (regex "{") str then
         Just (Json str)
     else
@@ -201,11 +205,11 @@ validateTokenUrl token =
         [ ( "access_token", token ) ]
 
 
-setExpiration : String -> Maybe String -> Cmd Msg
-setExpiration response token =
-    case Debug.log "decoded string" (D.decodeString (D.maybe (D.field "expires_in" D.string)) response) of
+setExpiration : String -> Cmd Msg
+setExpiration response =
+    case D.decodeString (D.maybe (D.field "expires_in" D.string)) response of
         Ok (Just expiration) ->
-            delay (Time.second * Debug.log "token expires in (seconds)" (Result.withDefault 0 (String.toFloat expiration))) <| TokenValue Nothing
+            delay (Time.second * (Result.withDefault 0 (String.toFloat expiration))) <| TokenValue Nothing
 
         Ok Nothing ->
             setAndGetToken (Nothing)
@@ -221,8 +225,8 @@ delay time msg =
         |> Task.perform identity
 
 
-getData : Maybe Input -> Model -> Cmd Msg
-getData input model =
+convert : Maybe Input -> Model -> Cmd Msg
+convert input model =
     case input of
         Just (Json str) ->
             requestCsv model.token model (GoogleSheet.createSheet str)
@@ -287,12 +291,12 @@ bootstrap =
         ]
         []
 
-
+inputOrLink : Model -> Html Msg
 inputOrLink model =
     case model.spreadsheetUrl of
         "" ->
             div []
-                [ textarea [ placeholder "Enter your JSON or URL here.", class "form-control", rows 10, cols 60, onInput Url ] [ showUrl model ]
+                [ textarea [ placeholder "Enter your JSON or URL here.", class "form-control", rows 10, cols 60, onInput Input ] [ showInput model.input ]
                 , authorizeOrConvert model
                 ]
 
@@ -301,9 +305,9 @@ inputOrLink model =
                 [ a [ href url ] [ text "Click here to see your spreadsheet" ]
                 ]
 
-
-showUrl model =
-    case (Debug.log "input" model.url) of
+showInput : Maybe Input -> Html Msg
+showInput input =
+    case input of
         Just (Json str) ->
             text str
 
@@ -313,20 +317,23 @@ showUrl model =
         Nothing ->
             text ""
 
-
+authorizeOrConvert : Model -> Html Msg
 authorizeOrConvert model =
     case Debug.log "view model" model.token of
         Just str ->
             div []
-                [ button (Animation.render model.style ++ [ onClick GetData
-                                                              , style
-                                                                  [ ( "margin-top", "10px" ), ( "float", "right" )
-                                                                  ]
-                                                              , class "btn btn-primary"
-                                                                     ])
-                                                               [ text "Convert" ]
+                [ button
+                    (Animation.render model.style
+                        ++ [ onClick Convert
+                           , style
+                                [ ( "margin-top", "10px" )
+                                , ( "float", "right" )
+                                ]
+                           , class "btn btn-primary"
+                           ]
+                    )
+                    [ text "Convert" ]
                 ]
-
 
         Nothing ->
             div []
@@ -364,7 +371,7 @@ dialogConfig model =
 
 getJson : String -> Cmd Msg
 getJson url =
-    Http.send Fetch <|
+    Http.send FetchJson <|
         Http.getString (url)
 
 
@@ -372,7 +379,7 @@ requestCsv : Maybe String -> Model -> E.Value -> Cmd Msg
 requestCsv token model requestBody =
     case token of
         Just token ->
-            Http.send PostCsv (putRequest token model requestBody)
+            Http.send CreateSheet (putRequest token model requestBody)
 
         Nothing ->
             Cmd.none
