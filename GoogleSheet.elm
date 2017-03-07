@@ -154,17 +154,17 @@ destructureArray nestedName key list acc counter =
             acc
 
 
-headersAndRows : List (List ( String, JsonVal )) -> List E.Value
+headersAndRows : List (List ( String, JsonVal )) -> (List E.Value, Int)
 headersAndRows rows =
     Maybe.withDefault [ ( "There was an error with the headers in this app", JsonNull ) ] (List.head rows)
         |> createHeaders
-        |> List.append (List.map createRow rows)
-        |> List.reverse
+        |> Tuple.mapFirst (List.append (List.map createRow rows))
+        |> Tuple.mapFirst (List.reverse)
 
 
-createHeaders : List ( String, JsonVal ) -> List E.Value
+createHeaders : List ( String, JsonVal ) -> (List E.Value, Int)
 createHeaders row =
-    [ E.object
+    ([ E.object
         [ ( "values"
           , E.array
                 (Array.fromList
@@ -173,6 +173,7 @@ createHeaders row =
           )
         ]
     ]
+    , List.length row)
 
 
 firstTuple : ( String, JsonVal ) -> E.Value
@@ -244,7 +245,7 @@ googleNumberCell num =
         ]
 
 
-googleSheetsRequestBody : List E.Value -> E.Value
+googleSheetsRequestBody : (List E.Value, Int) -> E.Value
 googleSheetsRequestBody rows =
     E.object
         [ ( "sheets"
@@ -258,7 +259,7 @@ googleSheetsRequestBody rows =
                                         [ ( "rowData"
                                           , E.array
                                                 (Array.fromList
-                                                    rows
+                                                    (Tuple.first rows)
                                                 )
                                           )
                                         ]
@@ -269,7 +270,7 @@ googleSheetsRequestBody rows =
                           , E.object
                                 [ ( "gridProperties"
                                   , E.object
-                                        [ ( "columnCount", E.int 200 ) ]
+                                        [ ( "columnCount", E.int (columnLength rows) ) ]
                                   )
                                 , ("title", E.string "From Accio")
                                 ]
@@ -279,3 +280,10 @@ googleSheetsRequestBody rows =
                 )
           )
         ]
+
+columnLength : (List E.Value, Int) -> Int
+columnLength rows=
+  if Tuple.second rows > 26 then
+    Tuple.second rows
+  else
+    26

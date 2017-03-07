@@ -1,3 +1,8 @@
+var _user$project$GoogleSheet$columnLength = function (rows) {
+	return (_elm_lang$core$Native_Utils.cmp(
+		_elm_lang$core$Tuple$second(rows),
+		26) > 0) ? _elm_lang$core$Tuple$second(rows) : 26;
+};
 var _user$project$GoogleSheet$googleSheetsRequestBody = function (rows) {
 	return _elm_lang$core$Json_Encode$object(
 		{
@@ -26,7 +31,8 @@ var _user$project$GoogleSheet$googleSheetsRequestBody = function (rows) {
 																ctor: '_Tuple2',
 																_0: 'rowData',
 																_1: _elm_lang$core$Json_Encode$array(
-																	_elm_lang$core$Array$fromList(rows))
+																	_elm_lang$core$Array$fromList(
+																		_elm_lang$core$Tuple$first(rows)))
 															},
 															_1: {ctor: '[]'}
 														}),
@@ -50,7 +56,8 @@ var _user$project$GoogleSheet$googleSheetsRequestBody = function (rows) {
 																_0: {
 																	ctor: '_Tuple2',
 																	_0: 'columnCount',
-																	_1: _elm_lang$core$Json_Encode$int(200)
+																	_1: _elm_lang$core$Json_Encode$int(
+																		_user$project$GoogleSheet$columnLength(rows))
 																},
 																_1: {ctor: '[]'}
 															})
@@ -183,20 +190,24 @@ var _user$project$GoogleSheet$firstTuple = function (row) {
 };
 var _user$project$GoogleSheet$createHeaders = function (row) {
 	return {
-		ctor: '::',
-		_0: _elm_lang$core$Json_Encode$object(
-			{
-				ctor: '::',
-				_0: {
-					ctor: '_Tuple2',
-					_0: 'values',
-					_1: _elm_lang$core$Json_Encode$array(
-						_elm_lang$core$Array$fromList(
-							A2(_elm_lang$core$List$map, _user$project$GoogleSheet$firstTuple, row)))
-				},
-				_1: {ctor: '[]'}
-			}),
-		_1: {ctor: '[]'}
+		ctor: '_Tuple2',
+		_0: {
+			ctor: '::',
+			_0: _elm_lang$core$Json_Encode$object(
+				{
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'values',
+						_1: _elm_lang$core$Json_Encode$array(
+							_elm_lang$core$Array$fromList(
+								A2(_elm_lang$core$List$map, _user$project$GoogleSheet$firstTuple, row)))
+					},
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		},
+		_1: _elm_lang$core$List$length(row)
 	};
 };
 var _user$project$GoogleSheet$nestKeys = F2(
@@ -219,10 +230,13 @@ var _user$project$GoogleSheet$JsonBool = function (a) {
 };
 var _user$project$GoogleSheet$JsonNull = {ctor: 'JsonNull'};
 var _user$project$GoogleSheet$headersAndRows = function (rows) {
-	return _elm_lang$core$List$reverse(
+	return A2(
+		_elm_lang$core$Tuple$mapFirst,
+		_elm_lang$core$List$reverse,
 		A2(
-			_elm_lang$core$List$append,
-			A2(_elm_lang$core$List$map, _user$project$GoogleSheet$createRow, rows),
+			_elm_lang$core$Tuple$mapFirst,
+			_elm_lang$core$List$append(
+				A2(_elm_lang$core$List$map, _user$project$GoogleSheet$createRow, rows)),
 			_user$project$GoogleSheet$createHeaders(
 				A2(
 					_elm_lang$core$Maybe$withDefault,
