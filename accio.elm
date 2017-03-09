@@ -138,7 +138,8 @@ update msg model =
 
         Convert ->
             ( { model
-                | style =
+                | errorMessage = ""
+                , style =
                     Animation.interrupt
                         [ Animation.loop
                             [ Animation.to
@@ -158,7 +159,18 @@ update msg model =
             ( model, requestCsv model.token model (GoogleSheet.createSheet response) )
 
         FetchJson (Err message) ->
-            ( { model | errorMessage = toString message }, Cmd.none )
+            ( { model
+                | errorMessage = parseError message
+                , style =
+                    Animation.interrupt
+                        [ Animation.to
+                            [ Animation.opacity 1
+                            ]
+                        ]
+                        model.style
+              }
+            , Cmd.none
+            )
 
         CreateSheet (Ok response) ->
             ( { model | spreadsheetUrl = response }, Cmd.none )
@@ -185,6 +197,33 @@ encodeInput str =
         Just (Json str)
     else
         Just (ApiUrl str)
+
+
+convert : Maybe Input -> Model -> Cmd Msg
+convert input model =
+    case input of
+        Just (Json str) ->
+            requestCsv model.token model (GoogleSheet.createSheet str)
+
+        Just (ApiUrl str) ->
+            getJson str
+
+        Nothing ->
+            Cmd.none
+
+
+parseError : Http.Error -> String
+parseError error =
+    case error of
+        BadStatus res ->
+            String.concat [ toString res.status.code, " Error: ", res.status.message, "\n(Try entering the url in your browser, and pasting the json here.)" ]
+
+        _ ->
+            "There was an error trying to fetch the Json. Try entering the url in your browser, and pasting the json here."
+
+
+
+-- BadStatus { status = { code = 404, message = "" }, headers = Dict.fromList [("cache-control","no-cache"),("content-type","application/json; charset=utf-8"),("expires","-1"),("pragma","no-cache")], url = "https://jsonplaceholder.typicode.com/comme", body = "{}" }
 
 
 validateToken : Maybe String -> Cmd Msg
@@ -225,19 +264,6 @@ delay time msg =
         |> Task.perform identity
 
 
-convert : Maybe Input -> Model -> Cmd Msg
-convert input model =
-    case input of
-        Just (Json str) ->
-            requestCsv model.token model (GoogleSheet.createSheet str)
-
-        Just (ApiUrl str) ->
-            getJson str
-
-        Nothing ->
-            Cmd.none
-
-
 
 -- SUBSCRIPTIONS
 
@@ -269,7 +295,7 @@ view model =
         , div [ class "row" ]
             [ div [ class "col-md-6" ]
                 [ h1 [] [ text "Turn JSON into a Google Sheet" ]
-                , h4 [] [ text model.errorMessage ]
+                , errorAlert model
                 , inputOrLink model
                 , Dialog.view
                     (if model.showDialog then
@@ -290,6 +316,16 @@ bootstrap =
         , rel "stylesheet"
         ]
         []
+
+
+errorAlert : Model -> Html Msg
+errorAlert model =
+    case model.errorMessage of
+        "" ->
+            div [] []
+
+        _ ->
+            div [ class "alert alert-danger" ] [ text model.errorMessage ]
 
 
 inputOrLink : Model -> Html Msg
