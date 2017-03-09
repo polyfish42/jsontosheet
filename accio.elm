@@ -291,6 +291,7 @@ bootstrap =
         ]
         []
 
+
 inputOrLink : Model -> Html Msg
 inputOrLink model =
     case model.spreadsheetUrl of
@@ -301,9 +302,10 @@ inputOrLink model =
                 ]
 
         url ->
-            div []
-                [ a [ href url ] [ text "Click here to see your spreadsheet" ]
+            div [ style [ ( "height", "215px" ), ( "text-align", "center" ), ( "max-width", "518px" ) ] ]
+                [ a [ href url, class "btn btn-primary", style [ ( "margin-top", "100px" ) ] ] [ text "Click here to see your spreadsheet" ]
                 ]
+
 
 showInput : Maybe Input -> Html Msg
 showInput input =
@@ -316,6 +318,7 @@ showInput input =
 
         Nothing ->
             text ""
+
 
 authorizeOrConvert : Model -> Html Msg
 authorizeOrConvert model =
