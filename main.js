@@ -17278,9 +17278,6 @@ var _user$project$Accio$setExpiration = function (response) {
 		return _user$project$Accio$setAndGetToken(_elm_lang$core$Maybe$Nothing);
 	}
 };
-var _user$project$Accio$Error = function (a) {
-	return {ctor: 'Error', _0: a};
-};
 var _user$project$Accio$CreateSheet = function (a) {
 	return {ctor: 'CreateSheet', _0: a};
 };
@@ -17454,16 +17451,29 @@ var _user$project$Accio$update = F2(
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				} else {
-					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{
+								errorMessage: _user$project$Accio$parseError(_p13._0._0),
+								style: A2(
+									_mdgriffith$elm_style_animation$Animation$interrupt,
+									{
+										ctor: '::',
+										_0: _mdgriffith$elm_style_animation$Animation$to(
+											{
+												ctor: '::',
+												_0: _mdgriffith$elm_style_animation$Animation$opacity(1),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									},
+									model.style)
+							}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
 				}
-			case 'Error':
-				return {
-					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
-						model,
-						{errorMessage: _p13._0}),
-					_1: _elm_lang$core$Platform_Cmd$none
-				};
 			case 'TokenValue':
 				var _p14 = _p13._0;
 				return {

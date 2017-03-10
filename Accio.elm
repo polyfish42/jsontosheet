@@ -100,7 +100,6 @@ type Msg
     | Convert
     | FetchJson (Result Http.Error String)
     | CreateSheet (Result Http.Error String)
-    | Error String
     | TokenValue (Maybe String)
     | ValidateToken (Result Http.Error String)
 
@@ -175,11 +174,19 @@ update msg model =
         CreateSheet (Ok response) ->
             ( { model | spreadsheetUrl = response }, Cmd.none )
 
-        CreateSheet (Err _) ->
-            ( model, Cmd.none )
-
-        Error msg ->
-            ( { model | errorMessage = msg }, Cmd.none )
+        CreateSheet (Err message) ->
+            ( { model
+                | errorMessage = parseError message
+                , style =
+                    Animation.interrupt
+                        [ Animation.to
+                            [ Animation.opacity 1
+                            ]
+                        ]
+                        model.style
+              }
+            , Cmd.none
+            )
 
         TokenValue token ->
             ( { model | token = token }, validateToken token )

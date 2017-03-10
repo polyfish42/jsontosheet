@@ -62,7 +62,7 @@ flattenAndEncode json =
                     [ [ ( "error", JsonString "irregular json" ) ] ]
 
         Err message ->
-            [ [ ( "error", JsonString message ) ] ]
+            [ [ ( "There was an error making this sheet.", JsonString message ) ] ]
 
 
 destructure : List ( String, JsonVal ) -> String -> JsonVal -> List ( String, JsonVal )
