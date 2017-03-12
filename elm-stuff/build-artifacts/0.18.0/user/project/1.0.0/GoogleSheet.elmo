@@ -667,7 +667,7 @@ var _user$project$GoogleSheet$flattenAndEncode = function (json) {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
-					_0: 'error',
+					_0: 'There was an error making this sheet.',
 					_1: _user$project$GoogleSheet$JsonString(_p13._0)
 				},
 				_1: {ctor: '[]'}
