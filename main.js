@@ -16236,7 +16236,7 @@ var _user$project$OAuth$formUrl = function (state) {
 				_0: {ctor: '_Tuple2', _0: 'client_id', _1: '591745061791-69jpb1uina8sp60eq8c0125dm5nb5hhd.apps.googleusercontent.com'},
 				_1: {
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'redirect_uri', _1: 'http://localhost:8000/main.html'},
+					_0: {ctor: '_Tuple2', _0: 'redirect_uri', _1: 'http://jsontosheet.com/'},
 					_1: {
 						ctor: '::',
 						_0: {ctor: '_Tuple2', _0: 'scope', _1: 'https://www.googleapis.com/auth/spreadsheets'},
@@ -16982,7 +16982,7 @@ var _user$project$GoogleSheet$flattenAndEncode = function (json) {
 				ctor: '::',
 				_0: {
 					ctor: '_Tuple2',
-					_0: 'error',
+					_0: 'There was an error making this sheet.',
 					_1: _user$project$GoogleSheet$JsonString(_p13._0)
 				},
 				_1: {ctor: '[]'}
