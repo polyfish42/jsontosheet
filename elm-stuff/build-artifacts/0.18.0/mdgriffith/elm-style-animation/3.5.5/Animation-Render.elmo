@@ -1,0 +1,1213 @@
+var _mdgriffith$elm_style_animation$Animation_Render$dropWhile = F2(
+	function (predicate, list) {
+		dropWhile:
+		while (true) {
+			var _p0 = list;
+			if (_p0.ctor === '[]') {
+				return {ctor: '[]'};
+			} else {
+				if (predicate(_p0._0)) {
+					var _v1 = predicate,
+						_v2 = _p0._1;
+					predicate = _v1;
+					list = _v2;
+					continue dropWhile;
+				} else {
+					return list;
+				}
+			}
+		}
+	});
+var _mdgriffith$elm_style_animation$Animation_Render$takeWhile = function (predicate) {
+	var takeWhileMemo = F2(
+		function (memo, list) {
+			takeWhileMemo:
+			while (true) {
+				var _p1 = list;
+				if (_p1.ctor === '[]') {
+					return _elm_lang$core$List$reverse(memo);
+				} else {
+					var _p2 = _p1._0;
+					if (predicate(_p2)) {
+						var _v4 = {ctor: '::', _0: _p2, _1: memo},
+							_v5 = _p1._1;
+						memo = _v4;
+						list = _v5;
+						continue takeWhileMemo;
+					} else {
+						return _elm_lang$core$List$reverse(memo);
+					}
+				}
+			}
+		});
+	return takeWhileMemo(
+		{ctor: '[]'});
+};
+var _mdgriffith$elm_style_animation$Animation_Render$span = F2(
+	function (p, xs) {
+		return {
+			ctor: '_Tuple2',
+			_0: A2(_mdgriffith$elm_style_animation$Animation_Render$takeWhile, p, xs),
+			_1: A2(_mdgriffith$elm_style_animation$Animation_Render$dropWhile, p, xs)
+		};
+	});
+var _mdgriffith$elm_style_animation$Animation_Render$groupWhile = F2(
+	function (eq, xs_) {
+		var _p3 = xs_;
+		if (_p3.ctor === '[]') {
+			return {ctor: '[]'};
+		} else {
+			var _p5 = _p3._0;
+			var _p4 = A2(
+				_mdgriffith$elm_style_animation$Animation_Render$span,
+				eq(_p5),
+				_p3._1);
+			var ys = _p4._0;
+			var zs = _p4._1;
+			return {
+				ctor: '::',
+				_0: {ctor: '::', _0: _p5, _1: ys},
+				_1: A2(_mdgriffith$elm_style_animation$Animation_Render$groupWhile, eq, zs)
+			};
+		}
+	});
+var _mdgriffith$elm_style_animation$Animation_Render$pathCmdValue = function (cmd) {
+	var renderPoints = function (coords) {
+		return A2(
+			_elm_lang$core$String$join,
+			' ',
+			A2(
+				_elm_lang$core$List$map,
+				function (_p6) {
+					var _p7 = _p6;
+					return A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(_p7._0.position),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							',',
+							_elm_lang$core$Basics$toString(_p7._1.position)));
+				},
+				coords));
+	};
+	var _p8 = cmd;
+	switch (_p8.ctor) {
+		case 'Move':
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'm ',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(_p8._0.position),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						',',
+						_elm_lang$core$Basics$toString(_p8._1.position))));
+		case 'MoveTo':
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'M ',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(_p8._0.position),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						',',
+						_elm_lang$core$Basics$toString(_p8._1.position))));
+		case 'Line':
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'l ',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(_p8._0.position),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						',',
+						_elm_lang$core$Basics$toString(_p8._1.position))));
+		case 'LineTo':
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'L ',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(_p8._0.position),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						',',
+						_elm_lang$core$Basics$toString(_p8._1.position))));
+		case 'Horizontal':
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'h ',
+				_elm_lang$core$Basics$toString(_p8._0.position));
+		case 'HorizontalTo':
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'H ',
+				_elm_lang$core$Basics$toString(_p8._0.position));
+		case 'Vertical':
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'v ',
+				_elm_lang$core$Basics$toString(_p8._0.position));
+		case 'VerticalTo':
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'V ',
+				_elm_lang$core$Basics$toString(_p8._0.position));
+		case 'Curve':
+			var _p9 = _p8._0.point;
+			var p1x = _p9._0;
+			var p1y = _p9._1;
+			var _p10 = _p8._0.control2;
+			var c2x = _p10._0;
+			var c2y = _p10._1;
+			var _p11 = _p8._0.control1;
+			var c1x = _p11._0;
+			var c1y = _p11._1;
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'c ',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(c1x.position),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						' ',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(c1y.position),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								', ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(c2x.position),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										' ',
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											_elm_lang$core$Basics$toString(c2y.position),
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												', ',
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													_elm_lang$core$Basics$toString(p1x.position),
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														' ',
+														_elm_lang$core$Basics$toString(p1y.position))))))))))));
+		case 'CurveTo':
+			var _p12 = _p8._0.point;
+			var p1x = _p12._0;
+			var p1y = _p12._1;
+			var _p13 = _p8._0.control2;
+			var c2x = _p13._0;
+			var c2y = _p13._1;
+			var _p14 = _p8._0.control1;
+			var c1x = _p14._0;
+			var c1y = _p14._1;
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'C ',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(c1x.position),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						' ',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(c1y.position),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								', ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(c2x.position),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										' ',
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											_elm_lang$core$Basics$toString(c2y.position),
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												', ',
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													_elm_lang$core$Basics$toString(p1x.position),
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														' ',
+														_elm_lang$core$Basics$toString(p1y.position))))))))))));
+		case 'Quadratic':
+			var _p15 = _p8._0.point;
+			var p1x = _p15._0;
+			var p1y = _p15._1;
+			var _p16 = _p8._0.control;
+			var c1x = _p16._0;
+			var c1y = _p16._1;
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'q ',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(c1x.position),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						' ',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(c1y.position),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								', ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(p1x.position),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										' ',
+										_elm_lang$core$Basics$toString(p1y.position))))))));
+		case 'QuadraticTo':
+			var _p17 = _p8._0.point;
+			var p1x = _p17._0;
+			var p1y = _p17._1;
+			var _p18 = _p8._0.control;
+			var c1x = _p18._0;
+			var c1y = _p18._1;
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'Q ',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(c1x.position),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						' ',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(c1y.position),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								', ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(p1x.position),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										' ',
+										_elm_lang$core$Basics$toString(p1y.position))))))));
+		case 'SmoothQuadratic':
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				't ',
+				renderPoints(_p8._0));
+		case 'SmoothQuadraticTo':
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'T ',
+				renderPoints(_p8._0));
+		case 'Smooth':
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				's ',
+				renderPoints(_p8._0));
+		case 'SmoothTo':
+			return A2(
+				_elm_lang$core$Basics_ops['++'],
+				'S ',
+				renderPoints(_p8._0));
+		case 'ClockwiseArc':
+			var _p19 = _p8._0;
+			var deltaAngle = _p19.endAngle.position - _p19.startAngle.position;
+			if (_elm_lang$core$Native_Utils.cmp(deltaAngle, 360 - 1.0e-6) > 0) {
+				var dy = _p19.radius.position * _elm_lang$core$Basics$sin(
+					_elm_lang$core$Basics$degrees(_p19.startAngle.position));
+				var dx = _p19.radius.position * _elm_lang$core$Basics$cos(
+					_elm_lang$core$Basics$degrees(_p19.startAngle.position));
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					'A ',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(_p19.radius.position),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							',',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(_p19.radius.position),
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									',0,1,1,',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										_elm_lang$core$Basics$toString(_p19.x.position - dx),
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											',',
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												_elm_lang$core$Basics$toString(_p19.y.position - dy),
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													' A ',
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														_elm_lang$core$Basics$toString(_p19.radius.position),
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															',',
+															A2(
+																_elm_lang$core$Basics_ops['++'],
+																_elm_lang$core$Basics$toString(_p19.radius.position),
+																A2(
+																	_elm_lang$core$Basics_ops['++'],
+																	',0,1,1,',
+																	A2(
+																		_elm_lang$core$Basics_ops['++'],
+																		_elm_lang$core$Basics$toString(_p19.x.position + dx),
+																		A2(
+																			_elm_lang$core$Basics_ops['++'],
+																			',',
+																			_elm_lang$core$Basics$toString(_p19.y.position + dy))))))))))))))));
+			} else {
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					'A ',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(_p19.radius.position),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							',',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(_p19.radius.position),
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									' 0 ',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										(_elm_lang$core$Native_Utils.cmp(deltaAngle, 180) > -1) ? '1' : '0',
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											' ',
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												'1',
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													' ',
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														_elm_lang$core$Basics$toString(
+															_p19.x.position + (_p19.radius.position * _elm_lang$core$Basics$cos(
+																_elm_lang$core$Basics$degrees(_p19.endAngle.position)))),
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															',',
+															_elm_lang$core$Basics$toString(
+																_p19.y.position + (_p19.radius.position * _elm_lang$core$Basics$sin(
+																	_elm_lang$core$Basics$degrees(_p19.endAngle.position)))))))))))))));
+			}
+		case 'AntiClockwiseArc':
+			var _p20 = _p8._0;
+			var deltaAngle = _p20.endAngle.position - _p20.startAngle.position;
+			if (_elm_lang$core$Native_Utils.cmp(deltaAngle, 360 - 1.0e-6) > 0) {
+				var dy = _p20.radius.position * _elm_lang$core$Basics$sin(
+					_elm_lang$core$Basics$degrees(_p20.startAngle.position));
+				var dx = _p20.radius.position * _elm_lang$core$Basics$cos(
+					_elm_lang$core$Basics$degrees(_p20.startAngle.position));
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					'A ',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(_p20.radius.position),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							',',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(_p20.radius.position),
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									',0,1,0,',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										_elm_lang$core$Basics$toString(_p20.x.position - dx),
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											',',
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												_elm_lang$core$Basics$toString(_p20.y.position - dy),
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													' A ',
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														_elm_lang$core$Basics$toString(_p20.radius.position),
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															',',
+															A2(
+																_elm_lang$core$Basics_ops['++'],
+																_elm_lang$core$Basics$toString(_p20.radius.position),
+																A2(
+																	_elm_lang$core$Basics_ops['++'],
+																	',0,1,1,',
+																	A2(
+																		_elm_lang$core$Basics_ops['++'],
+																		_elm_lang$core$Basics$toString(_p20.x.position + dx),
+																		A2(
+																			_elm_lang$core$Basics_ops['++'],
+																			',',
+																			_elm_lang$core$Basics$toString(_p20.y.position + dy))))))))))))))));
+			} else {
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					'A ',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(_p20.radius.position),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							',',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(_p20.radius.position),
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									' 0 ',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										(_elm_lang$core$Native_Utils.cmp(_p20.startAngle.position - _p20.endAngle.position, 180) > -1) ? '1' : '0',
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											' ',
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												'0',
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													' ',
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														_elm_lang$core$Basics$toString(
+															_p20.x.position + (_p20.radius.position * _elm_lang$core$Basics$cos(_p20.endAngle.position))),
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															',',
+															_elm_lang$core$Basics$toString(
+																_p20.y.position + (_p20.radius.position * _elm_lang$core$Basics$sin(_p20.endAngle.position))))))))))))));
+			}
+		default:
+			return 'z';
+	}
+};
+var _mdgriffith$elm_style_animation$Animation_Render$propertyValue = F2(
+	function (prop, delim) {
+		var _p21 = prop;
+		switch (_p21.ctor) {
+			case 'ExactProperty':
+				return _p21._1;
+			case 'ColorProperty':
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					'rgba(',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(
+							_elm_lang$core$Basics$round(_p21._1.position)),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							',',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(
+									_elm_lang$core$Basics$round(_p21._2.position)),
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									',',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										_elm_lang$core$Basics$toString(
+											_elm_lang$core$Basics$round(_p21._3.position)),
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											',',
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												_elm_lang$core$Basics$toString(_p21._4.position),
+												')'))))))));
+			case 'ShadowProperty':
+				var _p23 = _p21._2;
+				var _p22 = _p21._0;
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					_p21._1 ? 'inset ' : '',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_elm_lang$core$Basics$toString(_p23.offsetX.position),
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'px',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								' ',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_elm_lang$core$Basics$toString(_p23.offsetY.position),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										'px',
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											' ',
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												_elm_lang$core$Basics$toString(_p23.blur.position),
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													'px',
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														' ',
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															(_elm_lang$core$Native_Utils.eq(_p22, 'text-shadow') || _elm_lang$core$Native_Utils.eq(_p22, 'drop-shadow')) ? '' : A2(
+																_elm_lang$core$Basics_ops['++'],
+																_elm_lang$core$Basics$toString(_p23.size.position),
+																A2(_elm_lang$core$Basics_ops['++'], 'px', ' ')),
+															A2(
+																_elm_lang$core$Basics_ops['++'],
+																'rgba(',
+																A2(
+																	_elm_lang$core$Basics_ops['++'],
+																	_elm_lang$core$Basics$toString(
+																		_elm_lang$core$Basics$round(_p23.red.position)),
+																	A2(
+																		_elm_lang$core$Basics_ops['++'],
+																		', ',
+																		A2(
+																			_elm_lang$core$Basics_ops['++'],
+																			_elm_lang$core$Basics$toString(
+																				_elm_lang$core$Basics$round(_p23.green.position)),
+																			A2(
+																				_elm_lang$core$Basics_ops['++'],
+																				', ',
+																				A2(
+																					_elm_lang$core$Basics_ops['++'],
+																					_elm_lang$core$Basics$toString(
+																						_elm_lang$core$Basics$round(_p23.blue.position)),
+																					A2(
+																						_elm_lang$core$Basics_ops['++'],
+																						', ',
+																						A2(
+																							_elm_lang$core$Basics_ops['++'],
+																							_elm_lang$core$Basics$toString(_p23.alpha.position),
+																							')')))))))))))))))))));
+			case 'Property':
+				var _p24 = _p21._1;
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(_p24.position),
+					_p24.unit);
+			case 'Property2':
+				var _p26 = _p21._2;
+				var _p25 = _p21._1;
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(_p25.position),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_p25.unit,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							delim,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(_p26.position),
+								_p26.unit))));
+			case 'Property3':
+				var _p29 = _p21._3;
+				var _p28 = _p21._2;
+				var _p27 = _p21._1;
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(_p27.position),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_p27.unit,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							delim,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(_p28.position),
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_p28.unit,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										delim,
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											_elm_lang$core$Basics$toString(_p29.position),
+											_p29.unit)))))));
+			case 'Property4':
+				var _p33 = _p21._4;
+				var _p32 = _p21._3;
+				var _p31 = _p21._2;
+				var _p30 = _p21._1;
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(_p30.position),
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_p30.unit,
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							delim,
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(_p31.position),
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									_p31.unit,
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										delim,
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											_elm_lang$core$Basics$toString(_p32.position),
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												_p32.unit,
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													delim,
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														_elm_lang$core$Basics$toString(_p33.position),
+														_p33.unit))))))))));
+			case 'AngleProperty':
+				var _p34 = _p21._1;
+				return A2(
+					_elm_lang$core$Basics_ops['++'],
+					_elm_lang$core$Basics$toString(_p34.position),
+					_p34.unit);
+			case 'Points':
+				return A2(
+					_elm_lang$core$String$join,
+					' ',
+					A2(
+						_elm_lang$core$List$map,
+						function (_p35) {
+							var _p36 = _p35;
+							return A2(
+								_elm_lang$core$Basics_ops['++'],
+								_elm_lang$core$Basics$toString(_p36._0.position),
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									',',
+									_elm_lang$core$Basics$toString(_p36._1.position)));
+						},
+						_p21._0));
+			default:
+				return A2(
+					_elm_lang$core$String$join,
+					' ',
+					A2(_elm_lang$core$List$map, _mdgriffith$elm_style_animation$Animation_Render$pathCmdValue, _p21._0));
+		}
+	});
+var _mdgriffith$elm_style_animation$Animation_Render$isAttr = function (prop) {
+	return A2(
+		_elm_lang$core$String$startsWith,
+		'attr:',
+		_mdgriffith$elm_style_animation$Animation_Model$propertyName(prop)) || function () {
+		var _p37 = prop;
+		switch (_p37.ctor) {
+			case 'Points':
+				return true;
+			case 'Path':
+				return true;
+			case 'Property':
+				var _p38 = _p37._0;
+				return _elm_lang$core$Native_Utils.eq(_p38, 'cx') || (_elm_lang$core$Native_Utils.eq(_p38, 'cy') || (_elm_lang$core$Native_Utils.eq(_p38, 'x') || (_elm_lang$core$Native_Utils.eq(_p38, 'y') || (_elm_lang$core$Native_Utils.eq(_p38, 'rx') || (_elm_lang$core$Native_Utils.eq(_p38, 'ry') || (_elm_lang$core$Native_Utils.eq(_p38, 'r') || _elm_lang$core$Native_Utils.eq(_p38, 'offset')))))));
+			case 'Property4':
+				return _elm_lang$core$Native_Utils.eq(_p37._0, 'viewBox');
+			default:
+				return false;
+		}
+	}();
+};
+var _mdgriffith$elm_style_animation$Animation_Render$webkitPrefix = '-webkit-';
+var _mdgriffith$elm_style_animation$Animation_Render$iePrefix = '-ms-';
+var _mdgriffith$elm_style_animation$Animation_Render$prefix = function (stylePair) {
+	var propValue = _elm_lang$core$Tuple$second(stylePair);
+	var propName = _elm_lang$core$Tuple$first(stylePair);
+	var _p39 = propName;
+	switch (_p39) {
+		case 'transform':
+			return {
+				ctor: '::',
+				_0: stylePair,
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: A2(_elm_lang$core$Basics_ops['++'], _mdgriffith$elm_style_animation$Animation_Render$iePrefix, propName),
+						_1: propValue
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: A2(_elm_lang$core$Basics_ops['++'], _mdgriffith$elm_style_animation$Animation_Render$webkitPrefix, propName),
+							_1: propValue
+						},
+						_1: {ctor: '[]'}
+					}
+				}
+			};
+		case 'transform-origin':
+			return {
+				ctor: '::',
+				_0: stylePair,
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: A2(_elm_lang$core$Basics_ops['++'], _mdgriffith$elm_style_animation$Animation_Render$iePrefix, propName),
+						_1: propValue
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: A2(_elm_lang$core$Basics_ops['++'], _mdgriffith$elm_style_animation$Animation_Render$webkitPrefix, propName),
+							_1: propValue
+						},
+						_1: {ctor: '[]'}
+					}
+				}
+			};
+		case 'filter':
+			return {
+				ctor: '::',
+				_0: stylePair,
+				_1: {
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: A2(_elm_lang$core$Basics_ops['++'], _mdgriffith$elm_style_animation$Animation_Render$iePrefix, propName),
+						_1: propValue
+					},
+					_1: {
+						ctor: '::',
+						_0: {
+							ctor: '_Tuple2',
+							_0: A2(_elm_lang$core$Basics_ops['++'], _mdgriffith$elm_style_animation$Animation_Render$webkitPrefix, propName),
+							_1: propValue
+						},
+						_1: {ctor: '[]'}
+					}
+				}
+			};
+		default:
+			return {
+				ctor: '::',
+				_0: stylePair,
+				_1: {ctor: '[]'}
+			};
+	}
+};
+var _mdgriffith$elm_style_animation$Animation_Render$isFilter = function (prop) {
+	return A2(
+		_elm_lang$core$List$member,
+		_mdgriffith$elm_style_animation$Animation_Model$propertyName(prop),
+		{
+			ctor: '::',
+			_0: 'filter-url',
+			_1: {
+				ctor: '::',
+				_0: 'blur',
+				_1: {
+					ctor: '::',
+					_0: 'brightness',
+					_1: {
+						ctor: '::',
+						_0: 'contrast',
+						_1: {
+							ctor: '::',
+							_0: 'grayscale',
+							_1: {
+								ctor: '::',
+								_0: 'hue-rotate',
+								_1: {
+									ctor: '::',
+									_0: 'invert',
+									_1: {
+										ctor: '::',
+										_0: 'saturate',
+										_1: {
+											ctor: '::',
+											_0: 'sepia',
+											_1: {
+												ctor: '::',
+												_0: 'drop-shadow',
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+};
+var _mdgriffith$elm_style_animation$Animation_Render$render3dRotation = function (prop) {
+	var _p40 = prop;
+	if (_p40.ctor === 'Property3') {
+		var _p43 = _p40._3;
+		var _p42 = _p40._2;
+		var _p41 = _p40._1;
+		return A2(
+			_elm_lang$core$Basics_ops['++'],
+			'rotateX(',
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				_elm_lang$core$Basics$toString(_p41.position),
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					_p41.unit,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						') rotateY(',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							_elm_lang$core$Basics$toString(_p42.position),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								_p42.unit,
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									') rotateZ(',
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										_elm_lang$core$Basics$toString(_p43.position),
+										A2(_elm_lang$core$Basics_ops['++'], _p43.unit, ')')))))))));
+	} else {
+		return '';
+	}
+};
+var _mdgriffith$elm_style_animation$Animation_Render$isTransformation = function (prop) {
+	return A2(
+		_elm_lang$core$List$member,
+		_mdgriffith$elm_style_animation$Animation_Model$propertyName(prop),
+		{
+			ctor: '::',
+			_0: 'rotate',
+			_1: {
+				ctor: '::',
+				_0: 'rotateX',
+				_1: {
+					ctor: '::',
+					_0: 'rotateY',
+					_1: {
+						ctor: '::',
+						_0: 'rotateZ',
+						_1: {
+							ctor: '::',
+							_0: 'rotate3d',
+							_1: {
+								ctor: '::',
+								_0: 'translate',
+								_1: {
+									ctor: '::',
+									_0: 'translate3d',
+									_1: {
+										ctor: '::',
+										_0: 'scale',
+										_1: {
+											ctor: '::',
+											_0: 'scale3d',
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		});
+};
+var _mdgriffith$elm_style_animation$Animation_Render$warnForDoubleListedProperties = function (props) {
+	var _p44 = A2(
+		_elm_lang$core$List$map,
+		function (propGroup) {
+			var _p45 = _elm_lang$core$List$head(propGroup);
+			if (_p45.ctor === 'Nothing') {
+				return '';
+			} else {
+				return (_elm_lang$core$Native_Utils.cmp(
+					_elm_lang$core$List$length(propGroup),
+					1) > 0) ? A2(
+					_elm_lang$core$Debug$log,
+					'elm-style-animation',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'The \"',
+						A2(_elm_lang$core$Basics_ops['++'], _p45._0, '\" css property is listed more than once.  Only the last instance will be used.'))) : '';
+			}
+		},
+		A2(
+			_mdgriffith$elm_style_animation$Animation_Render$groupWhile,
+			F2(
+				function (x, y) {
+					return _elm_lang$core$Native_Utils.eq(x, y);
+				}),
+			_elm_lang$core$List$sort(
+				A2(
+					_elm_lang$core$List$map,
+					_mdgriffith$elm_style_animation$Animation_Model$propertyName,
+					A2(
+						_elm_lang$core$List$filter,
+						function (prop) {
+							return !_mdgriffith$elm_style_animation$Animation_Render$isTransformation(prop);
+						},
+						props)))));
+	return props;
+};
+var _mdgriffith$elm_style_animation$Animation_Render$renderAttrs = function (prop) {
+	if (A2(
+		_elm_lang$core$String$startsWith,
+		'attr:',
+		_mdgriffith$elm_style_animation$Animation_Model$propertyName(prop))) {
+		return _elm_lang$core$Maybe$Just(
+			A2(
+				_elm_lang$html$Html_Attributes$attribute,
+				A2(
+					_elm_lang$core$String$dropLeft,
+					5,
+					_mdgriffith$elm_style_animation$Animation_Model$propertyName(prop)),
+				A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ' ')));
+	} else {
+		var _p46 = prop;
+		switch (_p46.ctor) {
+			case 'Points':
+				return _elm_lang$core$Maybe$Just(
+					_elm_lang$svg$Svg_Attributes$points(
+						A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ' ')));
+			case 'Path':
+				return _elm_lang$core$Maybe$Just(
+					_elm_lang$svg$Svg_Attributes$d(
+						A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ' ')));
+			case 'Property':
+				var _p47 = _p46._0;
+				switch (_p47) {
+					case 'x':
+						return _elm_lang$core$Maybe$Just(
+							_elm_lang$svg$Svg_Attributes$x(
+								A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ' ')));
+					case 'y':
+						return _elm_lang$core$Maybe$Just(
+							_elm_lang$svg$Svg_Attributes$y(
+								A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ' ')));
+					case 'cx':
+						return _elm_lang$core$Maybe$Just(
+							_elm_lang$svg$Svg_Attributes$cx(
+								A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ' ')));
+					case 'cy':
+						return _elm_lang$core$Maybe$Just(
+							_elm_lang$svg$Svg_Attributes$cy(
+								A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ' ')));
+					case 'rx':
+						return _elm_lang$core$Maybe$Just(
+							_elm_lang$svg$Svg_Attributes$rx(
+								A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ' ')));
+					case 'ry':
+						return _elm_lang$core$Maybe$Just(
+							_elm_lang$svg$Svg_Attributes$ry(
+								A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ' ')));
+					case 'r':
+						return _elm_lang$core$Maybe$Just(
+							_elm_lang$svg$Svg_Attributes$r(
+								A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ' ')));
+					case 'offset':
+						return _elm_lang$core$Maybe$Just(
+							_elm_lang$svg$Svg_Attributes$offset(
+								A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ' ')));
+					default:
+						return _elm_lang$core$Maybe$Nothing;
+				}
+			case 'Property4':
+				return _elm_lang$core$Native_Utils.eq(_p46._0, 'viewBox') ? _elm_lang$core$Maybe$Just(
+					_elm_lang$svg$Svg_Attributes$viewBox(
+						A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ' '))) : _elm_lang$core$Maybe$Nothing;
+			default:
+				return _elm_lang$core$Maybe$Nothing;
+		}
+	}
+};
+var _mdgriffith$elm_style_animation$Animation_Render$renderValues = function (_p48) {
+	var _p49 = _p48;
+	var _p50 = A2(_elm_lang$core$List$partition, _mdgriffith$elm_style_animation$Animation_Render$isAttr, _p49._0.style);
+	var attrProps = _p50._0;
+	var styleProps = _p50._1;
+	var _p51 = A3(
+		_elm_lang$core$List$foldl,
+		F2(
+			function (prop, _p52) {
+				var _p53 = _p52;
+				var _p56 = _p53._1;
+				var _p55 = _p53._0;
+				var _p54 = _p53._2;
+				return _mdgriffith$elm_style_animation$Animation_Render$isTransformation(prop) ? {
+					ctor: '_Tuple3',
+					_0: _p55,
+					_1: A2(
+						_elm_lang$core$Basics_ops['++'],
+						_p56,
+						{
+							ctor: '::',
+							_0: prop,
+							_1: {ctor: '[]'}
+						}),
+					_2: _p54
+				} : (_mdgriffith$elm_style_animation$Animation_Render$isFilter(prop) ? {
+					ctor: '_Tuple3',
+					_0: _p55,
+					_1: _p56,
+					_2: A2(
+						_elm_lang$core$Basics_ops['++'],
+						_p54,
+						{
+							ctor: '::',
+							_0: prop,
+							_1: {ctor: '[]'}
+						})
+				} : {
+					ctor: '_Tuple3',
+					_0: A2(
+						_elm_lang$core$Basics_ops['++'],
+						_p55,
+						{
+							ctor: '::',
+							_0: prop,
+							_1: {ctor: '[]'}
+						}),
+					_1: _p56,
+					_2: _p54
+				});
+			}),
+		{
+			ctor: '_Tuple3',
+			_0: {ctor: '[]'},
+			_1: {ctor: '[]'},
+			_2: {ctor: '[]'}
+		},
+		styleProps);
+	var style = _p51._0;
+	var transforms = _p51._1;
+	var filters = _p51._2;
+	var renderedStyle = A2(
+		_elm_lang$core$List$map,
+		function (prop) {
+			return {
+				ctor: '_Tuple2',
+				_0: _mdgriffith$elm_style_animation$Animation_Model$propertyName(prop),
+				_1: A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ' ')
+			};
+		},
+		style);
+	var renderedTransforms = _elm_lang$core$List$isEmpty(transforms) ? {ctor: '[]'} : {
+		ctor: '::',
+		_0: {
+			ctor: '_Tuple2',
+			_0: 'transform',
+			_1: A2(
+				_elm_lang$core$String$join,
+				' ',
+				A2(
+					_elm_lang$core$List$map,
+					function (prop) {
+						return _elm_lang$core$Native_Utils.eq(
+							_mdgriffith$elm_style_animation$Animation_Model$propertyName(prop),
+							'rotate3d') ? _mdgriffith$elm_style_animation$Animation_Render$render3dRotation(prop) : A2(
+							_elm_lang$core$Basics_ops['++'],
+							_mdgriffith$elm_style_animation$Animation_Model$propertyName(prop),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'(',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ', '),
+									')')));
+					},
+					transforms))
+		},
+		_1: {ctor: '[]'}
+	};
+	var renderedFilters = _elm_lang$core$List$isEmpty(filters) ? {ctor: '[]'} : {
+		ctor: '::',
+		_0: {
+			ctor: '_Tuple2',
+			_0: 'filter',
+			_1: A2(
+				_elm_lang$core$String$join,
+				' ',
+				A2(
+					_elm_lang$core$List$map,
+					function (prop) {
+						var name = _mdgriffith$elm_style_animation$Animation_Model$propertyName(prop);
+						return _elm_lang$core$Native_Utils.eq(name, 'filter-url') ? A2(
+							_elm_lang$core$Basics_ops['++'],
+							'url(\"',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ', '),
+								'\")')) : A2(
+							_elm_lang$core$Basics_ops['++'],
+							_mdgriffith$elm_style_animation$Animation_Model$propertyName(prop),
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								'(',
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									A2(_mdgriffith$elm_style_animation$Animation_Render$propertyValue, prop, ', '),
+									')')));
+					},
+					filters))
+		},
+		_1: {ctor: '[]'}
+	};
+	return {
+		ctor: '_Tuple2',
+		_0: A2(
+			_elm_lang$core$Basics_ops['++'],
+			renderedTransforms,
+			A2(_elm_lang$core$Basics_ops['++'], renderedFilters, renderedStyle)),
+		_1: attrProps
+	};
+};
+var _mdgriffith$elm_style_animation$Animation_Render$render = function (animation) {
+	var _p57 = _mdgriffith$elm_style_animation$Animation_Render$renderValues(animation);
+	var style = _p57._0;
+	var attrProps = _p57._1;
+	var styleAttr = _elm_lang$html$Html_Attributes$style(
+		A2(_elm_lang$core$List$concatMap, _mdgriffith$elm_style_animation$Animation_Render$prefix, style));
+	var otherAttrs = A2(_elm_lang$core$List$filterMap, _mdgriffith$elm_style_animation$Animation_Render$renderAttrs, attrProps);
+	return {ctor: '::', _0: styleAttr, _1: otherAttrs};
+};

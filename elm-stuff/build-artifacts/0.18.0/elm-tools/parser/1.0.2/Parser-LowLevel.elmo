@@ -1,0 +1,52 @@
+var _elm_tools$parser$Parser_LowLevel$getSource = _elm_tools$parser$Parser_Internal$Parser(
+	function (state) {
+		return A2(_elm_tools$parser$Parser_Internal$Good, state.source, state);
+	});
+var _elm_tools$parser$Parser_LowLevel$getOffset = _elm_tools$parser$Parser_Internal$Parser(
+	function (state) {
+		return A2(_elm_tools$parser$Parser_Internal$Good, state.offset, state);
+	});
+var _elm_tools$parser$Parser_LowLevel$getCol = _elm_tools$parser$Parser_Internal$Parser(
+	function (state) {
+		return A2(_elm_tools$parser$Parser_Internal$Good, state.col, state);
+	});
+var _elm_tools$parser$Parser_LowLevel$getRow = _elm_tools$parser$Parser_Internal$Parser(
+	function (state) {
+		return A2(_elm_tools$parser$Parser_Internal$Good, state.row, state);
+	});
+var _elm_tools$parser$Parser_LowLevel$getPosition = _elm_tools$parser$Parser_Internal$Parser(
+	function (state) {
+		return A2(
+			_elm_tools$parser$Parser_Internal$Good,
+			{ctor: '_Tuple2', _0: state.row, _1: state.col},
+			state);
+	});
+var _elm_tools$parser$Parser_LowLevel$changeIndent = F2(
+	function (newIndent, _p0) {
+		var _p1 = _p0;
+		return {source: _p1.source, offset: _p1.offset, indent: newIndent, context: _p1.context, row: _p1.row, col: _p1.col};
+	});
+var _elm_tools$parser$Parser_LowLevel$withIndentLevel = F2(
+	function (newIndent, _p2) {
+		var _p3 = _p2;
+		return _elm_tools$parser$Parser_Internal$Parser(
+			function (state1) {
+				var _p4 = _p3._0(
+					A2(_elm_tools$parser$Parser_LowLevel$changeIndent, newIndent, state1));
+				if (_p4.ctor === 'Good') {
+					return A2(
+						_elm_tools$parser$Parser_Internal$Good,
+						_p4._0,
+						A2(_elm_tools$parser$Parser_LowLevel$changeIndent, state1.indent, _p4._1));
+				} else {
+					return A2(
+						_elm_tools$parser$Parser_Internal$Bad,
+						_p4._0,
+						A2(_elm_tools$parser$Parser_LowLevel$changeIndent, state1.indent, _p4._1));
+				}
+			});
+	});
+var _elm_tools$parser$Parser_LowLevel$getIndentLevel = _elm_tools$parser$Parser_Internal$Parser(
+	function (state) {
+		return A2(_elm_tools$parser$Parser_Internal$Good, state.indent, state);
+	});

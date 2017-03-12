@@ -1,0 +1,2081 @@
+var _mdgriffith$elm_style_animation$Animation_Model$matchPoints = F2(
+	function (points1, points2) {
+		var diff = _elm_lang$core$List$length(points1) - _elm_lang$core$List$length(points2);
+		if (_elm_lang$core$Native_Utils.cmp(diff, 0) > 0) {
+			var _p0 = _elm_lang$core$List$head(
+				_elm_lang$core$List$reverse(points2));
+			if (_p0.ctor === 'Nothing') {
+				return {ctor: '_Tuple2', _0: points1, _1: points2};
+			} else {
+				return {
+					ctor: '_Tuple2',
+					_0: points1,
+					_1: A2(
+						_elm_lang$core$Basics_ops['++'],
+						points2,
+						A2(
+							_elm_lang$core$List$repeat,
+							_elm_lang$core$Basics$abs(diff),
+							_p0._0))
+				};
+			}
+		} else {
+			if (_elm_lang$core$Native_Utils.cmp(diff, 0) < 0) {
+				var _p1 = _elm_lang$core$List$head(
+					_elm_lang$core$List$reverse(points1));
+				if (_p1.ctor === 'Nothing') {
+					return {ctor: '_Tuple2', _0: points1, _1: points2};
+				} else {
+					return {
+						ctor: '_Tuple2',
+						_0: A2(
+							_elm_lang$core$Basics_ops['++'],
+							points1,
+							A2(
+								_elm_lang$core$List$repeat,
+								_elm_lang$core$Basics$abs(diff),
+								_p1._0)),
+						_1: points2
+					};
+				}
+			} else {
+				return {ctor: '_Tuple2', _0: points1, _1: points2};
+			}
+		}
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$vTolerance = 0.1;
+var _mdgriffith$elm_style_animation$Animation_Model$tolerance = 1.0e-2;
+var _mdgriffith$elm_style_animation$Animation_Model$isCmdDone = function (cmd) {
+	var motionDone = function (motion) {
+		return _elm_lang$core$Native_Utils.eq(motion.velocity, 0) && _elm_lang$core$Native_Utils.eq(motion.position, motion.target);
+	};
+	var _p2 = cmd;
+	switch (_p2.ctor) {
+		case 'Move':
+			return motionDone(_p2._0) && motionDone(_p2._1);
+		case 'MoveTo':
+			return motionDone(_p2._0) && motionDone(_p2._1);
+		case 'Line':
+			return motionDone(_p2._0) && motionDone(_p2._1);
+		case 'LineTo':
+			return motionDone(_p2._0) && motionDone(_p2._1);
+		case 'Horizontal':
+			return motionDone(_p2._0);
+		case 'HorizontalTo':
+			return motionDone(_p2._0);
+		case 'Vertical':
+			return motionDone(_p2._0);
+		case 'VerticalTo':
+			return motionDone(_p2._0);
+		case 'Curve':
+			var _p5 = _p2._0.point;
+			var _p4 = _p2._0.control2;
+			var _p3 = _p2._0.control1;
+			return motionDone(
+				_elm_lang$core$Tuple$first(_p3)) && (motionDone(
+				_elm_lang$core$Tuple$second(_p3)) && (motionDone(
+				_elm_lang$core$Tuple$first(_p4)) && (motionDone(
+				_elm_lang$core$Tuple$second(_p4)) && (motionDone(
+				_elm_lang$core$Tuple$first(_p5)) && motionDone(
+				_elm_lang$core$Tuple$second(_p5))))));
+		case 'CurveTo':
+			var _p8 = _p2._0.point;
+			var _p7 = _p2._0.control2;
+			var _p6 = _p2._0.control1;
+			return motionDone(
+				_elm_lang$core$Tuple$first(_p6)) && (motionDone(
+				_elm_lang$core$Tuple$second(_p6)) && (motionDone(
+				_elm_lang$core$Tuple$first(_p7)) && (motionDone(
+				_elm_lang$core$Tuple$second(_p7)) && (motionDone(
+				_elm_lang$core$Tuple$first(_p8)) && motionDone(
+				_elm_lang$core$Tuple$second(_p8))))));
+		case 'Quadratic':
+			var _p10 = _p2._0.point;
+			var _p9 = _p2._0.control;
+			return motionDone(
+				_elm_lang$core$Tuple$first(_p9)) && (motionDone(
+				_elm_lang$core$Tuple$second(_p9)) && (motionDone(
+				_elm_lang$core$Tuple$first(_p10)) && motionDone(
+				_elm_lang$core$Tuple$second(_p10))));
+		case 'QuadraticTo':
+			var _p12 = _p2._0.point;
+			var _p11 = _p2._0.control;
+			return motionDone(
+				_elm_lang$core$Tuple$first(_p11)) && (motionDone(
+				_elm_lang$core$Tuple$second(_p11)) && (motionDone(
+				_elm_lang$core$Tuple$first(_p12)) && motionDone(
+				_elm_lang$core$Tuple$second(_p12))));
+		case 'SmoothQuadratic':
+			return A2(
+				_elm_lang$core$List$all,
+				function (_p13) {
+					var _p14 = _p13;
+					return motionDone(_p14._0) && motionDone(_p14._1);
+				},
+				_p2._0);
+		case 'SmoothQuadraticTo':
+			return A2(
+				_elm_lang$core$List$all,
+				function (_p15) {
+					var _p16 = _p15;
+					return motionDone(_p16._0) && motionDone(_p16._1);
+				},
+				_p2._0);
+		case 'Smooth':
+			return A2(
+				_elm_lang$core$List$all,
+				function (_p17) {
+					var _p18 = _p17;
+					return motionDone(_p18._0) && motionDone(_p18._1);
+				},
+				_p2._0);
+		case 'SmoothTo':
+			return A2(
+				_elm_lang$core$List$all,
+				function (_p19) {
+					var _p20 = _p19;
+					return motionDone(_p20._0) && motionDone(_p20._1);
+				},
+				_p2._0);
+		case 'ClockwiseArc':
+			var _p21 = _p2._0;
+			return motionDone(_p21.x) && (motionDone(_p21.y) && (motionDone(_p21.radius) && (motionDone(_p21.startAngle) && motionDone(_p21.endAngle))));
+		case 'AntiClockwiseArc':
+			var _p22 = _p2._0;
+			return motionDone(_p22.x) && (motionDone(_p22.y) && (motionDone(_p22.radius) && (motionDone(_p22.startAngle) && motionDone(_p22.endAngle))));
+		default:
+			return true;
+	}
+};
+var _mdgriffith$elm_style_animation$Animation_Model$isDone = function (property) {
+	var motionDone = function (motion) {
+		var runningInterpolation = A2(_elm_lang$core$Maybe$withDefault, motion.interpolation, motion.interpolationOverride);
+		var _p23 = runningInterpolation;
+		switch (_p23.ctor) {
+			case 'Spring':
+				return _elm_lang$core$Native_Utils.eq(motion.velocity, 0) && _elm_lang$core$Native_Utils.eq(motion.position, motion.target);
+			case 'Easing':
+				var _p24 = _p23._0;
+				return _elm_lang$core$Native_Utils.eq(_p24.progress, 1) || (_elm_lang$core$Native_Utils.eq(_p24.progress, 0) && _elm_lang$core$Native_Utils.eq(motion.position, motion.target));
+			default:
+				return _elm_lang$core$Native_Utils.eq(motion.position, motion.target);
+		}
+	};
+	var _p25 = property;
+	switch (_p25.ctor) {
+		case 'ExactProperty':
+			return true;
+		case 'ColorProperty':
+			return A2(
+				_elm_lang$core$List$all,
+				motionDone,
+				{
+					ctor: '::',
+					_0: _p25._1,
+					_1: {
+						ctor: '::',
+						_0: _p25._2,
+						_1: {
+							ctor: '::',
+							_0: _p25._3,
+							_1: {
+								ctor: '::',
+								_0: _p25._4,
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				});
+		case 'ShadowProperty':
+			var _p26 = _p25._2;
+			return A2(
+				_elm_lang$core$List$all,
+				motionDone,
+				{
+					ctor: '::',
+					_0: _p26.offsetX,
+					_1: {
+						ctor: '::',
+						_0: _p26.offsetY,
+						_1: {
+							ctor: '::',
+							_0: _p26.size,
+							_1: {
+								ctor: '::',
+								_0: _p26.blur,
+								_1: {
+									ctor: '::',
+									_0: _p26.red,
+									_1: {
+										ctor: '::',
+										_0: _p26.green,
+										_1: {
+											ctor: '::',
+											_0: _p26.blue,
+											_1: {
+												ctor: '::',
+												_0: _p26.alpha,
+												_1: {ctor: '[]'}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				});
+		case 'Property':
+			return motionDone(_p25._1);
+		case 'Property2':
+			return motionDone(_p25._1) && motionDone(_p25._2);
+		case 'Property3':
+			return A2(
+				_elm_lang$core$List$all,
+				motionDone,
+				{
+					ctor: '::',
+					_0: _p25._1,
+					_1: {
+						ctor: '::',
+						_0: _p25._2,
+						_1: {
+							ctor: '::',
+							_0: _p25._3,
+							_1: {ctor: '[]'}
+						}
+					}
+				});
+		case 'Property4':
+			return A2(
+				_elm_lang$core$List$all,
+				motionDone,
+				{
+					ctor: '::',
+					_0: _p25._1,
+					_1: {
+						ctor: '::',
+						_0: _p25._2,
+						_1: {
+							ctor: '::',
+							_0: _p25._3,
+							_1: {
+								ctor: '::',
+								_0: _p25._4,
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				});
+		case 'AngleProperty':
+			return motionDone(_p25._1);
+		case 'Points':
+			return A2(
+				_elm_lang$core$List$all,
+				function (_p27) {
+					var _p28 = _p27;
+					return motionDone(_p28._0) && motionDone(_p28._1);
+				},
+				_p25._0);
+		default:
+			return A2(_elm_lang$core$List$all, _mdgriffith$elm_style_animation$Animation_Model$isCmdDone, _p25._0);
+	}
+};
+var _mdgriffith$elm_style_animation$Animation_Model$refreshTiming = F2(
+	function (now, timing) {
+		var dt = now - timing.current;
+		return {
+			current: now,
+			dt: ((_elm_lang$core$Native_Utils.cmp(dt, 34) > 0) || _elm_lang$core$Native_Utils.eq(timing.current, 0)) ? 16.666 : dt
+		};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$propertyName = function (prop) {
+	var _p29 = prop;
+	switch (_p29.ctor) {
+		case 'ExactProperty':
+			return _p29._0;
+		case 'ColorProperty':
+			return _p29._0;
+		case 'ShadowProperty':
+			return _p29._0;
+		case 'Property':
+			return _p29._0;
+		case 'Property2':
+			return _p29._0;
+		case 'Property3':
+			return _p29._0;
+		case 'Property4':
+			return _p29._0;
+		case 'AngleProperty':
+			return _p29._0;
+		case 'Points':
+			return 'points';
+		default:
+			return 'path';
+	}
+};
+var _mdgriffith$elm_style_animation$Animation_Model$replaceProps = F2(
+	function (props, replacements) {
+		var replacementNames = A2(_elm_lang$core$List$map, _mdgriffith$elm_style_animation$Animation_Model$propertyName, replacements);
+		var removed = A2(
+			_elm_lang$core$List$filter,
+			function (prop) {
+				return !A2(
+					_elm_lang$core$List$member,
+					_mdgriffith$elm_style_animation$Animation_Model$propertyName(prop),
+					replacementNames);
+			},
+			props);
+		return A2(_elm_lang$core$Basics_ops['++'], removed, replacements);
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$zipPropertiesGreedy = F2(
+	function (initialProps, newTargetProps) {
+		var propertyMatch = F2(
+			function (prop1, prop2) {
+				return _elm_lang$core$Native_Utils.eq(
+					_mdgriffith$elm_style_animation$Animation_Model$propertyName(prop1),
+					_mdgriffith$elm_style_animation$Animation_Model$propertyName(prop2));
+			});
+		var _p30 = A3(
+			_elm_lang$core$List$foldl,
+			F2(
+				function (_p32, _p31) {
+					var _p33 = _p31;
+					var _p40 = _p33._1;
+					var _p39 = _p33._0;
+					var _p38 = _p33._2;
+					var _p34 = _elm_lang$core$List$head(_p39);
+					if (_p34.ctor === 'Nothing') {
+						return {ctor: '_Tuple3', _0: _p39, _1: _p40, _2: _p38};
+					} else {
+						var _p37 = _p34._0;
+						var _p35 = A2(
+							_elm_lang$core$List$partition,
+							propertyMatch(_p37),
+							_p40);
+						var matchingBs = _p35._0;
+						var nonMatchingBs = _p35._1;
+						return {
+							ctor: '_Tuple3',
+							_0: A2(_elm_lang$core$List$drop, 1, _p39),
+							_1: function () {
+								var _p36 = matchingBs;
+								if (_p36.ctor === '[]') {
+									return nonMatchingBs;
+								} else {
+									return A2(_elm_lang$core$Basics_ops['++'], _p36._1, nonMatchingBs);
+								}
+							}(),
+							_2: {
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: _p37,
+									_1: _elm_lang$core$List$head(matchingBs)
+								},
+								_1: _p38
+							}
+						};
+					}
+				}),
+			{
+				ctor: '_Tuple3',
+				_0: initialProps,
+				_1: newTargetProps,
+				_2: {ctor: '[]'}
+			},
+			A2(
+				_elm_lang$core$List$repeat,
+				_elm_lang$core$List$length(initialProps),
+				0));
+		var warnings = _p30._1;
+		var props = _p30._2;
+		var _p41 = A2(
+			_elm_lang$core$List$map,
+			function (b) {
+				return A2(
+					_elm_lang$core$Debug$log,
+					'elm-style-animation',
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						_mdgriffith$elm_style_animation$Animation_Model$propertyName(b),
+						' has no initial value and therefore will not be animated.'));
+			},
+			warnings);
+		return _elm_lang$core$List$reverse(props);
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$Timing = F2(
+	function (a, b) {
+		return {current: a, dt: b};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$Motion = F6(
+	function (a, b, c, d, e, f) {
+		return {position: a, velocity: b, target: c, interpolation: d, unit: e, interpolationOverride: f};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$ShadowMotion = F8(
+	function (a, b, c, d, e, f, g, h) {
+		return {offsetX: a, offsetY: b, size: c, blur: d, red: e, green: f, blue: g, alpha: h};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$CubicCurveMotion = F3(
+	function (a, b, c) {
+		return {control1: a, control2: b, point: c};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$QuadraticCurveMotion = F2(
+	function (a, b) {
+		return {control: a, point: b};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$ArcMotion = F5(
+	function (a, b, c, d, e) {
+		return {x: a, y: b, radius: c, startAngle: d, endAngle: e};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$Animation = function (a) {
+	return {ctor: 'Animation', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$Tick = function (a) {
+	return {ctor: 'Tick', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$Loop = function (a) {
+	return {ctor: 'Loop', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$Repeat = F2(
+	function (a, b) {
+		return {ctor: 'Repeat', _0: a, _1: b};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$Send = function (a) {
+	return {ctor: 'Send', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$Wait = function (a) {
+	return {ctor: 'Wait', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$Set = function (a) {
+	return {ctor: 'Set', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$ToWith = function (a) {
+	return {ctor: 'ToWith', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$To = function (a) {
+	return {ctor: 'To', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$Step = {ctor: 'Step'};
+var _mdgriffith$elm_style_animation$Animation_Model$AtSpeed = function (a) {
+	return {ctor: 'AtSpeed', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$Easing = function (a) {
+	return {ctor: 'Easing', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$stepInterpolation = F2(
+	function (dtms, motion) {
+		var interpolationToUse = A2(_elm_lang$core$Maybe$withDefault, motion.interpolation, motion.interpolationOverride);
+		var _p42 = interpolationToUse;
+		switch (_p42.ctor) {
+			case 'AtSpeed':
+				var _p44 = _p42._0.perSecond;
+				var _p43 = function () {
+					if (_elm_lang$core$Native_Utils.cmp(motion.position, motion.target) < 0) {
+						var $new = motion.position + (_p44 * (dtms / 1000));
+						return {
+							ctor: '_Tuple2',
+							_0: $new,
+							_1: _elm_lang$core$Native_Utils.cmp($new, motion.target) > -1
+						};
+					} else {
+						var $new = motion.position - (_p44 * (dtms / 1000));
+						return {
+							ctor: '_Tuple2',
+							_0: $new,
+							_1: _elm_lang$core$Native_Utils.cmp($new, motion.target) < 1
+						};
+					}
+				}();
+				var newPos = _p43._0;
+				var finished = _p43._1;
+				return finished ? _elm_lang$core$Native_Utils.update(
+					motion,
+					{position: motion.target, velocity: 0.0}) : _elm_lang$core$Native_Utils.update(
+					motion,
+					{position: newPos, velocity: _p44 * 1000});
+			case 'Spring':
+				var fdamper = (-1 * _p42._0.damping) * motion.velocity;
+				var fspring = _p42._0.stiffness * (motion.target - motion.position);
+				var a = fspring + fdamper;
+				var dt = dtms / 1000;
+				var newVelocity = motion.velocity + (a * dt);
+				var newPos = motion.position + (newVelocity * dt);
+				var dx = _elm_lang$core$Basics$abs(motion.target - newPos);
+				return ((_elm_lang$core$Native_Utils.cmp(dx, _mdgriffith$elm_style_animation$Animation_Model$tolerance) < 0) && (_elm_lang$core$Native_Utils.cmp(
+					_elm_lang$core$Basics$abs(newVelocity),
+					_mdgriffith$elm_style_animation$Animation_Model$vTolerance) < 0)) ? _elm_lang$core$Native_Utils.update(
+					motion,
+					{position: motion.target, velocity: 0.0}) : _elm_lang$core$Native_Utils.update(
+					motion,
+					{position: newPos, velocity: newVelocity});
+			default:
+				var _p49 = _p42._0.start;
+				var _p48 = _p42._0.progress;
+				var _p47 = _p42._0.ease;
+				var _p46 = _p42._0.duration;
+				var distance = motion.target - _p49;
+				var newProgress = (_elm_lang$core$Native_Utils.cmp((dtms / _p46) + _p48, 1) < 0) ? ((dtms / _p46) + _p48) : 1;
+				var eased = _p47(newProgress);
+				var newPos = _elm_lang$core$Basics$toFloat(
+					_elm_lang$core$Basics$truncate(((eased * distance) + _p49) * 10000)) / 10000;
+				var newVelocity = _elm_lang$core$Native_Utils.eq(newProgress, 1) ? 0 : ((newPos - motion.position) / dtms);
+				var _p45 = motion.interpolationOverride;
+				if (_p45.ctor === 'Nothing') {
+					return _elm_lang$core$Native_Utils.update(
+						motion,
+						{
+							position: newPos,
+							velocity: newVelocity,
+							interpolation: _mdgriffith$elm_style_animation$Animation_Model$Easing(
+								{progress: newProgress, duration: _p46, ease: _p47, start: _p49})
+						});
+				} else {
+					return _elm_lang$core$Native_Utils.update(
+						motion,
+						{
+							position: newPos,
+							velocity: newVelocity,
+							interpolationOverride: _elm_lang$core$Maybe$Just(
+								_mdgriffith$elm_style_animation$Animation_Model$Easing(
+									{progress: newProgress, duration: _p46, ease: _p47, start: _p49}))
+						});
+				}
+		}
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$Spring = function (a) {
+	return {ctor: 'Spring', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$Path = function (a) {
+	return {ctor: 'Path', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$Points = function (a) {
+	return {ctor: 'Points', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$AngleProperty = F2(
+	function (a, b) {
+		return {ctor: 'AngleProperty', _0: a, _1: b};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$Property4 = F5(
+	function (a, b, c, d, e) {
+		return {ctor: 'Property4', _0: a, _1: b, _2: c, _3: d, _4: e};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$Property3 = F4(
+	function (a, b, c, d) {
+		return {ctor: 'Property3', _0: a, _1: b, _2: c, _3: d};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$Property2 = F3(
+	function (a, b, c) {
+		return {ctor: 'Property2', _0: a, _1: b, _2: c};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$Property = F2(
+	function (a, b) {
+		return {ctor: 'Property', _0: a, _1: b};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$ShadowProperty = F3(
+	function (a, b, c) {
+		return {ctor: 'ShadowProperty', _0: a, _1: b, _2: c};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$ColorProperty = F5(
+	function (a, b, c, d, e) {
+		return {ctor: 'ColorProperty', _0: a, _1: b, _2: c, _3: d, _4: e};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$ExactProperty = F2(
+	function (a, b) {
+		return {ctor: 'ExactProperty', _0: a, _1: b};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$Close = {ctor: 'Close'};
+var _mdgriffith$elm_style_animation$Animation_Model$AntiClockwiseArc = function (a) {
+	return {ctor: 'AntiClockwiseArc', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$ClockwiseArc = function (a) {
+	return {ctor: 'ClockwiseArc', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$SmoothTo = function (a) {
+	return {ctor: 'SmoothTo', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$Smooth = function (a) {
+	return {ctor: 'Smooth', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$SmoothQuadraticTo = function (a) {
+	return {ctor: 'SmoothQuadraticTo', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$SmoothQuadratic = function (a) {
+	return {ctor: 'SmoothQuadratic', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$QuadraticTo = function (a) {
+	return {ctor: 'QuadraticTo', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$Quadratic = function (a) {
+	return {ctor: 'Quadratic', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$CurveTo = function (a) {
+	return {ctor: 'CurveTo', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$Curve = function (a) {
+	return {ctor: 'Curve', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$VerticalTo = function (a) {
+	return {ctor: 'VerticalTo', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$Vertical = function (a) {
+	return {ctor: 'Vertical', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$HorizontalTo = function (a) {
+	return {ctor: 'HorizontalTo', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$Horizontal = function (a) {
+	return {ctor: 'Horizontal', _0: a};
+};
+var _mdgriffith$elm_style_animation$Animation_Model$LineTo = F2(
+	function (a, b) {
+		return {ctor: 'LineTo', _0: a, _1: b};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$Line = F2(
+	function (a, b) {
+		return {ctor: 'Line', _0: a, _1: b};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$MoveTo = F2(
+	function (a, b) {
+		return {ctor: 'MoveTo', _0: a, _1: b};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$Move = F2(
+	function (a, b) {
+		return {ctor: 'Move', _0: a, _1: b};
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$mapPathMotion = F2(
+	function (fn, cmd) {
+		var mapCoords = function (coords) {
+			return A2(
+				_elm_lang$core$List$map,
+				function (_p50) {
+					var _p51 = _p50;
+					return {
+						ctor: '_Tuple2',
+						_0: fn(_p51._0),
+						_1: fn(_p51._1)
+					};
+				},
+				coords);
+		};
+		var _p52 = cmd;
+		switch (_p52.ctor) {
+			case 'Move':
+				return A2(
+					_mdgriffith$elm_style_animation$Animation_Model$Move,
+					fn(_p52._0),
+					fn(_p52._1));
+			case 'MoveTo':
+				return A2(
+					_mdgriffith$elm_style_animation$Animation_Model$MoveTo,
+					fn(_p52._0),
+					fn(_p52._1));
+			case 'Line':
+				return A2(
+					_mdgriffith$elm_style_animation$Animation_Model$Line,
+					fn(_p52._0),
+					fn(_p52._1));
+			case 'LineTo':
+				return A2(
+					_mdgriffith$elm_style_animation$Animation_Model$LineTo,
+					fn(_p52._0),
+					fn(_p52._1));
+			case 'Horizontal':
+				return _mdgriffith$elm_style_animation$Animation_Model$Horizontal(
+					fn(_p52._0));
+			case 'HorizontalTo':
+				return _mdgriffith$elm_style_animation$Animation_Model$HorizontalTo(
+					fn(_p52._0));
+			case 'Vertical':
+				return _mdgriffith$elm_style_animation$Animation_Model$Vertical(
+					fn(_p52._0));
+			case 'VerticalTo':
+				return _mdgriffith$elm_style_animation$Animation_Model$VerticalTo(
+					fn(_p52._0));
+			case 'Curve':
+				var _p55 = _p52._0.point;
+				var _p54 = _p52._0.control2;
+				var _p53 = _p52._0.control1;
+				return _mdgriffith$elm_style_animation$Animation_Model$Curve(
+					{
+						control1: {
+							ctor: '_Tuple2',
+							_0: fn(
+								_elm_lang$core$Tuple$first(_p53)),
+							_1: fn(
+								_elm_lang$core$Tuple$second(_p53))
+						},
+						control2: {
+							ctor: '_Tuple2',
+							_0: fn(
+								_elm_lang$core$Tuple$first(_p54)),
+							_1: fn(
+								_elm_lang$core$Tuple$second(_p54))
+						},
+						point: {
+							ctor: '_Tuple2',
+							_0: fn(
+								_elm_lang$core$Tuple$first(_p55)),
+							_1: fn(
+								_elm_lang$core$Tuple$second(_p55))
+						}
+					});
+			case 'CurveTo':
+				var _p58 = _p52._0.point;
+				var _p57 = _p52._0.control2;
+				var _p56 = _p52._0.control1;
+				return _mdgriffith$elm_style_animation$Animation_Model$CurveTo(
+					{
+						control1: {
+							ctor: '_Tuple2',
+							_0: fn(
+								_elm_lang$core$Tuple$first(_p56)),
+							_1: fn(
+								_elm_lang$core$Tuple$second(_p56))
+						},
+						control2: {
+							ctor: '_Tuple2',
+							_0: fn(
+								_elm_lang$core$Tuple$first(_p57)),
+							_1: fn(
+								_elm_lang$core$Tuple$second(_p57))
+						},
+						point: {
+							ctor: '_Tuple2',
+							_0: fn(
+								_elm_lang$core$Tuple$first(_p58)),
+							_1: fn(
+								_elm_lang$core$Tuple$second(_p58))
+						}
+					});
+			case 'Quadratic':
+				var _p60 = _p52._0.point;
+				var _p59 = _p52._0.control;
+				return _mdgriffith$elm_style_animation$Animation_Model$Quadratic(
+					{
+						control: {
+							ctor: '_Tuple2',
+							_0: fn(
+								_elm_lang$core$Tuple$first(_p59)),
+							_1: fn(
+								_elm_lang$core$Tuple$second(_p59))
+						},
+						point: {
+							ctor: '_Tuple2',
+							_0: fn(
+								_elm_lang$core$Tuple$first(_p60)),
+							_1: fn(
+								_elm_lang$core$Tuple$second(_p60))
+						}
+					});
+			case 'QuadraticTo':
+				var _p62 = _p52._0.point;
+				var _p61 = _p52._0.control;
+				return _mdgriffith$elm_style_animation$Animation_Model$QuadraticTo(
+					{
+						control: {
+							ctor: '_Tuple2',
+							_0: fn(
+								_elm_lang$core$Tuple$first(_p61)),
+							_1: fn(
+								_elm_lang$core$Tuple$second(_p61))
+						},
+						point: {
+							ctor: '_Tuple2',
+							_0: fn(
+								_elm_lang$core$Tuple$first(_p62)),
+							_1: fn(
+								_elm_lang$core$Tuple$second(_p62))
+						}
+					});
+			case 'SmoothQuadratic':
+				return _mdgriffith$elm_style_animation$Animation_Model$SmoothQuadratic(
+					mapCoords(_p52._0));
+			case 'SmoothQuadraticTo':
+				return _mdgriffith$elm_style_animation$Animation_Model$SmoothQuadraticTo(
+					mapCoords(_p52._0));
+			case 'Smooth':
+				return _mdgriffith$elm_style_animation$Animation_Model$Smooth(
+					mapCoords(_p52._0));
+			case 'SmoothTo':
+				return _mdgriffith$elm_style_animation$Animation_Model$SmoothTo(
+					mapCoords(_p52._0));
+			case 'ClockwiseArc':
+				var _p63 = _p52._0;
+				return _mdgriffith$elm_style_animation$Animation_Model$ClockwiseArc(
+					function () {
+						var endAngle = _p63.endAngle;
+						var startAngle = _p63.startAngle;
+						var radius = _p63.radius;
+						var y = _p63.y;
+						var x = _p63.x;
+						return _elm_lang$core$Native_Utils.update(
+							_p63,
+							{
+								x: fn(x),
+								y: fn(y),
+								radius: fn(radius),
+								startAngle: fn(startAngle),
+								endAngle: fn(endAngle)
+							});
+					}());
+			case 'AntiClockwiseArc':
+				var _p64 = _p52._0;
+				return _mdgriffith$elm_style_animation$Animation_Model$AntiClockwiseArc(
+					function () {
+						var endAngle = _p64.endAngle;
+						var startAngle = _p64.startAngle;
+						var radius = _p64.radius;
+						var y = _p64.y;
+						var x = _p64.x;
+						return _elm_lang$core$Native_Utils.update(
+							_p64,
+							{
+								x: fn(x),
+								y: fn(y),
+								radius: fn(radius),
+								startAngle: fn(startAngle),
+								endAngle: fn(endAngle)
+							});
+					}());
+			default:
+				return _mdgriffith$elm_style_animation$Animation_Model$Close;
+		}
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$mapToMotion = F2(
+	function (fn, prop) {
+		var _p65 = prop;
+		switch (_p65.ctor) {
+			case 'ExactProperty':
+				return A2(_mdgriffith$elm_style_animation$Animation_Model$ExactProperty, _p65._0, _p65._1);
+			case 'ColorProperty':
+				return A5(
+					_mdgriffith$elm_style_animation$Animation_Model$ColorProperty,
+					_p65._0,
+					fn(_p65._1),
+					fn(_p65._2),
+					fn(_p65._3),
+					fn(_p65._4));
+			case 'ShadowProperty':
+				var _p66 = _p65._2;
+				var alpha = _p66.alpha;
+				var blue = _p66.blue;
+				var green = _p66.green;
+				var red = _p66.red;
+				var blur = _p66.blur;
+				var size = _p66.size;
+				var offsetY = _p66.offsetY;
+				var offsetX = _p66.offsetX;
+				return A3(
+					_mdgriffith$elm_style_animation$Animation_Model$ShadowProperty,
+					_p65._0,
+					_p65._1,
+					{
+						offsetX: fn(offsetX),
+						offsetY: fn(offsetY),
+						size: fn(size),
+						blur: fn(blur),
+						red: fn(red),
+						green: fn(green),
+						blue: fn(blue),
+						alpha: fn(alpha)
+					});
+			case 'Property':
+				return A2(
+					_mdgriffith$elm_style_animation$Animation_Model$Property,
+					_p65._0,
+					fn(_p65._1));
+			case 'Property2':
+				return A3(
+					_mdgriffith$elm_style_animation$Animation_Model$Property2,
+					_p65._0,
+					fn(_p65._1),
+					fn(_p65._2));
+			case 'Property3':
+				return A4(
+					_mdgriffith$elm_style_animation$Animation_Model$Property3,
+					_p65._0,
+					fn(_p65._1),
+					fn(_p65._2),
+					fn(_p65._3));
+			case 'Property4':
+				return A5(
+					_mdgriffith$elm_style_animation$Animation_Model$Property4,
+					_p65._0,
+					fn(_p65._1),
+					fn(_p65._2),
+					fn(_p65._3),
+					fn(_p65._4));
+			case 'AngleProperty':
+				return A2(
+					_mdgriffith$elm_style_animation$Animation_Model$AngleProperty,
+					_p65._0,
+					fn(_p65._1));
+			case 'Points':
+				return _mdgriffith$elm_style_animation$Animation_Model$Points(
+					A2(
+						_elm_lang$core$List$map,
+						function (_p67) {
+							var _p68 = _p67;
+							return {
+								ctor: '_Tuple2',
+								_0: fn(_p68._0),
+								_1: fn(_p68._1)
+							};
+						},
+						_p65._0));
+			default:
+				return _mdgriffith$elm_style_animation$Animation_Model$Path(
+					A2(
+						_elm_lang$core$List$map,
+						_mdgriffith$elm_style_animation$Animation_Model$mapPathMotion(fn),
+						_p65._0));
+		}
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$setPathTarget = F2(
+	function (cmd, targetCmd) {
+		var setMotionTarget = F2(
+			function (motion, targetMotion) {
+				var _p69 = motion.interpolation;
+				if (_p69.ctor === 'Easing') {
+					return _elm_lang$core$Native_Utils.update(
+						motion,
+						{
+							target: targetMotion.position,
+							interpolation: _mdgriffith$elm_style_animation$Animation_Model$Easing(
+								_elm_lang$core$Native_Utils.update(
+									_p69._0,
+									{start: motion.position}))
+						});
+				} else {
+					return _elm_lang$core$Native_Utils.update(
+						motion,
+						{target: targetMotion.position});
+				}
+			});
+		var _p70 = cmd;
+		switch (_p70.ctor) {
+			case 'Move':
+				var _p71 = targetCmd;
+				if (_p71.ctor === 'Move') {
+					return A2(
+						_mdgriffith$elm_style_animation$Animation_Model$Move,
+						A2(setMotionTarget, _p70._0, _p71._0),
+						A2(setMotionTarget, _p70._1, _p71._1));
+				} else {
+					return cmd;
+				}
+			case 'MoveTo':
+				var _p72 = targetCmd;
+				if (_p72.ctor === 'MoveTo') {
+					return A2(
+						_mdgriffith$elm_style_animation$Animation_Model$MoveTo,
+						A2(setMotionTarget, _p70._0, _p72._0),
+						A2(setMotionTarget, _p70._1, _p72._1));
+				} else {
+					return cmd;
+				}
+			case 'Line':
+				var _p73 = targetCmd;
+				if (_p73.ctor === 'Line') {
+					return A2(
+						_mdgriffith$elm_style_animation$Animation_Model$Line,
+						A2(setMotionTarget, _p70._0, _p73._0),
+						A2(setMotionTarget, _p70._1, _p73._1));
+				} else {
+					return cmd;
+				}
+			case 'LineTo':
+				var _p74 = targetCmd;
+				if (_p74.ctor === 'LineTo') {
+					return A2(
+						_mdgriffith$elm_style_animation$Animation_Model$LineTo,
+						A2(setMotionTarget, _p70._0, _p74._0),
+						A2(setMotionTarget, _p70._1, _p74._1));
+				} else {
+					return cmd;
+				}
+			case 'Horizontal':
+				var _p75 = targetCmd;
+				if (_p75.ctor === 'Horizontal') {
+					return _mdgriffith$elm_style_animation$Animation_Model$Horizontal(
+						A2(setMotionTarget, _p70._0, _p75._0));
+				} else {
+					return cmd;
+				}
+			case 'HorizontalTo':
+				var _p76 = targetCmd;
+				if (_p76.ctor === 'HorizontalTo') {
+					return _mdgriffith$elm_style_animation$Animation_Model$HorizontalTo(
+						A2(setMotionTarget, _p70._0, _p76._0));
+				} else {
+					return cmd;
+				}
+			case 'Vertical':
+				var _p77 = targetCmd;
+				if (_p77.ctor === 'Vertical') {
+					return _mdgriffith$elm_style_animation$Animation_Model$Vertical(
+						A2(setMotionTarget, _p70._0, _p77._0));
+				} else {
+					return cmd;
+				}
+			case 'VerticalTo':
+				var _p78 = targetCmd;
+				if (_p78.ctor === 'VerticalTo') {
+					return _mdgriffith$elm_style_animation$Animation_Model$VerticalTo(
+						A2(setMotionTarget, _p70._0, _p78._0));
+				} else {
+					return cmd;
+				}
+			case 'Curve':
+				var _p81 = _p70._0;
+				var _p79 = targetCmd;
+				if (_p79.ctor === 'Curve') {
+					var _p80 = _p79._0;
+					return _mdgriffith$elm_style_animation$Animation_Model$Curve(
+						{
+							control1: {
+								ctor: '_Tuple2',
+								_0: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$first(_p81.control1),
+									_elm_lang$core$Tuple$first(_p80.control1)),
+								_1: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$second(_p81.control1),
+									_elm_lang$core$Tuple$second(_p80.control1))
+							},
+							control2: {
+								ctor: '_Tuple2',
+								_0: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$first(_p81.control2),
+									_elm_lang$core$Tuple$first(_p80.control2)),
+								_1: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$second(_p81.control2),
+									_elm_lang$core$Tuple$second(_p80.control2))
+							},
+							point: {
+								ctor: '_Tuple2',
+								_0: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$first(_p81.point),
+									_elm_lang$core$Tuple$first(_p80.point)),
+								_1: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$second(_p81.point),
+									_elm_lang$core$Tuple$second(_p80.point))
+							}
+						});
+				} else {
+					return cmd;
+				}
+			case 'CurveTo':
+				var _p84 = _p70._0;
+				var _p82 = targetCmd;
+				if (_p82.ctor === 'CurveTo') {
+					var _p83 = _p82._0;
+					return _mdgriffith$elm_style_animation$Animation_Model$CurveTo(
+						{
+							control1: {
+								ctor: '_Tuple2',
+								_0: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$first(_p84.control1),
+									_elm_lang$core$Tuple$first(_p83.control1)),
+								_1: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$second(_p84.control1),
+									_elm_lang$core$Tuple$second(_p83.control1))
+							},
+							control2: {
+								ctor: '_Tuple2',
+								_0: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$first(_p84.control2),
+									_elm_lang$core$Tuple$first(_p83.control2)),
+								_1: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$second(_p84.control2),
+									_elm_lang$core$Tuple$second(_p83.control2))
+							},
+							point: {
+								ctor: '_Tuple2',
+								_0: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$first(_p84.point),
+									_elm_lang$core$Tuple$first(_p83.point)),
+								_1: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$second(_p84.point),
+									_elm_lang$core$Tuple$second(_p83.point))
+							}
+						});
+				} else {
+					return cmd;
+				}
+			case 'Quadratic':
+				var _p87 = _p70._0;
+				var _p85 = targetCmd;
+				if (_p85.ctor === 'Quadratic') {
+					var _p86 = _p85._0;
+					return _mdgriffith$elm_style_animation$Animation_Model$Quadratic(
+						{
+							control: {
+								ctor: '_Tuple2',
+								_0: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$first(_p87.control),
+									_elm_lang$core$Tuple$first(_p86.control)),
+								_1: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$second(_p87.control),
+									_elm_lang$core$Tuple$second(_p86.control))
+							},
+							point: {
+								ctor: '_Tuple2',
+								_0: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$first(_p87.point),
+									_elm_lang$core$Tuple$first(_p86.point)),
+								_1: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$second(_p87.point),
+									_elm_lang$core$Tuple$second(_p86.point))
+							}
+						});
+				} else {
+					return cmd;
+				}
+			case 'QuadraticTo':
+				var _p90 = _p70._0;
+				var _p88 = targetCmd;
+				if (_p88.ctor === 'QuadraticTo') {
+					var _p89 = _p88._0;
+					return _mdgriffith$elm_style_animation$Animation_Model$QuadraticTo(
+						{
+							control: {
+								ctor: '_Tuple2',
+								_0: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$first(_p90.control),
+									_elm_lang$core$Tuple$first(_p89.control)),
+								_1: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$second(_p90.control),
+									_elm_lang$core$Tuple$second(_p89.control))
+							},
+							point: {
+								ctor: '_Tuple2',
+								_0: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$first(_p90.point),
+									_elm_lang$core$Tuple$first(_p89.point)),
+								_1: A2(
+									setMotionTarget,
+									_elm_lang$core$Tuple$second(_p90.point),
+									_elm_lang$core$Tuple$second(_p89.point))
+							}
+						});
+				} else {
+					return cmd;
+				}
+			case 'SmoothQuadratic':
+				var _p91 = targetCmd;
+				if (_p91.ctor === 'SmoothQuadratic') {
+					return _mdgriffith$elm_style_animation$Animation_Model$SmoothQuadratic(
+						A3(
+							_elm_lang$core$List$map2,
+							F2(
+								function (_p93, _p92) {
+									var _p94 = _p93;
+									var _p95 = _p92;
+									return {
+										ctor: '_Tuple2',
+										_0: A2(setMotionTarget, _p94._0, _p95._0),
+										_1: A2(setMotionTarget, _p94._1, _p95._1)
+									};
+								}),
+							_p70._0,
+							_p91._0));
+				} else {
+					return cmd;
+				}
+			case 'SmoothQuadraticTo':
+				var _p96 = targetCmd;
+				if (_p96.ctor === 'SmoothQuadraticTo') {
+					return _mdgriffith$elm_style_animation$Animation_Model$SmoothQuadraticTo(
+						A3(
+							_elm_lang$core$List$map2,
+							F2(
+								function (_p98, _p97) {
+									var _p99 = _p98;
+									var _p100 = _p97;
+									return {
+										ctor: '_Tuple2',
+										_0: A2(setMotionTarget, _p99._0, _p100._0),
+										_1: A2(setMotionTarget, _p99._1, _p100._1)
+									};
+								}),
+							_p70._0,
+							_p96._0));
+				} else {
+					return cmd;
+				}
+			case 'Smooth':
+				var _p101 = targetCmd;
+				if (_p101.ctor === 'Smooth') {
+					return _mdgriffith$elm_style_animation$Animation_Model$Smooth(
+						A3(
+							_elm_lang$core$List$map2,
+							F2(
+								function (_p103, _p102) {
+									var _p104 = _p103;
+									var _p105 = _p102;
+									return {
+										ctor: '_Tuple2',
+										_0: A2(setMotionTarget, _p104._0, _p105._0),
+										_1: A2(setMotionTarget, _p104._1, _p105._1)
+									};
+								}),
+							_p70._0,
+							_p101._0));
+				} else {
+					return cmd;
+				}
+			case 'SmoothTo':
+				var _p106 = targetCmd;
+				if (_p106.ctor === 'SmoothTo') {
+					return _mdgriffith$elm_style_animation$Animation_Model$SmoothTo(
+						A3(
+							_elm_lang$core$List$map2,
+							F2(
+								function (_p108, _p107) {
+									var _p109 = _p108;
+									var _p110 = _p107;
+									return {
+										ctor: '_Tuple2',
+										_0: A2(setMotionTarget, _p109._0, _p110._0),
+										_1: A2(setMotionTarget, _p109._1, _p110._1)
+									};
+								}),
+							_p70._0,
+							_p106._0));
+				} else {
+					return cmd;
+				}
+			case 'ClockwiseArc':
+				var _p113 = _p70._0;
+				var _p111 = targetCmd;
+				if (_p111.ctor === 'ClockwiseArc') {
+					var _p112 = _p111._0;
+					return _mdgriffith$elm_style_animation$Animation_Model$ClockwiseArc(
+						function () {
+							var endAngle = _p113.endAngle;
+							var startAngle = _p113.startAngle;
+							var radius = _p113.radius;
+							var y = _p113.y;
+							var x = _p113.x;
+							return _elm_lang$core$Native_Utils.update(
+								_p113,
+								{
+									x: A2(setMotionTarget, x, _p112.x),
+									y: A2(setMotionTarget, y, _p112.y),
+									radius: A2(setMotionTarget, radius, _p112.radius),
+									startAngle: A2(setMotionTarget, startAngle, _p112.startAngle),
+									endAngle: A2(setMotionTarget, endAngle, _p112.endAngle)
+								});
+						}());
+				} else {
+					return cmd;
+				}
+			case 'AntiClockwiseArc':
+				var _p116 = _p70._0;
+				var _p114 = targetCmd;
+				if (_p114.ctor === 'AntiClockwiseArc') {
+					var _p115 = _p114._0;
+					return _mdgriffith$elm_style_animation$Animation_Model$AntiClockwiseArc(
+						function () {
+							var endAngle = _p116.endAngle;
+							var startAngle = _p116.startAngle;
+							var radius = _p116.radius;
+							var y = _p116.y;
+							var x = _p116.x;
+							return _elm_lang$core$Native_Utils.update(
+								_p116,
+								{
+									x: A2(setMotionTarget, x, _p115.x),
+									y: A2(setMotionTarget, y, _p115.y),
+									radius: A2(setMotionTarget, radius, _p115.radius),
+									startAngle: A2(setMotionTarget, startAngle, _p115.startAngle),
+									endAngle: A2(setMotionTarget, endAngle, _p115.endAngle)
+								});
+						}());
+				} else {
+					return cmd;
+				}
+			default:
+				return _mdgriffith$elm_style_animation$Animation_Model$Close;
+		}
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$setTarget = F3(
+	function (overrideInterpolation, current, newTarget) {
+		var setMotionTarget = F2(
+			function (motion, targetMotion) {
+				var newMotion = overrideInterpolation ? _elm_lang$core$Native_Utils.update(
+					motion,
+					{
+						interpolationOverride: _elm_lang$core$Maybe$Just(targetMotion.interpolation)
+					}) : motion;
+				var _p117 = newMotion.interpolationOverride;
+				if (_p117.ctor === 'Nothing') {
+					var _p118 = newMotion.interpolation;
+					if (_p118.ctor === 'Easing') {
+						return _elm_lang$core$Native_Utils.update(
+							newMotion,
+							{
+								target: targetMotion.position,
+								interpolation: _mdgriffith$elm_style_animation$Animation_Model$Easing(
+									_elm_lang$core$Native_Utils.update(
+										_p118._0,
+										{start: motion.position, progress: 0}))
+							});
+					} else {
+						return _elm_lang$core$Native_Utils.update(
+							newMotion,
+							{target: targetMotion.position});
+					}
+				} else {
+					var _p119 = _p117._0;
+					if (_p119.ctor === 'Easing') {
+						return _elm_lang$core$Native_Utils.update(
+							newMotion,
+							{
+								target: targetMotion.position,
+								interpolationOverride: _elm_lang$core$Maybe$Just(
+									_mdgriffith$elm_style_animation$Animation_Model$Easing(
+										_elm_lang$core$Native_Utils.update(
+											_p119._0,
+											{start: motion.position, progress: 0})))
+							});
+					} else {
+						return _elm_lang$core$Native_Utils.update(
+							newMotion,
+							{target: targetMotion.position});
+					}
+				}
+			});
+		var _p120 = current;
+		switch (_p120.ctor) {
+			case 'ExactProperty':
+				return A2(_mdgriffith$elm_style_animation$Animation_Model$ExactProperty, _p120._0, _p120._1);
+			case 'ColorProperty':
+				var _p121 = newTarget;
+				if (_p121.ctor === 'ColorProperty') {
+					return A5(
+						_mdgriffith$elm_style_animation$Animation_Model$ColorProperty,
+						_p120._0,
+						A2(setMotionTarget, _p120._1, _p121._1),
+						A2(setMotionTarget, _p120._2, _p121._2),
+						A2(setMotionTarget, _p120._3, _p121._3),
+						A2(setMotionTarget, _p120._4, _p121._4));
+				} else {
+					return current;
+				}
+			case 'ShadowProperty':
+				var _p124 = _p120._2;
+				var _p122 = newTarget;
+				if (_p122.ctor === 'ShadowProperty') {
+					var _p123 = _p122._2;
+					return A3(
+						_mdgriffith$elm_style_animation$Animation_Model$ShadowProperty,
+						_p120._0,
+						_p120._1,
+						{
+							offsetX: A2(setMotionTarget, _p124.offsetX, _p123.offsetX),
+							offsetY: A2(setMotionTarget, _p124.offsetY, _p123.offsetY),
+							size: A2(setMotionTarget, _p124.size, _p123.size),
+							blur: A2(setMotionTarget, _p124.blur, _p123.blur),
+							red: A2(setMotionTarget, _p124.red, _p123.red),
+							green: A2(setMotionTarget, _p124.green, _p123.green),
+							blue: A2(setMotionTarget, _p124.blue, _p123.blue),
+							alpha: A2(setMotionTarget, _p124.alpha, _p123.alpha)
+						});
+				} else {
+					return current;
+				}
+			case 'Property':
+				var _p125 = newTarget;
+				if (_p125.ctor === 'Property') {
+					return A2(
+						_mdgriffith$elm_style_animation$Animation_Model$Property,
+						_p120._0,
+						A2(setMotionTarget, _p120._1, _p125._1));
+				} else {
+					return current;
+				}
+			case 'Property2':
+				var _p126 = newTarget;
+				if (_p126.ctor === 'Property2') {
+					return A3(
+						_mdgriffith$elm_style_animation$Animation_Model$Property2,
+						_p120._0,
+						A2(setMotionTarget, _p120._1, _p126._1),
+						A2(setMotionTarget, _p120._2, _p126._2));
+				} else {
+					return current;
+				}
+			case 'Property3':
+				var _p127 = newTarget;
+				if (_p127.ctor === 'Property3') {
+					return A4(
+						_mdgriffith$elm_style_animation$Animation_Model$Property3,
+						_p120._0,
+						A2(setMotionTarget, _p120._1, _p127._1),
+						A2(setMotionTarget, _p120._2, _p127._2),
+						A2(setMotionTarget, _p120._3, _p127._3));
+				} else {
+					return current;
+				}
+			case 'Property4':
+				var _p128 = newTarget;
+				if (_p128.ctor === 'Property4') {
+					return A5(
+						_mdgriffith$elm_style_animation$Animation_Model$Property4,
+						_p120._0,
+						A2(setMotionTarget, _p120._1, _p128._1),
+						A2(setMotionTarget, _p120._2, _p128._2),
+						A2(setMotionTarget, _p120._3, _p128._3),
+						A2(setMotionTarget, _p120._4, _p128._4));
+				} else {
+					return current;
+				}
+			case 'AngleProperty':
+				var _p129 = newTarget;
+				if (_p129.ctor === 'AngleProperty') {
+					return A2(
+						_mdgriffith$elm_style_animation$Animation_Model$AngleProperty,
+						_p120._0,
+						A2(setMotionTarget, _p120._1, _p129._1));
+				} else {
+					return current;
+				}
+			case 'Points':
+				var _p130 = newTarget;
+				if (_p130.ctor === 'Points') {
+					var _p131 = A2(_mdgriffith$elm_style_animation$Animation_Model$matchPoints, _p120._0, _p130._0);
+					var m1s = _p131._0;
+					var m2s = _p131._1;
+					return _mdgriffith$elm_style_animation$Animation_Model$Points(
+						A3(
+							_elm_lang$core$List$map2,
+							F2(
+								function (_p133, _p132) {
+									var _p134 = _p133;
+									var _p135 = _p132;
+									return {
+										ctor: '_Tuple2',
+										_0: A2(setMotionTarget, _p134._0, _p135._0),
+										_1: A2(setMotionTarget, _p134._1, _p135._1)
+									};
+								}),
+							m1s,
+							m2s));
+				} else {
+					return current;
+				}
+			default:
+				var _p136 = newTarget;
+				if (_p136.ctor === 'Path') {
+					return _mdgriffith$elm_style_animation$Animation_Model$Path(
+						A3(_elm_lang$core$List$map2, _mdgriffith$elm_style_animation$Animation_Model$setPathTarget, _p120._0, _p136._0));
+				} else {
+					return current;
+				}
+		}
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$startTowards = F3(
+	function (overrideInterpolation, current, target) {
+		return A2(
+			_elm_lang$core$List$filterMap,
+			function (propPair) {
+				var _p137 = propPair;
+				if (_p137._1.ctor === 'Just') {
+					return _elm_lang$core$Maybe$Just(
+						A3(_mdgriffith$elm_style_animation$Animation_Model$setTarget, overrideInterpolation, _p137._0, _p137._1._0));
+				} else {
+					return _elm_lang$core$Maybe$Just(_p137._0);
+				}
+			},
+			A2(_mdgriffith$elm_style_animation$Animation_Model$zipPropertiesGreedy, current, target));
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$stepPath = F2(
+	function (dt, cmd) {
+		var stepCoords = function (coords) {
+			return A2(
+				_elm_lang$core$List$map,
+				function (_p138) {
+					var _p139 = _p138;
+					return {
+						ctor: '_Tuple2',
+						_0: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p139._0),
+						_1: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p139._1)
+					};
+				},
+				coords);
+		};
+		var _p140 = cmd;
+		switch (_p140.ctor) {
+			case 'Move':
+				return A2(
+					_mdgriffith$elm_style_animation$Animation_Model$Move,
+					A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p140._0),
+					A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p140._1));
+			case 'MoveTo':
+				return A2(
+					_mdgriffith$elm_style_animation$Animation_Model$MoveTo,
+					A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p140._0),
+					A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p140._1));
+			case 'Line':
+				return A2(
+					_mdgriffith$elm_style_animation$Animation_Model$Line,
+					A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p140._0),
+					A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p140._1));
+			case 'LineTo':
+				return A2(
+					_mdgriffith$elm_style_animation$Animation_Model$LineTo,
+					A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p140._0),
+					A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p140._1));
+			case 'Horizontal':
+				return _mdgriffith$elm_style_animation$Animation_Model$Horizontal(
+					A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p140._0));
+			case 'HorizontalTo':
+				return _mdgriffith$elm_style_animation$Animation_Model$HorizontalTo(
+					A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p140._0));
+			case 'Vertical':
+				return _mdgriffith$elm_style_animation$Animation_Model$Vertical(
+					A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p140._0));
+			case 'VerticalTo':
+				return _mdgriffith$elm_style_animation$Animation_Model$VerticalTo(
+					A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p140._0));
+			case 'Curve':
+				var _p143 = _p140._0.point;
+				var _p142 = _p140._0.control2;
+				var _p141 = _p140._0.control1;
+				return _mdgriffith$elm_style_animation$Animation_Model$Curve(
+					{
+						control1: {
+							ctor: '_Tuple2',
+							_0: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$first(_p141)),
+							_1: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$second(_p141))
+						},
+						control2: {
+							ctor: '_Tuple2',
+							_0: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$first(_p142)),
+							_1: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$second(_p142))
+						},
+						point: {
+							ctor: '_Tuple2',
+							_0: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$first(_p143)),
+							_1: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$second(_p143))
+						}
+					});
+			case 'CurveTo':
+				var _p146 = _p140._0.point;
+				var _p145 = _p140._0.control2;
+				var _p144 = _p140._0.control1;
+				return _mdgriffith$elm_style_animation$Animation_Model$CurveTo(
+					{
+						control1: {
+							ctor: '_Tuple2',
+							_0: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$first(_p144)),
+							_1: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$second(_p144))
+						},
+						control2: {
+							ctor: '_Tuple2',
+							_0: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$first(_p145)),
+							_1: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$second(_p145))
+						},
+						point: {
+							ctor: '_Tuple2',
+							_0: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$first(_p146)),
+							_1: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$second(_p146))
+						}
+					});
+			case 'Quadratic':
+				var _p148 = _p140._0.point;
+				var _p147 = _p140._0.control;
+				return _mdgriffith$elm_style_animation$Animation_Model$Quadratic(
+					{
+						control: {
+							ctor: '_Tuple2',
+							_0: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$first(_p147)),
+							_1: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$second(_p147))
+						},
+						point: {
+							ctor: '_Tuple2',
+							_0: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$first(_p148)),
+							_1: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$second(_p148))
+						}
+					});
+			case 'QuadraticTo':
+				var _p150 = _p140._0.point;
+				var _p149 = _p140._0.control;
+				return _mdgriffith$elm_style_animation$Animation_Model$QuadraticTo(
+					{
+						control: {
+							ctor: '_Tuple2',
+							_0: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$first(_p149)),
+							_1: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$second(_p149))
+						},
+						point: {
+							ctor: '_Tuple2',
+							_0: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$first(_p150)),
+							_1: A2(
+								_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation,
+								dt,
+								_elm_lang$core$Tuple$second(_p150))
+						}
+					});
+			case 'SmoothQuadratic':
+				return _mdgriffith$elm_style_animation$Animation_Model$SmoothQuadratic(
+					stepCoords(_p140._0));
+			case 'SmoothQuadraticTo':
+				return _mdgriffith$elm_style_animation$Animation_Model$SmoothQuadraticTo(
+					stepCoords(_p140._0));
+			case 'Smooth':
+				return _mdgriffith$elm_style_animation$Animation_Model$Smooth(
+					stepCoords(_p140._0));
+			case 'SmoothTo':
+				return _mdgriffith$elm_style_animation$Animation_Model$SmoothTo(
+					stepCoords(_p140._0));
+			case 'ClockwiseArc':
+				var _p151 = _p140._0;
+				return _mdgriffith$elm_style_animation$Animation_Model$ClockwiseArc(
+					_elm_lang$core$Native_Utils.update(
+						_p151,
+						{
+							x: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p151.x),
+							y: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p151.y),
+							radius: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p151.radius),
+							startAngle: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p151.startAngle),
+							endAngle: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p151.endAngle)
+						}));
+			case 'AntiClockwiseArc':
+				var _p152 = _p140._0;
+				return _mdgriffith$elm_style_animation$Animation_Model$AntiClockwiseArc(
+					_elm_lang$core$Native_Utils.update(
+						_p152,
+						{
+							x: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p152.x),
+							y: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p152.y),
+							radius: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p152.radius),
+							startAngle: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p152.startAngle),
+							endAngle: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p152.endAngle)
+						}));
+			default:
+				return _mdgriffith$elm_style_animation$Animation_Model$Close;
+		}
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$step = F2(
+	function (dt, props) {
+		var stepProp = function (property) {
+			var _p153 = property;
+			switch (_p153.ctor) {
+				case 'ExactProperty':
+					return A2(_mdgriffith$elm_style_animation$Animation_Model$ExactProperty, _p153._0, _p153._1);
+				case 'Property':
+					return A2(
+						_mdgriffith$elm_style_animation$Animation_Model$Property,
+						_p153._0,
+						A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p153._1));
+				case 'Property2':
+					return A3(
+						_mdgriffith$elm_style_animation$Animation_Model$Property2,
+						_p153._0,
+						A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p153._1),
+						A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p153._2));
+				case 'Property3':
+					return A4(
+						_mdgriffith$elm_style_animation$Animation_Model$Property3,
+						_p153._0,
+						A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p153._1),
+						A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p153._2),
+						A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p153._3));
+				case 'Property4':
+					return A5(
+						_mdgriffith$elm_style_animation$Animation_Model$Property4,
+						_p153._0,
+						A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p153._1),
+						A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p153._2),
+						A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p153._3),
+						A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p153._4));
+				case 'AngleProperty':
+					return A2(
+						_mdgriffith$elm_style_animation$Animation_Model$AngleProperty,
+						_p153._0,
+						A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p153._1));
+				case 'ColorProperty':
+					return A5(
+						_mdgriffith$elm_style_animation$Animation_Model$ColorProperty,
+						_p153._0,
+						A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p153._1),
+						A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p153._2),
+						A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p153._3),
+						A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p153._4));
+				case 'ShadowProperty':
+					var _p154 = _p153._2;
+					return A3(
+						_mdgriffith$elm_style_animation$Animation_Model$ShadowProperty,
+						_p153._0,
+						_p153._1,
+						{
+							offsetX: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p154.offsetX),
+							offsetY: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p154.offsetY),
+							size: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p154.size),
+							blur: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p154.blur),
+							red: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p154.red),
+							green: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p154.green),
+							blue: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p154.blue),
+							alpha: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p154.alpha)
+						});
+				case 'Points':
+					return _mdgriffith$elm_style_animation$Animation_Model$Points(
+						A2(
+							_elm_lang$core$List$map,
+							function (_p155) {
+								var _p156 = _p155;
+								return {
+									ctor: '_Tuple2',
+									_0: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p156._0),
+									_1: A2(_mdgriffith$elm_style_animation$Animation_Model$stepInterpolation, dt, _p156._1)
+								};
+							},
+							_p153._0));
+				default:
+					return _mdgriffith$elm_style_animation$Animation_Model$Path(
+						A2(
+							_elm_lang$core$List$map,
+							_mdgriffith$elm_style_animation$Animation_Model$stepPath(dt),
+							_p153._0));
+			}
+		};
+		return A2(_elm_lang$core$List$map, stepProp, props);
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$alreadyThere = F2(
+	function (current, target) {
+		return A2(
+			_elm_lang$core$List$all,
+			_mdgriffith$elm_style_animation$Animation_Model$isDone,
+			A2(
+				_mdgriffith$elm_style_animation$Animation_Model$step,
+				0,
+				A3(_mdgriffith$elm_style_animation$Animation_Model$startTowards, false, current, target)));
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$resolveSteps = F3(
+	function (currentStyle, steps, dt) {
+		resolveSteps:
+		while (true) {
+			var _p157 = _elm_lang$core$List$head(steps);
+			if (_p157.ctor === 'Nothing') {
+				return {
+					ctor: '_Tuple3',
+					_0: currentStyle,
+					_1: {ctor: '[]'},
+					_2: {ctor: '[]'}
+				};
+			} else {
+				var _p158 = _p157._0;
+				switch (_p158.ctor) {
+					case 'Wait':
+						var _p159 = _p158._0;
+						if (_elm_lang$core$Native_Utils.cmp(_p159, 0) < 1) {
+							var _v70 = currentStyle,
+								_v71 = A2(_elm_lang$core$List$drop, 1, steps),
+								_v72 = dt;
+							currentStyle = _v70;
+							steps = _v71;
+							dt = _v72;
+							continue resolveSteps;
+						} else {
+							return {
+								ctor: '_Tuple3',
+								_0: currentStyle,
+								_1: {ctor: '[]'},
+								_2: {
+									ctor: '::',
+									_0: _mdgriffith$elm_style_animation$Animation_Model$Wait(_p159 - dt),
+									_1: A2(_elm_lang$core$List$drop, 1, steps)
+								}
+							};
+						}
+					case 'Send':
+						var _p160 = A3(
+							_mdgriffith$elm_style_animation$Animation_Model$resolveSteps,
+							currentStyle,
+							A2(_elm_lang$core$List$drop, 1, steps),
+							dt);
+						var newStyle = _p160._0;
+						var msgs = _p160._1;
+						var remainingSteps = _p160._2;
+						return {
+							ctor: '_Tuple3',
+							_0: newStyle,
+							_1: {ctor: '::', _0: _p158._0, _1: msgs},
+							_2: remainingSteps
+						};
+					case 'To':
+						var _p161 = _p158._0;
+						if (A2(_mdgriffith$elm_style_animation$Animation_Model$alreadyThere, currentStyle, _p161)) {
+							return {
+								ctor: '_Tuple3',
+								_0: currentStyle,
+								_1: {ctor: '[]'},
+								_2: A2(_elm_lang$core$List$drop, 1, steps)
+							};
+						} else {
+							var _v73 = A3(_mdgriffith$elm_style_animation$Animation_Model$startTowards, false, currentStyle, _p161),
+								_v74 = {
+								ctor: '::',
+								_0: _mdgriffith$elm_style_animation$Animation_Model$Step,
+								_1: A2(_elm_lang$core$List$drop, 1, steps)
+							},
+								_v75 = dt;
+							currentStyle = _v73;
+							steps = _v74;
+							dt = _v75;
+							continue resolveSteps;
+						}
+					case 'ToWith':
+						var _p162 = _p158._0;
+						if (A2(_mdgriffith$elm_style_animation$Animation_Model$alreadyThere, currentStyle, _p162)) {
+							return {
+								ctor: '_Tuple3',
+								_0: currentStyle,
+								_1: {ctor: '[]'},
+								_2: A2(_elm_lang$core$List$drop, 1, steps)
+							};
+						} else {
+							var _v76 = A3(_mdgriffith$elm_style_animation$Animation_Model$startTowards, true, currentStyle, _p162),
+								_v77 = {
+								ctor: '::',
+								_0: _mdgriffith$elm_style_animation$Animation_Model$Step,
+								_1: A2(_elm_lang$core$List$drop, 1, steps)
+							},
+								_v78 = dt;
+							currentStyle = _v76;
+							steps = _v77;
+							dt = _v78;
+							continue resolveSteps;
+						}
+					case 'Set':
+						var _v79 = A2(_mdgriffith$elm_style_animation$Animation_Model$replaceProps, currentStyle, _p158._0),
+							_v80 = A2(_elm_lang$core$List$drop, 1, steps),
+							_v81 = dt;
+						currentStyle = _v79;
+						steps = _v80;
+						dt = _v81;
+						continue resolveSteps;
+					case 'Step':
+						var stepped = A2(_mdgriffith$elm_style_animation$Animation_Model$step, dt, currentStyle);
+						return A2(_elm_lang$core$List$all, _mdgriffith$elm_style_animation$Animation_Model$isDone, stepped) ? {
+							ctor: '_Tuple3',
+							_0: A2(
+								_elm_lang$core$List$map,
+								_mdgriffith$elm_style_animation$Animation_Model$mapToMotion(
+									function (m) {
+										return _elm_lang$core$Native_Utils.update(
+											m,
+											{interpolationOverride: _elm_lang$core$Maybe$Nothing});
+									}),
+								stepped),
+							_1: {ctor: '[]'},
+							_2: A2(_elm_lang$core$List$drop, 1, steps)
+						} : {
+							ctor: '_Tuple3',
+							_0: stepped,
+							_1: {ctor: '[]'},
+							_2: steps
+						};
+					case 'Loop':
+						var _p163 = _p158._0;
+						var _v82 = currentStyle,
+							_v83 = A2(
+							_elm_lang$core$Basics_ops['++'],
+							_p163,
+							{
+								ctor: '::',
+								_0: _mdgriffith$elm_style_animation$Animation_Model$Loop(_p163),
+								_1: {ctor: '[]'}
+							}),
+							_v84 = dt;
+						currentStyle = _v82;
+						steps = _v83;
+						dt = _v84;
+						continue resolveSteps;
+					default:
+						var _p165 = _p158._1;
+						var _p164 = _p158._0;
+						if (_elm_lang$core$Native_Utils.cmp(_p164, 0) < 1) {
+							var _v85 = currentStyle,
+								_v86 = A2(_elm_lang$core$List$drop, 1, steps),
+								_v87 = dt;
+							currentStyle = _v85;
+							steps = _v86;
+							dt = _v87;
+							continue resolveSteps;
+						} else {
+							var _v88 = currentStyle,
+								_v89 = A2(
+								_elm_lang$core$Basics_ops['++'],
+								_p165,
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									{
+										ctor: '::',
+										_0: A2(_mdgriffith$elm_style_animation$Animation_Model$Repeat, _p164 - 1, _p165),
+										_1: {ctor: '[]'}
+									},
+									A2(_elm_lang$core$List$drop, 1, steps))),
+								_v90 = dt;
+							currentStyle = _v88;
+							steps = _v89;
+							dt = _v90;
+							continue resolveSteps;
+						}
+				}
+			}
+		}
+	});
+var _mdgriffith$elm_style_animation$Animation_Model$updateAnimation = F2(
+	function (_p167, _p166) {
+		var _p168 = _p167;
+		var _p169 = _p166;
+		var _p178 = _p169._0;
+		var timing = A2(_mdgriffith$elm_style_animation$Animation_Model$refreshTiming, _p168._0, _p178.timing);
+		var _p170 = A2(
+			_elm_lang$core$List$partition,
+			function (_p171) {
+				var _p172 = _p171;
+				return _elm_lang$core$Native_Utils.cmp(_p172._0, 0) < 1;
+			},
+			A2(
+				_elm_lang$core$List$map,
+				function (_p173) {
+					var _p174 = _p173;
+					return {ctor: '_Tuple2', _0: _p174._0 - timing.dt, _1: _p174._1};
+				},
+				_p178.interruption));
+		var readyInterruption = _p170._0;
+		var queuedInterruptions = _p170._1;
+		var _p175 = function () {
+			var _p176 = _elm_lang$core$List$head(readyInterruption);
+			if (_p176.ctor === 'Just') {
+				return {
+					ctor: '_Tuple2',
+					_0: _p176._0._1,
+					_1: A2(
+						_elm_lang$core$List$map,
+						_mdgriffith$elm_style_animation$Animation_Model$mapToMotion(
+							function (m) {
+								return _elm_lang$core$Native_Utils.update(
+									m,
+									{interpolationOverride: _elm_lang$core$Maybe$Nothing});
+							}),
+						_p178.style)
+				};
+			} else {
+				return {ctor: '_Tuple2', _0: _p178.steps, _1: _p178.style};
+			}
+		}();
+		var steps = _p175._0;
+		var style = _p175._1;
+		var _p177 = A3(_mdgriffith$elm_style_animation$Animation_Model$resolveSteps, style, steps, timing.dt);
+		var revisedStyle = _p177._0;
+		var sentMessages = _p177._1;
+		var revisedSteps = _p177._2;
+		return {
+			ctor: '_Tuple2',
+			_0: _mdgriffith$elm_style_animation$Animation_Model$Animation(
+				_elm_lang$core$Native_Utils.update(
+					_p178,
+					{
+						timing: timing,
+						interruption: queuedInterruptions,
+						running: (!_elm_lang$core$Native_Utils.eq(
+							_elm_lang$core$List$length(revisedSteps),
+							0)) || (!_elm_lang$core$Native_Utils.eq(
+							_elm_lang$core$List$length(queuedInterruptions),
+							0)),
+						steps: revisedSteps,
+						style: revisedStyle
+					})),
+			_1: _elm_lang$core$Platform_Cmd$batch(
+				A2(
+					_elm_lang$core$List$map,
+					function (m) {
+						return A2(
+							_elm_lang$core$Task$perform,
+							_elm_lang$core$Basics$identity,
+							_elm_lang$core$Task$succeed(m));
+					},
+					sentMessages))
+		};
+	});

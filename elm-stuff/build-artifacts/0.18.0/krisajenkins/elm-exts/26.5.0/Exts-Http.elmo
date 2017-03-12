@@ -1,0 +1,22 @@
+var _krisajenkins$elm_exts$Exts_Http$cgiParameter = function (_p0) {
+	var _p1 = _p0;
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		_elm_lang$http$Http$encodeUri(_p1._0),
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			'=',
+			_elm_lang$http$Http$encodeUri(_p1._1)));
+};
+var _krisajenkins$elm_exts$Exts_Http$cgiParameters = function (_p2) {
+	return A2(
+		_elm_lang$core$String$join,
+		'&',
+		A2(_elm_lang$core$List$map, _krisajenkins$elm_exts$Exts_Http$cgiParameter, _p2));
+};
+var _krisajenkins$elm_exts$Exts_Http$formBody = function (_p3) {
+	return A2(
+		_elm_lang$http$Http$stringBody,
+		'application/x-www-form-urlencoded',
+		_krisajenkins$elm_exts$Exts_Http$cgiParameters(_p3));
+};

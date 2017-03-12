@@ -1,0 +1,7 @@
+var _mdgriffith$elm_style_animation$Animation_Messenger$send = function (msg) {
+	return _mdgriffith$elm_style_animation$Animation_Model$Send(msg);
+};
+var _mdgriffith$elm_style_animation$Animation_Messenger$update = F2(
+	function (tick, animation) {
+		return A2(_mdgriffith$elm_style_animation$Animation_Model$updateAnimation, tick, animation);
+	});
