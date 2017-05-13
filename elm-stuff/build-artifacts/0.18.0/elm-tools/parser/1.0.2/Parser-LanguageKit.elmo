@@ -1,0 +1,447 @@
+var _elm_tools$parser$Parser_LanguageKit$isChar = function ($char) {
+	return true;
+};
+var _elm_tools$parser$Parser_LanguageKit$isTab = function ($char) {
+	return _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('\t'));
+};
+var _elm_tools$parser$Parser_LanguageKit$isSpace = function ($char) {
+	return _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr(' ')) || (_elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('\n')) || _elm_lang$core$Native_Utils.eq(
+		$char,
+		_elm_lang$core$Native_Utils.chr('\r')));
+};
+var _elm_tools$parser$Parser_LanguageKit$chompSpaces = _elm_tools$parser$Parser$ignoreWhile(_elm_tools$parser$Parser_LanguageKit$isSpace);
+var _elm_tools$parser$Parser_LanguageKit$revAlways = F2(
+	function (_p0, keep) {
+		return keep;
+	});
+var _elm_tools$parser$Parser_LanguageKit$ignore = F2(
+	function (ignoreParser, keepParser) {
+		return A3(_elm_tools$parser$Parser$map2, _elm_tools$parser$Parser_LanguageKit$revAlways, ignoreParser, keepParser);
+	});
+var _elm_tools$parser$Parser_LanguageKit_ops = _elm_tools$parser$Parser_LanguageKit_ops || {};
+_elm_tools$parser$Parser_LanguageKit_ops['|-'] = _elm_tools$parser$Parser_LanguageKit$ignore;
+var _elm_tools$parser$Parser_LanguageKit$sequenceEndMandatory = F5(
+	function (end, spaces, parseItem, sep, revItems) {
+		var chompRest = function (item) {
+			return A5(
+				_elm_tools$parser$Parser_LanguageKit$sequenceEndMandatory,
+				end,
+				spaces,
+				parseItem,
+				sep,
+				{ctor: '::', _0: item, _1: revItems});
+		};
+		return _elm_tools$parser$Parser$oneOf(
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_tools$parser$Parser$andThen,
+					chompRest,
+					A2(
+						_elm_tools$parser$Parser_ops['|.'],
+						A2(
+							_elm_tools$parser$Parser_ops['|.'],
+							A2(_elm_tools$parser$Parser_ops['|.'], parseItem, spaces),
+							_elm_tools$parser$Parser$symbol(sep)),
+						spaces)),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+						_elm_tools$parser$Parser$symbol(end),
+						_elm_tools$parser$Parser$succeed(
+							_elm_lang$core$List$reverse(revItems))),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _elm_tools$parser$Parser_LanguageKit$sequenceEndForbidden = F5(
+	function (end, spaces, parseItem, sep, revItems) {
+		var chompRest = function (item) {
+			return A5(
+				_elm_tools$parser$Parser_LanguageKit$sequenceEndForbidden,
+				end,
+				spaces,
+				parseItem,
+				sep,
+				{ctor: '::', _0: item, _1: revItems});
+		};
+		return A2(
+			_elm_tools$parser$Parser_LanguageKit$ignore,
+			spaces,
+			_elm_tools$parser$Parser$oneOf(
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+						A2(
+							_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+							_elm_tools$parser$Parser$symbol(sep),
+							spaces),
+						A2(_elm_tools$parser$Parser$andThen, chompRest, parseItem)),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+							_elm_tools$parser$Parser$symbol(end),
+							_elm_tools$parser$Parser$succeed(
+								_elm_lang$core$List$reverse(revItems))),
+						_1: {ctor: '[]'}
+					}
+				}));
+	});
+var _elm_tools$parser$Parser_LanguageKit$sequenceEndOptional = F5(
+	function (end, spaces, parseItem, sep, revItems) {
+		var chompRest = function (item) {
+			return A5(
+				_elm_tools$parser$Parser_LanguageKit$sequenceEndOptional,
+				end,
+				spaces,
+				parseItem,
+				sep,
+				{ctor: '::', _0: item, _1: revItems});
+		};
+		var parseEnd = A2(
+			_elm_tools$parser$Parser$andThen,
+			function (_p1) {
+				return _elm_tools$parser$Parser$succeed(
+					_elm_lang$core$List$reverse(revItems));
+			},
+			_elm_tools$parser$Parser$symbol(end));
+		return A2(
+			_elm_tools$parser$Parser_LanguageKit$ignore,
+			spaces,
+			_elm_tools$parser$Parser$oneOf(
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+						A2(
+							_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+							_elm_tools$parser$Parser$symbol(sep),
+							spaces),
+						_elm_tools$parser$Parser$oneOf(
+							{
+								ctor: '::',
+								_0: A2(_elm_tools$parser$Parser$andThen, chompRest, parseItem),
+								_1: {
+									ctor: '::',
+									_0: parseEnd,
+									_1: {ctor: '[]'}
+								}
+							})),
+					_1: {
+						ctor: '::',
+						_0: parseEnd,
+						_1: {ctor: '[]'}
+					}
+				}));
+	});
+var _elm_tools$parser$Parser_LanguageKit$sequenceEnd = F5(
+	function (end, spaces, parseItem, sep, trailing) {
+		var chompRest = function (item) {
+			var _p2 = trailing;
+			switch (_p2.ctor) {
+				case 'Forbidden':
+					return A5(
+						_elm_tools$parser$Parser_LanguageKit$sequenceEndForbidden,
+						end,
+						spaces,
+						parseItem,
+						sep,
+						{
+							ctor: '::',
+							_0: item,
+							_1: {ctor: '[]'}
+						});
+				case 'Optional':
+					return A5(
+						_elm_tools$parser$Parser_LanguageKit$sequenceEndOptional,
+						end,
+						spaces,
+						parseItem,
+						sep,
+						{
+							ctor: '::',
+							_0: item,
+							_1: {ctor: '[]'}
+						});
+				default:
+					return A2(
+						_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+						A2(
+							_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+							A2(
+								_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+								spaces,
+								_elm_tools$parser$Parser$symbol(sep)),
+							spaces),
+						A5(
+							_elm_tools$parser$Parser_LanguageKit$sequenceEndMandatory,
+							end,
+							spaces,
+							parseItem,
+							sep,
+							{
+								ctor: '::',
+								_0: item,
+								_1: {ctor: '[]'}
+							}));
+			}
+		};
+		return _elm_tools$parser$Parser$oneOf(
+			{
+				ctor: '::',
+				_0: A2(_elm_tools$parser$Parser$andThen, chompRest, parseItem),
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+						_elm_tools$parser$Parser$symbol(end),
+						_elm_tools$parser$Parser$succeed(
+							{ctor: '[]'})),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _elm_tools$parser$Parser_LanguageKit$whitespaceHelp = function (parser) {
+	return A2(
+		_elm_tools$parser$Parser_LanguageKit$ignore,
+		_elm_tools$parser$Parser_LanguageKit$chompSpaces,
+		_elm_tools$parser$Parser$oneOf(
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_tools$parser$Parser$andThen,
+					function (_p3) {
+						return _elm_tools$parser$Parser_LanguageKit$whitespaceHelp(parser);
+					},
+					parser),
+				_1: {
+					ctor: '::',
+					_0: _elm_tools$parser$Parser$succeed(
+						{ctor: '_Tuple0'}),
+					_1: {ctor: '[]'}
+				}
+			}));
+};
+var _elm_tools$parser$Parser_LanguageKit$nestableCommentHelp = F4(
+	function (isNotRelevant, start, end, nestLevel) {
+		return _elm_tools$parser$Parser$lazy(
+			function (_p4) {
+				return A2(
+					_elm_tools$parser$Parser_LanguageKit$ignore,
+					_elm_tools$parser$Parser$ignoreWhile(isNotRelevant),
+					_elm_tools$parser$Parser$oneOf(
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_tools$parser$Parser_LanguageKit$ignore,
+								_elm_tools$parser$Parser$symbol(end),
+								_elm_lang$core$Native_Utils.eq(nestLevel, 1) ? _elm_tools$parser$Parser$succeed(
+									{ctor: '_Tuple0'}) : A4(_elm_tools$parser$Parser_LanguageKit$nestableCommentHelp, isNotRelevant, start, end, nestLevel - 1)),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_tools$parser$Parser_LanguageKit$ignore,
+									_elm_tools$parser$Parser$symbol(start),
+									A4(_elm_tools$parser$Parser_LanguageKit$nestableCommentHelp, isNotRelevant, start, end, nestLevel + 1)),
+								_1: {
+									ctor: '::',
+									_0: A2(
+										_elm_tools$parser$Parser_LanguageKit$ignore,
+										A2(_elm_tools$parser$Parser$ignore, 1, _elm_tools$parser$Parser_LanguageKit$isChar),
+										A4(_elm_tools$parser$Parser_LanguageKit$nestableCommentHelp, isNotRelevant, start, end, nestLevel)),
+									_1: {ctor: '[]'}
+								}
+							}
+						}));
+			});
+	});
+var _elm_tools$parser$Parser_LanguageKit$nestableComment = F2(
+	function (start, end) {
+		var _p5 = {
+			ctor: '_Tuple2',
+			_0: _elm_lang$core$String$uncons(start),
+			_1: _elm_lang$core$String$uncons(end)
+		};
+		if (_p5._0.ctor === 'Nothing') {
+			return _elm_tools$parser$Parser$fail('Trying to parse a multi-line comment, but the start token cannot be the empty string!');
+		} else {
+			if (_p5._1.ctor === 'Nothing') {
+				return _elm_tools$parser$Parser$fail('Trying to parse a multi-line comment, but the end token cannot be the empty string!');
+			} else {
+				var isNotRelevant = function ($char) {
+					return (!_elm_lang$core$Native_Utils.eq($char, _p5._0._0._0)) && (!_elm_lang$core$Native_Utils.eq($char, _p5._1._0._0));
+				};
+				return A2(
+					_elm_tools$parser$Parser_ops['|.'],
+					_elm_tools$parser$Parser$symbol(start),
+					A4(_elm_tools$parser$Parser_LanguageKit$nestableCommentHelp, isNotRelevant, start, end, 1));
+			}
+		}
+	});
+var _elm_tools$parser$Parser_LanguageKit$whitespace = function (_p6) {
+	var _p7 = _p6;
+	var multiParser = function () {
+		var _p8 = _p7.multiComment;
+		switch (_p8.ctor) {
+			case 'NoMultiComment':
+				return {ctor: '[]'};
+			case 'UnnestableComment':
+				return {
+					ctor: '::',
+					_0: A2(
+						_elm_tools$parser$Parser_ops['|.'],
+						_elm_tools$parser$Parser$symbol(_p8._0),
+						_elm_tools$parser$Parser$ignoreUntilAfter(_p8._1)),
+					_1: {ctor: '[]'}
+				};
+			default:
+				return {
+					ctor: '::',
+					_0: A2(_elm_tools$parser$Parser_LanguageKit$nestableComment, _p8._0, _p8._1),
+					_1: {ctor: '[]'}
+				};
+		}
+	}();
+	var lineParser = function () {
+		var _p9 = _p7.lineComment;
+		if (_p9.ctor === 'NoLineComment') {
+			return {ctor: '[]'};
+		} else {
+			return {
+				ctor: '::',
+				_0: A2(
+					_elm_tools$parser$Parser_ops['|.'],
+					_elm_tools$parser$Parser$symbol(_p9._0),
+					_elm_tools$parser$Parser$ignoreUntilAfter('\n')),
+				_1: {ctor: '[]'}
+			};
+		}
+	}();
+	var tabParser = _p7.allowTabs ? {
+		ctor: '::',
+		_0: _elm_tools$parser$Parser$ignoreWhile(_elm_tools$parser$Parser_LanguageKit$isTab),
+		_1: {ctor: '[]'}
+	} : {ctor: '[]'};
+	return _elm_tools$parser$Parser_LanguageKit$whitespaceHelp(
+		_elm_tools$parser$Parser$oneOf(
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				tabParser,
+				A2(_elm_lang$core$Basics_ops['++'], lineParser, multiParser))));
+};
+var _elm_tools$parser$Parser_LanguageKit$sequence = function (_p10) {
+	var _p11 = _p10;
+	var _p12 = _p11.spaces;
+	return A2(
+		_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+		A2(
+			_elm_tools$parser$Parser_LanguageKit_ops['|-'],
+			_elm_tools$parser$Parser$symbol(_p11.start),
+			_p12),
+		A5(_elm_tools$parser$Parser_LanguageKit$sequenceEnd, _p11.end, _p12, _p11.item, _p11.separator, _p11.trailing));
+};
+var _elm_tools$parser$Parser_LanguageKit$varHelp = F7(
+	function (isGood, offset, row, col, source, indent, context) {
+		varHelp:
+		while (true) {
+			var newOffset = A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, isGood, offset, source);
+			if (_elm_lang$core$Native_Utils.eq(newOffset, -1)) {
+				return {source: source, offset: offset, indent: indent, context: context, row: row, col: col};
+			} else {
+				if (_elm_lang$core$Native_Utils.eq(newOffset, -2)) {
+					var _v6 = isGood,
+						_v7 = offset + 1,
+						_v8 = row + 1,
+						_v9 = 1,
+						_v10 = source,
+						_v11 = indent,
+						_v12 = context;
+					isGood = _v6;
+					offset = _v7;
+					row = _v8;
+					col = _v9;
+					source = _v10;
+					indent = _v11;
+					context = _v12;
+					continue varHelp;
+				} else {
+					var _v13 = isGood,
+						_v14 = newOffset,
+						_v15 = row,
+						_v16 = col + 1,
+						_v17 = source,
+						_v18 = indent,
+						_v19 = context;
+					isGood = _v13;
+					offset = _v14;
+					row = _v15;
+					col = _v16;
+					source = _v17;
+					indent = _v18;
+					context = _v19;
+					continue varHelp;
+				}
+			}
+		}
+	});
+var _elm_tools$parser$Parser_LanguageKit$variable = F3(
+	function (isFirst, isOther, keywords) {
+		return _elm_tools$parser$Parser_Internal$Parser(
+			function (_p13) {
+				var _p14 = _p13;
+				var _p20 = _p14;
+				var _p19 = _p14.source;
+				var _p18 = _p14.row;
+				var _p17 = _p14.offset;
+				var _p16 = _p14.indent;
+				var _p15 = _p14.context;
+				var firstOffset = A3(_elm_tools$parser_primitives$ParserPrimitives$isSubChar, isFirst, _p17, _p19);
+				if (_elm_lang$core$Native_Utils.eq(firstOffset, -1)) {
+					return A2(_elm_tools$parser$Parser_Internal$Bad, _elm_tools$parser$Parser$ExpectingVariable, _p20);
+				} else {
+					var state2 = _elm_lang$core$Native_Utils.eq(firstOffset, -2) ? A7(_elm_tools$parser$Parser_LanguageKit$varHelp, isOther, _p17 + 1, _p18 + 1, 1, _p19, _p16, _p15) : A7(_elm_tools$parser$Parser_LanguageKit$varHelp, isOther, firstOffset, _p18, _p14.col + 1, _p19, _p16, _p15);
+					var name = A3(_elm_lang$core$String$slice, _p17, state2.offset, _p19);
+					return A2(_elm_lang$core$Set$member, name, keywords) ? A2(_elm_tools$parser$Parser_Internal$Bad, _elm_tools$parser$Parser$ExpectingVariable, _p20) : A2(_elm_tools$parser$Parser_Internal$Good, name, state2);
+				}
+			});
+	});
+var _elm_tools$parser$Parser_LanguageKit$Mandatory = {ctor: 'Mandatory'};
+var _elm_tools$parser$Parser_LanguageKit$Optional = {ctor: 'Optional'};
+var _elm_tools$parser$Parser_LanguageKit$Forbidden = {ctor: 'Forbidden'};
+var _elm_tools$parser$Parser_LanguageKit$list = F2(
+	function (spaces, item) {
+		return _elm_tools$parser$Parser_LanguageKit$sequence(
+			{start: '[', separator: ',', end: ']', spaces: spaces, item: item, trailing: _elm_tools$parser$Parser_LanguageKit$Forbidden});
+	});
+var _elm_tools$parser$Parser_LanguageKit$record = F2(
+	function (spaces, item) {
+		return _elm_tools$parser$Parser_LanguageKit$sequence(
+			{start: '{', separator: ',', end: '}', spaces: spaces, item: item, trailing: _elm_tools$parser$Parser_LanguageKit$Forbidden});
+	});
+var _elm_tools$parser$Parser_LanguageKit$tuple = F2(
+	function (spaces, item) {
+		return _elm_tools$parser$Parser_LanguageKit$sequence(
+			{start: '(', separator: ',', end: ')', spaces: spaces, item: item, trailing: _elm_tools$parser$Parser_LanguageKit$Forbidden});
+	});
+var _elm_tools$parser$Parser_LanguageKit$LineComment = function (a) {
+	return {ctor: 'LineComment', _0: a};
+};
+var _elm_tools$parser$Parser_LanguageKit$NoLineComment = {ctor: 'NoLineComment'};
+var _elm_tools$parser$Parser_LanguageKit$UnnestableComment = F2(
+	function (a, b) {
+		return {ctor: 'UnnestableComment', _0: a, _1: b};
+	});
+var _elm_tools$parser$Parser_LanguageKit$NestableComment = F2(
+	function (a, b) {
+		return {ctor: 'NestableComment', _0: a, _1: b};
+	});
+var _elm_tools$parser$Parser_LanguageKit$NoMultiComment = {ctor: 'NoMultiComment'};

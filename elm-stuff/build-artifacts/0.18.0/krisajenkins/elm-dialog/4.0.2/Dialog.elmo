@@ -1,0 +1,217 @@
+var _krisajenkins$elm_dialog$Dialog$map = F2(
+	function (f, config) {
+		return {
+			closeMessage: A2(_elm_lang$core$Maybe$map, f, config.closeMessage),
+			containerClass: config.containerClass,
+			header: A2(
+				_elm_lang$core$Maybe$map,
+				_elm_lang$html$Html$map(f),
+				config.header),
+			body: A2(
+				_elm_lang$core$Maybe$map,
+				_elm_lang$html$Html$map(f),
+				config.body),
+			footer: A2(
+				_elm_lang$core$Maybe$map,
+				_elm_lang$html$Html$map(f),
+				config.footer)
+		};
+	});
+var _krisajenkins$elm_dialog$Dialog$mapMaybe = function (_p0) {
+	return _elm_lang$core$Maybe$map(
+		_krisajenkins$elm_dialog$Dialog$map(_p0));
+};
+var _krisajenkins$elm_dialog$Dialog$backdrop = function (config) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$classList(
+				{
+					ctor: '::',
+					_0: {
+						ctor: '_Tuple2',
+						_0: 'modal-backdrop in',
+						_1: _krisajenkins$elm_exts$Exts_Maybe$isJust(config)
+					},
+					_1: {ctor: '[]'}
+				}),
+			_1: {ctor: '[]'}
+		},
+		{ctor: '[]'});
+};
+var _krisajenkins$elm_dialog$Dialog$wrapFooter = function (footer) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('modal-footer'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: footer,
+			_1: {ctor: '[]'}
+		});
+};
+var _krisajenkins$elm_dialog$Dialog$wrapBody = function (body) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('modal-body'),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: body,
+			_1: {ctor: '[]'}
+		});
+};
+var _krisajenkins$elm_dialog$Dialog$closeButton = function (closeMessage) {
+	return A2(
+		_elm_lang$html$Html$button,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$class('close'),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$html$Html_Events$onClick(closeMessage),
+				_1: {ctor: '[]'}
+			}
+		},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html$text('x'),
+			_1: {ctor: '[]'}
+		});
+};
+var _krisajenkins$elm_dialog$Dialog$wrapHeader = F2(
+	function (closeMessage, header) {
+		return (_elm_lang$core$Native_Utils.eq(closeMessage, _elm_lang$core$Maybe$Nothing) && _elm_lang$core$Native_Utils.eq(header, _elm_lang$core$Maybe$Nothing)) ? _krisajenkins$elm_exts$Exts_Html_Bootstrap$empty : A2(
+			_elm_lang$html$Html$div,
+			{
+				ctor: '::',
+				_0: _elm_lang$html$Html_Attributes$class('modal-header'),
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A3(_krisajenkins$elm_exts$Exts_Maybe$maybe, _krisajenkins$elm_exts$Exts_Html_Bootstrap$empty, _krisajenkins$elm_dialog$Dialog$closeButton, closeMessage),
+				_1: {
+					ctor: '::',
+					_0: A2(_elm_lang$core$Maybe$withDefault, _krisajenkins$elm_exts$Exts_Html_Bootstrap$empty, header),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
+var _krisajenkins$elm_dialog$Dialog$view = function (maybeConfig) {
+	var displayed = _krisajenkins$elm_exts$Exts_Maybe$isJust(maybeConfig);
+	return A2(
+		_elm_lang$html$Html$div,
+		function () {
+			var _p1 = A2(
+				_elm_lang$core$Maybe$andThen,
+				function (_) {
+					return _.containerClass;
+				},
+				maybeConfig);
+			if (_p1.ctor === 'Nothing') {
+				return {ctor: '[]'};
+			} else {
+				return {
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$class(_p1._0),
+					_1: {ctor: '[]'}
+				};
+			}
+		}(),
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$classList(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'modal', _1: true},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'in', _1: displayed},
+								_1: {ctor: '[]'}
+							}
+						}),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$style(
+							{
+								ctor: '::',
+								_0: {
+									ctor: '_Tuple2',
+									_0: 'display',
+									_1: displayed ? 'block' : 'none'
+								},
+								_1: {ctor: '[]'}
+							}),
+						_1: {ctor: '[]'}
+					}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$class('modal-dialog'),
+							_1: {ctor: '[]'}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$class('modal-content'),
+									_1: {ctor: '[]'}
+								},
+								function () {
+									var _p2 = maybeConfig;
+									if (_p2.ctor === 'Nothing') {
+										return {
+											ctor: '::',
+											_0: _krisajenkins$elm_exts$Exts_Html_Bootstrap$empty,
+											_1: {ctor: '[]'}
+										};
+									} else {
+										var _p3 = _p2._0;
+										return {
+											ctor: '::',
+											_0: A2(_krisajenkins$elm_dialog$Dialog$wrapHeader, _p3.closeMessage, _p3.header),
+											_1: {
+												ctor: '::',
+												_0: A3(_krisajenkins$elm_exts$Exts_Maybe$maybe, _krisajenkins$elm_exts$Exts_Html_Bootstrap$empty, _krisajenkins$elm_dialog$Dialog$wrapBody, _p3.body),
+												_1: {
+													ctor: '::',
+													_0: A3(_krisajenkins$elm_exts$Exts_Maybe$maybe, _krisajenkins$elm_exts$Exts_Html_Bootstrap$empty, _krisajenkins$elm_dialog$Dialog$wrapFooter, _p3.footer),
+													_1: {ctor: '[]'}
+												}
+											}
+										};
+									}
+								}()),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}),
+			_1: {
+				ctor: '::',
+				_0: _krisajenkins$elm_dialog$Dialog$backdrop(maybeConfig),
+				_1: {ctor: '[]'}
+			}
+		});
+};
+var _krisajenkins$elm_dialog$Dialog$Config = F5(
+	function (a, b, c, d, e) {
+		return {closeMessage: a, containerClass: b, header: c, body: d, footer: e};
+	});

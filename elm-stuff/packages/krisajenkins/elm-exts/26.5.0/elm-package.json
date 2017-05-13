@@ -1,0 +1,44 @@
+{
+    "version": "26.5.0",
+    "summary": "A collection of functions missing from the core.",
+    "repository": "https://github.com/krisajenkins/elm-exts.git",
+    "license": "MIT",
+    "source-directories": [
+        "src"
+    ],
+    "exposed-modules": [
+        "Exts.Array",
+        "Exts.Basics",
+        "Exts.Date",
+        "Exts.Delta",
+        "Exts.Dict",
+        "Exts.Float",
+        "Exts.Function",
+        "Exts.Html.Attributes",
+        "Exts.Html.Bootstrap.Glyphicons",
+        "Exts.Html.Bootstrap",
+        "Exts.Html.Events",
+        "Exts.Html.Table",
+        "Exts.Html",
+        "Exts.Http",
+        "Exts.Int",
+        "Exts.Json.Decode",
+        "Exts.Json.Encode",
+        "Exts.LatLng",
+        "Exts.List",
+        "Exts.Maybe",
+        "Exts.Result",
+        "Exts.Set",
+        "Exts.String",
+        "Exts.Task",
+        "Exts.Tuple",
+        "Exts.Validation"
+    ],
+    "dependencies": {
+        "elm-lang/core": "5.0.0 <= v < 6.0.0",
+        "elm-lang/html": "2.0.0 <= v < 3.0.0",
+        "elm-lang/http": "1.0.0 <= v < 2.0.0",
+        "elm-lang/trampoline": "1.0.1 <= v < 2.0.0"
+    },
+    "elm-version": "0.18.0 <= v < 0.19.0"
+}

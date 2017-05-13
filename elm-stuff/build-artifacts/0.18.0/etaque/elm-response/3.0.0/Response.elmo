@@ -1,0 +1,36 @@
+var _etaque$elm_response$Response$res = F2(
+	function (model, cmd) {
+		return {ctor: '_Tuple2', _0: model, _1: cmd};
+	});
+var _etaque$elm_response$Response$taskRes = F3(
+	function (model, handleResult, task) {
+		return A2(
+			_etaque$elm_response$Response$res,
+			model,
+			A2(_elm_lang$core$Task$attempt, handleResult, task));
+	});
+var _etaque$elm_response$Response$withTask = F3(
+	function (handleResult, task, model) {
+		return A3(_etaque$elm_response$Response$taskRes, model, handleResult, task);
+	});
+var _etaque$elm_response$Response$withCmd = F2(
+	function (cmd, model) {
+		return A2(_etaque$elm_response$Response$res, model, cmd);
+	});
+var _etaque$elm_response$Response$withNone = function (model) {
+	return A2(_etaque$elm_response$Response$res, model, _elm_lang$core$Platform_Cmd$none);
+};
+var _etaque$elm_response$Response$mapBoth = F3(
+	function (onModel, onCmd, _p0) {
+		var _p1 = _p0;
+		return A2(
+			_etaque$elm_response$Response$res,
+			onModel(_p1._0),
+			A2(_elm_lang$core$Platform_Cmd$map, onCmd, _p1._1));
+	});
+var _etaque$elm_response$Response$mapModel = function (onModel) {
+	return A2(_etaque$elm_response$Response$mapBoth, onModel, _elm_lang$core$Basics$identity);
+};
+var _etaque$elm_response$Response$mapCmd = function (onCmd) {
+	return A2(_etaque$elm_response$Response$mapBoth, _elm_lang$core$Basics$identity, onCmd);
+};
