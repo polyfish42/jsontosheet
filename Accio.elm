@@ -2,16 +2,16 @@ port module Accio exposing (..)
 
 import Animation exposing (px)
 import Array
-import Dialog
 import Debug
+import Dialog
 import Dict
 import GoogleSheet
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Http exposing (..)
-import Json.Encode as E exposing (..)
 import Json.Decode as D exposing (..)
+import Json.Encode as E exposing (..)
 import Maybe exposing (..)
 import Navigation
 import OAuth
@@ -55,7 +55,7 @@ type Input
 
 init : Navigation.Location -> ( Model, Cmd Msg )
 init location =
-    ( Model (OAuth.parseState location |> decodeState) "" Nothing "" False (Animation.style [ Animation.opacity 1.0 ]), Cmd.batch [ (Navigation.modifyUrl "#"), (OAuth.parseToken location |> saveToken) ] )
+    ( Model (OAuth.parseState location |> decodeState) "" Nothing "" False (Animation.style [ Animation.opacity 1.0 ]), Cmd.batch [ Navigation.modifyUrl "#", OAuth.parseToken location |> saveToken ] )
 
 
 decodeState : Maybe String -> Maybe Input
@@ -255,13 +255,13 @@ setExpiration : String -> Cmd Msg
 setExpiration response =
     case D.decodeString (D.maybe (D.field "expires_in" D.string)) response of
         Ok (Just expiration) ->
-            delay (Time.second * (Result.withDefault 0 (String.toFloat expiration))) <| TokenValue Nothing
+            delay (Time.second * Result.withDefault 0 (String.toFloat expiration)) <| TokenValue Nothing
 
         Ok Nothing ->
-            setAndGetToken (Nothing)
+            setAndGetToken Nothing
 
         Err _ ->
-            setAndGetToken (Nothing)
+            setAndGetToken Nothing
 
 
 delay : Time -> msg -> Cmd msg
@@ -284,9 +284,9 @@ port setAndGetTokenResponse : (Maybe String -> msg) -> Sub msg
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ (setAndGetTokenResponse TokenValue)
-        , (getTokenResponse TokenValue)
-        , (Animation.subscription Animate [ model.style ])
+        [ setAndGetTokenResponse TokenValue
+        , getTokenResponse TokenValue
+        , Animation.subscription Animate [ model.style ]
         ]
 
 
@@ -310,7 +310,7 @@ view model =
                      else
                         Nothing
                     )
-                , footer [ style [ ( "margin-top", "80px" ) ] ] [ text "For feedback, please ", a [ href "https://github.com/polyfish42/accio/issues" ] [ text "open an issue on Github. " ], text "Created by ", a [ href "https://twitter.com/polyfish42" ] [ text " @polyfish42" ] ]
+                , footer [ style [ ( "margin-top", "80px" ) ] ] [ text "For feedback, please ", a [ href "https://github.com/polyfish42/accio/issues" ] [ text "open an issue on Github. " ], text "Created by ", a [ href "https://twitter.com/polyfish42" ] [ text " @polyfish42" ], text " ", a [ href "/privacy.html" ] [ text "Privacy Policy" ] ]
                 ]
             ]
         ]
@@ -418,7 +418,7 @@ dialogConfig model =
 getJson : String -> Cmd Msg
 getJson url =
     Http.send FetchJson <|
-        Http.getString (url)
+        Http.getString url
 
 
 requestCsv : Maybe String -> Model -> E.Value -> Cmd Msg
